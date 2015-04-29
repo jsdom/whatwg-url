@@ -9,10 +9,11 @@
   },
   "devDependencies": {
     "jscs": "^1.13.0",
-    "jshint": "^2.7.0"
+    "jshint": "^2.7.0",
+    "mocha": "^2.2.4"
   },
   "scripts": {
-    "lint": "jscs lib/ && jshint lib/",
-    "test":  "npm run lint"
+    "lint": "jscs lib/ test/ && jshint lib/ test/",
+    "test": "npm run lint && mocha"
   }
 }

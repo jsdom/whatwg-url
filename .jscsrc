@@ -23,5 +23,9 @@
   "requireSemicolons": true,
   "validateLineBreaks": "LF",
   "validateParameterSeparator": ", ",
-  "requireBlocksOnNewline": 1
+  "requireBlocksOnNewline": 1,
+
+  "excludeFiles": [
+    "test/web-platform-tests/**"
+  ]
 }
