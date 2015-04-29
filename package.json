@@ -6,5 +6,13 @@
   "author": {
     "name": "Sebastian Mayr",
     "email": "Sebastian Mayr <github@smayr.name>"
+  },
+  "devDependencies": {
+    "jscs": "^1.13.0",
+    "jshint": "^2.7.0"
+  },
+  "scripts": {
+    "lint": "jscs lib/ && jshint lib/",
+    "test":  "npm run lint"
   }
 }
