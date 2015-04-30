@@ -1,3 +1,6 @@
 # node specific
 node_modules/
 npm-debug.log
+
+# project specific
+test/web-platform-tests/
