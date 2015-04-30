@@ -14,7 +14,7 @@
     "request": "^2.55.0"
   },
   "scripts": {
-    "lint": "jscs lib/ test/ && jshint lib/ test/",
+    "lint": "jscs lib/ test/ scripts/ && jshint lib/ test/ scripts/",
     "pretest": "iojs scripts/get-latest-platform-tests.js",
     "test": "npm run lint && mocha"
   }
