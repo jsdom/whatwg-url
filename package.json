@@ -10,10 +10,12 @@
   "devDependencies": {
     "jscs": "^1.13.0",
     "jshint": "^2.7.0",
-    "mocha": "^2.2.4"
+    "mocha": "^2.2.4",
+    "request": "^2.55.0"
   },
   "scripts": {
     "lint": "jscs lib/ test/ && jshint lib/ test/",
+    "pretest": "iojs scripts/get-latest-platform-tests.js",
     "test": "npm run lint && mocha"
   }
 }
