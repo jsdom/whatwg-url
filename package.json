@@ -2,7 +2,7 @@
   "name": "whatwg-url",
   "version": "0.0.1",
   "description": "An implementation of the WHATWG URL algorithm",
-  "main": "app.js",
+  "main": "lib/url.js",
   "author": {
     "name": "Sebastian Mayr",
     "email": "Sebastian Mayr <github@smayr.name>"
