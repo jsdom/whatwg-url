@@ -4,7 +4,7 @@
 
 const assert = require("assert");
 const fs = require("fs");
-const URL = require("../lib/url").URL;
+const URL = require("../lib/url").getURL(function () { return ""; });
 const uRLTestParser = require("./web-platform-tests/urltestparser");
 
 const testCases = fs.readFileSync(__dirname + "/web-platform-tests/urltestdata.txt", { encoding: "utf-8" });
@@ -26,12 +26,12 @@ function testURL(expected) {
       assert.fail(url.href, "", "Expected URL to fail parsing, got " + url.href);
     }
 
-    /*assert.equal(url.protocol, expected.protocol, "scheme");
+    assert.equal(url.protocol, expected.protocol, "scheme");
     assert.equal(url.hostname, expected.host, "host");
     assert.equal(url.port, expected.port, "port");
     assert.equal(url.pathname, expected.path, "path");
     assert.equal(url.search, expected.search, "search");
-    assert.equal(url.hash, expected.hash, "hash");*/
+    assert.equal(url.hash, expected.hash, "hash");
     assert.equal(url.href, expected.href, "href");
   };
 }
