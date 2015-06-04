@@ -1,5 +1,9 @@
 "use strict";
 
+if (process.env.NO_UPDATE) {
+  process.exit(0);
+}
+
 const path = require("path");
 const fs = require("fs");
 const request = require("request");
