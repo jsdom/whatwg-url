@@ -1,0 +1,7 @@
+.gitattributes
+.jshint*
+.jscsrc
+.travis.yml
+
+scripts/
+test/
