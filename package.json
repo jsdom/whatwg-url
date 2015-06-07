@@ -7,6 +7,9 @@
     "name": "Sebastian Mayr",
     "email": "Sebastian Mayr <github@smayr.name>"
   },
+  "dependencies": {
+    "tr46": "~0.0.1"
+  },
   "devDependencies": {
     "jscs": "^1.13.0",
     "jshint": "^2.7.0",
