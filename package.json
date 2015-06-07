@@ -11,12 +11,14 @@
     "tr46": "~0.0.1"
   },
   "devDependencies": {
+    "istanbul": "~0.3.14",
     "jscs": "^1.13.0",
     "jshint": "^2.7.0",
     "mocha": "^2.2.4",
     "request": "^2.55.0"
   },
   "scripts": {
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha",
     "lint": "jscs lib/ test/ scripts/ && jshint lib/ test/ scripts/",
     "pretest": "iojs scripts/get-latest-platform-tests.js",
     "test": "npm run lint && mocha"

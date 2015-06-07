@@ -3,4 +3,5 @@ node_modules/
 npm-debug.log
 
 # project specific
+coverage/
 test/web-platform-tests/
