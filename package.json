@@ -8,7 +8,6 @@
     "email": "Sebastian Mayr <github@smayr.name>"
   },
   "dependencies": {
-    "guid": "0.0.12",
     "tr46": "~0.0.1"
   },
   "devDependencies": {
