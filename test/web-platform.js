@@ -5,10 +5,11 @@
 const assert = require("assert");
 const fs = require("fs");
 const URL = require("../lib/url").getURL(function () { return ""; });
-const uRLTestParser = require("./web-platform-tests/urltestparser");
+const urlTestParser = require("./web-platform-tests/urltestparser");
 
-const testCases = fs.readFileSync(__dirname + "/web-platform-tests/urltestdata.txt", { encoding: "utf-8" });
-const urlTests = uRLTestParser(testCases);
+const testCases = fs.readFileSync(__dirname + "/web-platform-tests/urltestdata.txt", { encoding: "utf-8" }) + "\n" +
+                  fs.readFileSync(__dirname + "/additional-tests.txt", { encoding: "utf-8" });
+const urlTests = urlTestParser(testCases);
 
 function testURL(expected) {
   return function () {

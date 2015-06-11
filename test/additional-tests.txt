@@ -1,0 +1,1 @@
+http://test:a{b@localhost  s:http u:test pass:a%7Bb h:localhost p:/
