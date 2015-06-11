@@ -1,1 +1,2 @@
-http://test:a{b@localhost  s:http u:test pass:a%7Bb h:localhost p:/
+http://test:a{b@localhost http://example.org/ s:http u:test pass:a%7Bb h:localhost p:/
+http://localhost?query=a`b  s:http h:localhost p:/ q:?query=a`b
