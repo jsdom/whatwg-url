@@ -3,10 +3,9 @@
   "version": "0.2.1",
   "description": "An implementation of the WHATWG URL algorithm",
   "main": "lib/url.js",
-  "author": {
-    "name": "Sebastian Mayr",
-    "email": "Sebastian Mayr <github@smayr.name>"
-  },
+  "author": "Sebastian Mayr <github@smayr.name>",
+  "license": "MIT",
+  "repository": "jsdom/whatwg-url",
   "dependencies": {
     "tr46": "~0.0.1"
   },
