@@ -28,7 +28,8 @@ function testURL(expected) {
     }
 
     assert.equal(url.protocol, expected.protocol, "scheme");
-    assert.equal(url.hostname, expected.host, "host");
+    assert.equal(url.hostname, expected.hostname, "hostname");
+    assert.equal(url.host, expected.host, "host");
     assert.equal(url.port, expected.port, "port");
     assert.equal(url.pathname, expected.path, "path");
     assert.equal(url.search, expected.search, "search");
