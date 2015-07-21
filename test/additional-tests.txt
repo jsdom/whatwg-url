@@ -1,2 +1,1 @@
-http://test:a{b@localhost http://example.org/ s:http u:test pass:a%7Bb h:localhost p:/
-http://localhost?query=a`b  s:http h:localhost p:/ q:?query=a`b
+http://127.0.0.1:10100/relative_import.html  s:http h:127.0.0.1 port:10100 p:/relative_import.html
