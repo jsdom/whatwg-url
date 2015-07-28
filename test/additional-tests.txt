@@ -1,1 +1,5 @@
 http://127.0.0.1:10100/relative_import.html  s:http h:127.0.0.1 port:10100 p:/relative_import.html
+file:///C:/foo/index.html  s:file p:/C:/foo/index.html
+file:///etc/hosts  s:file p:/etc/hosts
+/foo/bar file:///etc/hosts s:file p:/foo/bar
+/foo/bar file:/path/to/docroot/index.html s:file p:/foo/bar
