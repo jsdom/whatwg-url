@@ -4,7 +4,7 @@
 
 const assert = require("assert");
 const fs = require("fs");
-const URL = require("../lib/url").getURL(function () { return ""; });
+const URL = require("../lib/url").createURLConstructor();
 const urlTestParser = require("./web-platform-tests/urltestparser");
 
 const testCases = fs.readFileSync(__dirname + "/web-platform-tests/urltestdata.txt", { encoding: "utf-8" }) + "\n" +
