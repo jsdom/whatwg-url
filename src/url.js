@@ -103,49 +103,28 @@ function utf8PercentEncode(c) {
   return str;
 }
 
-function simpleEncode(c) {
-  const c_str = String.fromCodePoint(c);
-
-  if (c < 0x20 || c > 0x7E) {
-    return utf8PercentEncode(c_str);
-  } else {
-    return c_str;
-  }
+function isSimpleEncode(c) {
+  return c < 0x20 || c > 0x7E;
 }
 
-function defaultEncode(c) {
-  const c_str = String.fromCodePoint(c);
-  if (c <= 0x20 || c >= 0x7E || c_str === "\"" || c_str === "#" ||
-    c_str === "<" || c_str === ">" || c_str === "?" || c_str === "`" ||
-    c_str === "{" || c_str === "}") {
-    return utf8PercentEncode(c_str);
-  } else {
-    return c_str;
-  }
+const defaultEncodeSet = [p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")];
+function isDefaultEncode(c) {
+  return isSimpleEncode(c) || defaultEncodeSet.indexOf(c) !== -1;
 }
 
-function passwordEncode(c) {
-  const c_str = String.fromCodePoint(c);
-  if (c <= 0x20 || c >= 0x7E || c_str === "\"" || c_str === "#" ||
-    c_str === "<" || c_str === ">" || c_str === "?" || c_str === "`" ||
-    c_str === "{" || c_str === "}" ||
-    c_str === "/" || c_str === "@" || c === p("\\")) {
-    return utf8PercentEncode(c_str);
-  } else {
-    return c_str;
-  }
+const userInfoEncodeSet = [p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")];
+function isUserInfoEncode(c) {
+  return isDefaultEncode(c) || userInfoEncodeSet.indexOf(c) !== -1;
 }
 
-function usernameEncode(c) {
+function encodeChar(c, checkCb) {
   const c_str = String.fromCodePoint(c);
-  if (c <= 0x20 || c >= 0x7E || c_str === "\"" || c_str === "#" ||
-    c_str === "<" || c_str === ">" || c_str === "?" || c_str === "`" ||
-    c_str === "{" || c_str === "}" ||
-    c_str === "/" || c_str === "@" || c === p("\\") || c_str === ":") {
+
+  if (checkCb(c)) {
     return utf8PercentEncode(c_str);
-  } else {
-    return c_str;
   }
+
+  return c_str;
 }
 
 function parseIPv4Number(input) {
@@ -714,9 +693,9 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
         continue;
       }
       if (this.url.password !== null) {
-        this.url.password += passwordEncode(c);
+        this.url.password += encodeChar(c, isUserInfoEncode);
       } else {
-        this.url.username += usernameEncode(c);
+        this.url.username += encodeChar(c, isUserInfoEncode);
       }
     }
     this.buffer = "";
@@ -935,7 +914,7 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
       this.parse_error = true;
     }
 
-    this.buffer += defaultEncode(c);
+    this.buffer += encodeChar(c, isDefaultEncode);
   }
 };
 
@@ -960,7 +939,7 @@ URLStateMachine.prototype["parse" + STATES.NON_RELATIVE_PATH] =
     }
 
     if (!isNaN(c) && c !== 0x9 && c !== 0xA && c !== 0xD) {
-      this.url.path[0] = this.url.path[0] + simpleEncode(c);
+      this.url.path[0] = this.url.path[0] + encodeChar(c, isSimpleEncode);
     }
   }
 };
@@ -1201,7 +1180,7 @@ const URLUtils = {
     this[urlSymbol].url.username = "";
     const decoded = punycode.ucs2.decode(val);
     for (let i = 0; i < decoded.length; ++i) {
-      this[urlSymbol].url.username += usernameEncode(decoded[i]);
+      this[urlSymbol].url.username += encodeChar(decoded[i], isUserInfoEncode);
     }
     preUpdateSteps(this);
   },
@@ -1217,7 +1196,7 @@ const URLUtils = {
     this[urlSymbol].url.password = "";
     const decoded = punycode.ucs2.decode(val);
     for (let i = 0; i < decoded.length; ++i) {
-      this[urlSymbol].url.password += passwordEncode(decoded[i]);
+      this[urlSymbol].url.password += encodeChar(decoded[i], isUserInfoEncode);
     }
     preUpdateSteps(this);
   },
