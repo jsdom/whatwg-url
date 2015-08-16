@@ -5,6 +5,10 @@ const tr46 = require("tr46");
 
 /*jshint unused: false */
 
+function p(char) {
+  return char.codePointAt(0);
+}
+
 const specialSchemas = {
   "ftp": "21",
   "file": null,
@@ -123,7 +127,7 @@ function passwordEncode(c) {
   if (c <= 0x20 || c >= 0x7E || c_str === "\"" || c_str === "#" ||
     c_str === "<" || c_str === ">" || c_str === "?" || c_str === "`" ||
     c_str === "{" || c_str === "}" ||
-    c_str === "/" || c_str === "@" || c_str === "\\") {
+    c_str === "/" || c_str === "@" || c === p("\\")) {
     return utf8PercentEncode(c_str);
   } else {
     return c_str;
@@ -135,7 +139,7 @@ function usernameEncode(c) {
   if (c <= 0x20 || c >= 0x7E || c_str === "\"" || c_str === "#" ||
     c_str === "<" || c_str === ">" || c_str === "?" || c_str === "`" ||
     c_str === "{" || c_str === "}" ||
-    c_str === "/" || c_str === "@" || c_str === "\\" || c_str === ":") {
+    c_str === "/" || c_str === "@" || c === p("\\") || c_str === ":") {
     return utf8PercentEncode(c_str);
   } else {
     return c_str;
@@ -228,8 +232,8 @@ function parseIPv6(input) {
 
   input = punycode.ucs2.decode(input);
 
-  if (at(input, pointer) === ":") {
-    if (at(input, pointer + 1) !== ":") {
+  if (input[pointer] === p(":")) {
+    if (input[pointer + 1] !== p(":")) {
       throw new TypeError("Invalid Host");
     }
 
@@ -245,7 +249,7 @@ function parseIPv6(input) {
       throw new TypeError("Invalid Host");
     }
 
-    if (at(input, pointer) === ":") {
+    if (input[pointer] === p(":")) {
       if (compressPtr !== null) {
         throw new TypeError("Invalid Host");
       }
@@ -314,7 +318,7 @@ function parseIPv6(input) {
         }
       }
 
-      if (dotsSeen < 3 && at(input, pointer) !== ".") {
+      if (dotsSeen < 3 && input[pointer] !== p(".")) {
         throw new TypeError("Invalid Host");
       }
       ip[piecePtr] = ip[piecePtr] * 0x100 + value;
@@ -516,9 +520,9 @@ URLStateMachine.prototype["parse" + STATES.SCHEME_START] =
 
 URLStateMachine.prototype["parse" + STATES.SCHEME] =
     function parseScheme(c, c_str) {
-  if (isASCIIAlpha(c) || c_str === "+" || c_str === "-" || c_str === ".") {
+  if (isASCIIAlpha(c) || c === p("+") || c === p("-") || c === p(".")) {
     this.buffer += c_str.toLowerCase();
-  } else if (c_str === ":") {
+  } else if (c === p(":")) {
     if (this.state_override) {
       // TODO: XOR
       if (specialSchemas[this.url.scheme] !== undefined && !specialSchemas[this.buffer]) {
@@ -539,7 +543,7 @@ URLStateMachine.prototype["parse" + STATES.SCHEME] =
       this.state = STATES.SPECIAL_RELATIVE_OR_AUTHORITY;
     } else if (specialSchemas[this.url.scheme] !== undefined) {
       this.state = STATES.SPECIAL_AUTHORITY_SLASHES;
-    } else if (at(this.input, this.pointer + 1) === "/") {
+    } else if (this.input[this.pointer + 1] === p("/")) {
       this.state = STATES.PATH_OR_AUTHORITY;
       ++this.pointer;
     } else {
@@ -560,9 +564,9 @@ URLStateMachine.prototype["parse" + STATES.SCHEME] =
 URLStateMachine.prototype["parse" + STATES.NO_SCHEME] =
     function parseNoScheme(c, c_str) {
   //jshint unused:false
-  if (this.base === null || (this.base.nonRelative && c_str !== "#")) {
+  if (this.base === null || (this.base.nonRelative && c !== p("#"))) {
     throw new TypeError("Invalid URL");
-  } else if (this.base.nonRelative && c_str === "#") {
+  } else if (this.base.nonRelative && c === p("#")) {
     this.url.scheme = this.base.scheme;
     this.url.path = this.base.path.slice();
     this.url.query = this.base.query;
@@ -577,7 +581,7 @@ URLStateMachine.prototype["parse" + STATES.NO_SCHEME] =
 
 URLStateMachine.prototype["parse" + STATES.SPECIAL_RELATIVE_OR_AUTHORITY] =
     function parseSpecialRelativeOrAuthority(c, c_str) {
-  if (c_str === "/" && at(this.input, this.pointer + 1) === "/") {
+  if (c === p("/") && this.input[this.pointer + 1] === p("/")) {
     this.state = STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES;
     ++this.pointer;
   } else {
@@ -589,7 +593,7 @@ URLStateMachine.prototype["parse" + STATES.SPECIAL_RELATIVE_OR_AUTHORITY] =
 
 URLStateMachine.prototype["parse" + STATES.PATH_OR_AUTHORITY] =
     function parsePathOrAuthority(c, c_str) {
-  if (c_str === "/") {
+  if (c === p("/")) {
     this.state = STATES.AUTHORITY;
   } else {
     this.state = STATES.PATH;
@@ -609,9 +613,9 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.port = this.base.port;
     this.url.path = this.base.path.slice();
     this.url.query = this.base.query;
-  } else if (c_str === "/") {
+  } else if (c === p("/")) {
     this.state = STATES.RELATIVE_SLASH;
-  } else if (c_str === "?") {
+  } else if (c === p("?")) {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
     this.url.host = this.base.host;
@@ -619,7 +623,7 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.path = this.base.path.slice();
     this.url.query = "";
     this.state = STATES.QUERY;
-  } else if (c_str === "#") {
+  } else if (c === p("#")) {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
     this.url.host = this.base.host;
@@ -628,7 +632,7 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.query = this.base.query;
     this.url.fragment = "";
     this.state = STATES.FRAGMENT;
-  } else if (specialSchemas[this.url.scheme] !== undefined && c_str === "\\") {
+  } else if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
     this.parse_error = true;
     this.state = STATES.RELATIVE_SLASH;
   } else {
@@ -651,8 +655,8 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
 
 URLStateMachine.prototype["parse" + STATES.RELATIVE_SLASH] =
     function parseRelativeSlash(c, c_str) {
-  if (c_str === "/" || (specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
-    if (c_str === "\\") {
+  if (c === p("/") || (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+    if (c === p("\\")) {
       this.parse_error = true;
     }
     if (this.url.scheme === "file") {
@@ -674,7 +678,7 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE_SLASH] =
 
 URLStateMachine.prototype["parse" + STATES.SPECIAL_AUTHORITY_SLASHES] =
     function parseSpecialAuthoritySlashes(c, c_str) {
-  if (c_str === "/" && at(this.input, this.pointer + 1) === "/") {
+  if (c === p("/") && this.input[this.pointer + 1] === p("/")) {
     this.state = STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES;
     ++this.pointer;
   } else {
@@ -686,7 +690,7 @@ URLStateMachine.prototype["parse" + STATES.SPECIAL_AUTHORITY_SLASHES] =
 
 URLStateMachine.prototype["parse" + STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES] =
     function parseSpecialAuthorityIgnoreSlashes(c, c_str) {
-  if (c_str !== "/" && c_str !== "\\") {
+  if (c !== p("/") && c !== p("\\")) {
     this.state = STATES.AUTHORITY;
     --this.pointer;
   } else {
@@ -696,7 +700,7 @@ URLStateMachine.prototype["parse" + STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES] =
 
 URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
     function parseAuthority(c, c_str) {
-  if (c_str === "@") {
+  if (c === p("@")) {
     this.parse_error = true;
     if (this.at_flag) {
       this.buffer = "%40" + this.buffer;
@@ -715,7 +719,7 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
         continue;
       }
 
-      if (c_str === ":" && this.url.password === null) {
+      if (c === p(":") && this.url.password === null) {
         this.url.password = "";
         continue;
       }
@@ -726,8 +730,8 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
       }
     }
     this.buffer = "";
-  } else if (isNaN(c) || c_str === "/" || c_str === "?" || c_str === "#" ||
-             (specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
+  } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
+             (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     this.pointer -= countSymbols(this.buffer) + 1;
     this.buffer = "";
     this.state = STATES.HOST;
@@ -739,7 +743,7 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
 URLStateMachine.prototype["parse" + STATES.HOST_NAME] =
 URLStateMachine.prototype["parse" + STATES.HOST] =
     function parseHostName(c, c_str) {
-  if (c_str === ":" && !this.arr_flag) {
+  if (c === p(":") && !this.arr_flag) {
     if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
       throw new TypeError("Invalid URL");
     }
@@ -751,8 +755,8 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
     if (this.state_override === STATES.HOST_NAME) {
       return false;
     }
-  } else if (isNaN(c) || c_str === "/" || c_str === "?" || c_str === "#" ||
-             (specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
+  } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
+             (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     --this.pointer;
     if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
       throw new TypeError("Invalid URL");
@@ -768,9 +772,9 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
     this.parse_error = true;
   } else {
-    if (c_str === "[") {
+    if (c === p("[")) {
       this.arr_flag = true;
-    } else if (c_str === "]") {
+    } else if (c === p("]")) {
       this.arr_flag = false;
     }
     this.buffer += c_str;
@@ -779,7 +783,7 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
 
 URLStateMachine.prototype["parse" + STATES.FILE_HOST] =
     function parseFileHost(c, c_str) {
-  if (isNaN(c) || c_str === "/" || c_str === "\\" || c_str === "?" || c_str === "#") {
+  if (isNaN(c) || c === p("/") || c === p("\\") || c === p("?") || c === p("#")) {
     --this.pointer;
     // don't need to count symbols here since we check ASCII values
     if (this.buffer.length === 2 &&
@@ -804,8 +808,8 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
     function parsePort(c, c_str) {
   if (isASCIIDigit(c)) {
     this.buffer += c_str;
-  } else if (isNaN(c) || c_str === "/" || c_str === "?" || c_str === "#" ||
-             (specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
+  } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
+             (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     while (this.buffer[0] === "0" && this.buffer.length > 1) {
       this.buffer = this.buffer.substr(1);
     }
@@ -829,31 +833,31 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
 
 URLStateMachine.prototype["parse" + STATES.PATH_START] =
     function parsePathStart(c, c_str) {
-  if (specialSchemas[this.url.scheme] !== undefined && c_str === "\\") {
+  if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
     this.parse_error = true;
   }
   this.state = STATES.PATH;
-  if (c_str !== "/" && !(specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
+  if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     --this.pointer;
   }
 };
 
 URLStateMachine.prototype["parse" + STATES.PATH] =
     function parsePath(c, c_str) {
-  if (isNaN(c) || c_str === "/" || (specialSchemas[this.url.scheme] !== undefined && c_str === "\\") ||
-      (!this.state_override && (c_str === "?" || c_str === "#"))) {
-    if (specialSchemas[this.url.scheme] !== undefined && c_str === "\\") {
+  if (isNaN(c) || c === p("/") || (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) ||
+      (!this.state_override && (c === p("?") || c === p("#")))) {
+    if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
       this.parse_error = true;
     }
 
     this.buffer = bufferReplacement[this.buffer.toLowerCase()] || this.buffer;
     if (this.buffer === "..") {
       this.url.path.pop();
-      if (c_str !== "/" && !(specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
+      if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
         this.url.path.push("");
       }
-    } else if (this.buffer === "." && c_str !== "/" &&
-               !(specialSchemas[this.url.scheme] !== undefined && c_str === "\\")) {
+    } else if (this.buffer === "." && c !== p("/") &&
+               !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
       this.url.path.push("");
     } else if (this.buffer !== ".") {
       if (this.url.scheme === "file" && this.url.path.length === 0 &&
@@ -863,11 +867,11 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
       this.url.path.push(this.buffer);
     }
     this.buffer = "";
-    if (c_str === "?") {
+    if (c === p("?")) {
       this.url.query = "";
       this.state = STATES.QUERY;
     }
-    if (c_str === "#") {
+    if (c === p("#")) {
       this.url.fragment = "";
       this.state = STATES.FRAGMENT;
     }
@@ -875,7 +879,7 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
     this.parse_error = true;
   } else {
     //TODO:If c is not a URL code point and not "%", parse error.
-    if (c_str === "%" &&
+    if (c === p("%") &&
       (!isASCIIHex(this.input[this.pointer + 1]) ||
         !isASCIIHex(this.input[this.pointer + 2]))) {
       this.parse_error = true;
@@ -887,19 +891,19 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
 
 URLStateMachine.prototype["parse" + STATES.NON_RELATIVE_PATH] =
     function parseNonRelativePath(c, c_str) {
-  if (c_str === "?") {
+  if (c === p("?")) {
     this.url.query = "";
     this.state = STATES.QUERY;
-  } else if (c_str === "#") {
+  } else if (c === p("#")) {
     this.url.fragment = "";
     this.state = STATES.FRAGMENT;
   } else {
     // TODO: Add: not a URL code point
-    if (!isNaN(c) && c_str !== "%") {
+    if (!isNaN(c) && c !== p("%")) {
       this.parse_error = true;
     }
 
-    if (c_str === "%" &&
+    if (c === p("%") &&
         (!isASCIIHex(this.input[this.pointer + 1]) ||
          !isASCIIHex(this.input[this.pointer + 2]))) {
       this.parse_error = true;
@@ -913,7 +917,7 @@ URLStateMachine.prototype["parse" + STATES.NON_RELATIVE_PATH] =
 
 URLStateMachine.prototype["parse" + STATES.QUERY] =
     function parseQuery(c, c_str) {
-  if (isNaN(c) || (!this.state_override && c_str === "#")) {
+  if (isNaN(c) || (!this.state_override && c === p("#"))) {
     if (specialSchemas[this.url.scheme] === undefined || this.url.scheme === "ws" || this.url.scheme === "wss") {
       this.encoding_override = "utf-8";
     }
@@ -929,7 +933,7 @@ URLStateMachine.prototype["parse" + STATES.QUERY] =
     }
 
     this.buffer = "";
-    if (c_str === "#") {
+    if (c === p("#")) {
       this.url.fragment = "";
       this.state = STATES.FRAGMENT;
     }
@@ -937,7 +941,7 @@ URLStateMachine.prototype["parse" + STATES.QUERY] =
     this.parse_error = true;
   } else {
     //TODO: If c is not a URL code point and not "%", parse error.
-    if (c_str === "%" &&
+    if (c === p("%") &&
       (!isASCIIHex(this.input[this.pointer + 1]) ||
         !isASCIIHex(this.input[this.pointer + 2]))) {
       this.parse_error = true;
@@ -954,7 +958,7 @@ URLStateMachine.prototype["parse" + STATES.FRAGMENT] =
     this.parse_error = true;
   } else {
     //TODO: If c is not a URL code point and not "%", parse error.
-    if (c_str === "%" &&
+    if (c === p("%") &&
       (!isASCIIHex(this.input[this.pointer + 1]) ||
         !isASCIIHex(this.input[this.pointer + 2]))) {
       this.parse_error = true;
