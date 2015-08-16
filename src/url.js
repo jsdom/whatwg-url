@@ -1018,13 +1018,11 @@ function serializeOrigin(tuple) {
 
 function mixin(src, target) {
   const props = Object.getOwnPropertyNames(src);
-  const descriptors = {};
 
   for (let i = 0; i < props.length; ++i) {
-    descriptors[props[i]] = Object.getOwnPropertyDescriptor(src, props[i]);
+    const descriptor = Object.getOwnPropertyDescriptor(src, props[i]);
+    Object.defineProperty(target, props[i], descriptor);
   }
-
-  Object.defineProperties(target, descriptors);
 
   const symbols = Object.getOwnPropertySymbols(src);
   for (var i = 0; i < symbols.length; ++i) {
