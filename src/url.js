@@ -712,7 +712,6 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
     for (let pointer = 0; pointer < len; ++pointer) {
       /* jshint -W004 */
       const c = this.buffer.codePointAt(pointer);
-      const c_str = String.fromCodePoint(c);
       /* jshint +W004 */
 
       if (c === 0x9 || c === 0xA || c === 0xD) {
