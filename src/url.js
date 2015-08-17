@@ -10,13 +10,13 @@ function p(char) {
 }
 
 const specialSchemas = {
-  "ftp": "21",
+  "ftp": 21,
   "file": null,
-  "gopher": "70",
-  "http": "80",
-  "https": "443",
-  "ws": "80",
-  "wss": "443"
+  "gopher": 70,
+  "http": 80,
+  "https": 443,
+  "ws": 80,
+  "wss": 443
 };
 
 const localSchemas = [
@@ -76,6 +76,15 @@ function isASCIIAlpha(c) {
 
 function isASCIIHex(c) {
   return isASCIIDigit(c) || (c >= 0x41 && c <= 0x46) || (c >= 0x61 && c <= 0x66);
+}
+
+function isSingleDot(buffer) {
+  return buffer === "." || buffer.toLowerCase() === "%2e";
+}
+
+function isDoubleDot(buffer) {
+  buffer = buffer.toLowerCase();
+  return buffer === ".." || buffer === "%2e." || buffer === ".%2e" || buffer === "%2e%2e";
 }
 
 function percentEncode(c) {
@@ -454,7 +463,7 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
       username: "",
       password: null,
       host: null,
-      port: "",
+      port: null,
       path: [],
       query: null,
       fragment: null,
@@ -692,10 +701,11 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
         this.url.password = "";
         continue;
       }
+      const encodedCodePoints = encodeChar(c, isUserInfoEncode);
       if (this.url.password !== null) {
-        this.url.password += encodeChar(c, isUserInfoEncode);
+        this.url.password += encodedCodePoints;
       } else {
-        this.url.username += encodeChar(c, isUserInfoEncode);
+        this.url.username += encodedCodePoints;
       }
     }
     this.buffer = "";
@@ -755,14 +765,14 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
   if (isASCIIDigit(c)) {
     this.buffer += c_str;
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
-             (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
-    while (this.buffer[0] === "0" && this.buffer.length > 1) {
-      this.buffer = this.buffer.substr(1);
+             (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) ||
+             this.state_override) {
+    const port = parseInt(this.buffer, 10);
+    if (port > Math.pow(2, 16) - 1) {
+      this.parse_error = true;
+      throw new TypeError("Invalid port");
     }
-    if (this.buffer === specialSchemas[this.url.scheme]) {
-      this.buffer = "";
-    }
-    this.url.port = this.buffer;
+    this.url.port = port === specialSchemas[this.url.scheme] ? null : port;
     if (this.state_override) {
       return false;
     }
@@ -813,6 +823,7 @@ URLStateMachine.prototype["parse" + STATES.FILE] =
       this.url.path.pop();
     }
     this.state = STATES.PATH;
+    --this.pointer;
   }
 };
 
@@ -878,16 +889,15 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
       this.parse_error = true;
     }
 
-    this.buffer = bufferReplacement[this.buffer.toLowerCase()] || this.buffer;
-    if (this.buffer === "..") {
+    if (isDoubleDot(this.buffer)) {
       this.url.path.pop();
       if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
         this.url.path.push("");
       }
-    } else if (this.buffer === "." && c !== p("/") &&
+    } else if (isSingleDot(this.buffer) && c !== p("/") &&
                !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
       this.url.path.push("");
-    } else if (this.buffer !== ".") {
+    } else if (!isSingleDot(this.buffer)) {
       if (this.url.scheme === "file" && this.url.path.length === 0 &&
         this.buffer.length === 2 && isASCIIAlpha(this.buffer.codePointAt(0)) && this.buffer[1] === "|") {
         this.url.host = null;
@@ -1008,10 +1018,10 @@ function serializeURL(url, excludeFragment) {
       output += "@";
     }
     output += serializeHost(url.host);
-    if (url.port !== "") {
+    if (url.port !== null) {
       output += ":" + url.port;
     }
-  } else if (url.scheme === "file") {
+  } else if (url.host === null && url.scheme === "file") {
     output += "//";
   }
 
@@ -1071,24 +1081,17 @@ const isURLSymbol = Symbol("isURL");
 const updateStepsSymbol = Symbol("updateSteps");
 
 function setTheInput(obj, input, url) {
-  if (url) {
-    obj[urlSymbol] = url;
-    obj[inputSymbol] = input;
-  } else {
-    obj[urlSymbol] = null;
-    if (input === null) {
-      obj[inputSymbol] = "";
-    } else {
-      obj[inputSymbol] = input;
+  obj[inputSymbol] = input;
+  obj[urlSymbol] = url ? url : null;
 
-      try {
-        if (typeof obj[baseSymbol] === "function") {
-          obj[urlSymbol] = new URLStateMachine(input, new URLStateMachine(obj[baseSymbol]()).url);
-        } else {
-          obj[urlSymbol] = new URLStateMachine(input, obj[baseSymbol]);
-        }
-      } catch (e) {}
-    }
+  if (input === null) {
+    try {
+      if (typeof obj[baseSymbol] === "function") {
+        obj[urlSymbol] = new URLStateMachine(input, new URLStateMachine(obj[baseSymbol]()).url);
+      } else {
+        obj[urlSymbol] = new URLStateMachine(input, obj[baseSymbol]);
+      }
+    } catch (e) {}
   }
 
   const query = obj[urlSymbol] !== null && obj[urlSymbol].url.query !== null ? obj[urlSymbol].url.query : "";
@@ -1144,7 +1147,7 @@ const URLUtils = {
         return serializeOrigin({
           scheme: url.scheme,
           host: serializeHost(url.host),
-          port: url.port === "" ? specialSchemas[url.scheme] : url.port
+          port: url.port === null ? specialSchemas[url.scheme] : url.port
         });
       case "file":
         // spec says "exercise to the reader", chrome says "file://"
@@ -1234,7 +1237,7 @@ const URLUtils = {
     if (this[urlSymbol] === null) {
       return "";
     }
-    return this[urlSymbol].url.port;
+    return this[urlSymbol].url.port ? this[urlSymbol].url.port : "";
   },
   set port(val) {
     if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative || this[urlSymbol].url.scheme === "file") {
