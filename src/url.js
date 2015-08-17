@@ -772,7 +772,7 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
       this.parse_error = true;
       throw new TypeError("Invalid port");
     }
-    this.url.port = port === specialSchemas[this.url.scheme] ? null : port;
+    this.url.port = isNaN(port) || port === specialSchemas[this.url.scheme] ? null : port;
     if (this.state_override) {
       return false;
     }
