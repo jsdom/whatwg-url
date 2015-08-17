@@ -114,6 +114,22 @@ function utf8PercentEncode(c) {
   return str;
 }
 
+function utf8PercentDecode(str) {
+  const input = new Buffer(str);
+  const output = [];
+  for (let i = 0; i < input.length; ++i) {
+    if (input[i] !== p("%")) {
+      output.push(input[i]);
+    } else if (input[i] === p("%") && isASCIIHex(input[i + 1]) && isASCIIHex(input[i + 2])) {
+      output.push(parseInt(input.slice(i + 1, i + 3).toString(), 16));
+      i += 2;
+    } else {
+      output.push(input[i]);
+    }
+  }
+  return new Buffer(output).toString();
+}
+
 function isSimpleEncode(c) {
   return c < 0x20 || c > 0x7E;
 }
@@ -381,13 +397,7 @@ function parseHost(input, isUnicode) {
     return parseIPv6(input.substring(1, input.length - 1));
   }
 
-  let domain;
-  try {
-    domain = decodeURIComponent(input);
-  } catch (e) {
-    throw new TypeError("Error while decoding host");
-  }
-
+  const domain = utf8PercentDecode(input);
   const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.TRANSITIONAL, false);
   if (asciiDomain === null) {
     return failure;
