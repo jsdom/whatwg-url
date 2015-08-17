@@ -33,6 +33,8 @@ const bufferReplacement = {
   "%2e%2e": ".."
 };
 
+const failure = Symbol("failure");
+
 const STATES = {
   SCHEME_START: 1,
   SCHEME: 2,
@@ -153,7 +155,7 @@ function parseIPv4Number(input) {
 
   const regex = R === 10 ? /[^0-9]/ : (R === 16 ? /[^0-9A-Fa-f]/ : /[^0-7]/);
   if (regex.test(input)) {
-    return null;
+    return failure;
   }
 
   return parseInt(input, R);
@@ -172,7 +174,7 @@ function parseIPv4(input) {
   let numbers = [];
   for (const part of parts) {
     const n = parseIPv4Number(part);
-    if (n === null) {
+    if (n === failure) {
       return input;
     }
 
@@ -181,11 +183,11 @@ function parseIPv4(input) {
 
   for (let i = 0; i < numbers.length - 1; ++i) {
     if (numbers[i] > 255) {
-      throw new TypeError("Invalid Host");
+      return failure;
     }
   }
   if (numbers[numbers.length - 1] >= Math.pow(256, 5 - numbers.length)) {
-    throw new TypeError("Invalid Host");
+    return failure;
   }
 
   let ipv4 = numbers.pop();
@@ -224,7 +226,7 @@ function parseIPv6(input) {
 
   if (input[pointer] === p(":")) {
     if (input[pointer + 1] !== p(":")) {
-      throw new TypeError("Invalid Host");
+      return failure;
     }
 
     pointer += 2;
@@ -236,12 +238,12 @@ function parseIPv6(input) {
   Main:
   while (pointer < input.length) {
     if (piecePtr === 8) {
-      throw new TypeError("Invalid Host");
+      return failure;
     }
 
     if (input[pointer] === p(":")) {
       if (compressPtr !== null) {
-        throw new TypeError("Invalid Host");
+        return failure;
       }
       ++pointer;
       ++piecePtr;
@@ -261,7 +263,7 @@ function parseIPv6(input) {
     switch (at(input, pointer)) {
       case ".":
         if (length === 0) {
-          throw new TypeError("Invalid Host");
+          return failure;
         }
         pointer -= length;
         ipv4 = true;
@@ -269,13 +271,13 @@ function parseIPv6(input) {
       case ":":
         ++pointer;
         if (input[pointer] === undefined) {
-          throw new TypeError("Invalid Host");
+          return failure;
         }
         break;
       case undefined:
         break;
       default:
-        throw new TypeError("Invalid Host");
+        return failure;
     }
 
     ip[piecePtr] = value;
@@ -283,14 +285,14 @@ function parseIPv6(input) {
   }
 
   if (ipv4 && piecePtr > 6) {
-    throw new TypeError("Invalid Host");
+    return failure;
   } else if (input[pointer] !== undefined) {
     let dotsSeen = 0;
 
     while (input[pointer] !== undefined) {
       let value = null;
       if (!isASCIIDigit(input[pointer])) {
-        throw new TypeError("Invalid Host");
+        return failure;
       }
 
       while (isASCIIDigit(input[pointer])) {
@@ -298,18 +300,18 @@ function parseIPv6(input) {
         if (value === null) {
           value = number;
         } else if (value === 0) {
-          throw new TypeError("Invalid Host");
+          return failure;
         } else {
           value = value * 10 + number;
         }
         ++pointer;
         if (value > 255) {
-          throw new TypeError("Invalid Host");
+          return failure;
         }
       }
 
       if (dotsSeen < 3 && input[pointer] !== p(".")) {
-        throw new TypeError("Invalid Host");
+        return failure;
       }
       ip[piecePtr] = ip[piecePtr] * 0x100 + value;
       if (dotsSeen === 1 || dotsSeen === 3) {
@@ -321,7 +323,7 @@ function parseIPv6(input) {
       }
 
       if (dotsSeen === 3 && input[pointer] !== undefined) {
-        throw new TypeError("Invalid Host");
+        return failure;
       }
       ++dotsSeen;
     }
@@ -338,7 +340,7 @@ function parseIPv6(input) {
       --swaps;
     }
   } else if (piecePtr !== 8) {
-    throw new TypeError("Invalid Host");
+    return failure;
   }
 
   return ip;
@@ -373,7 +375,7 @@ function serializeIPv6(address) {
 function parseHost(input, isUnicode) {
   if (input[0] === "[") {
     if (input[input.length - 1] !== "]") {
-      throw new TypeError("Invalid Host");
+      return failure;
     }
 
     return parseIPv6(input.substring(1, input.length - 1));
@@ -388,15 +390,15 @@ function parseHost(input, isUnicode) {
 
   const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.TRANSITIONAL, false);
   if (asciiDomain === null) {
-    throw new TypeError("Invalid Host");
+    return failure;
   }
 
   if (asciiDomain.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|\?|@|\[|\\|\]/) !== -1) {
-    throw new TypeError("Invalid Host");
+    return failure;
   }
 
   let ipv4Host = parseIPv4(asciiDomain);
-  if (typeof ipv4Host === "number") {
+  if (typeof ipv4Host === "number" || ipv4Host === failure) {
     return ipv4Host;
   }
 
@@ -456,6 +458,7 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
   this.encoding_override = encoding_override || "utf-8";
   this.state_override = state_override;
   this.url = url;
+  this.failure = false;
 
   if (!this.url) {
     this.url = {
@@ -488,8 +491,12 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
     const c_str = isNaN(c) ? undefined : String.fromCodePoint(c);
 
     // exec state machine
-    if (this["parse" + this.state](c, c_str) === false) {
+    const ret = this["parse" + this.state](c, c_str);
+    if (ret === false) {
       break; // terminate algorithm
+    } else if (ret === failure) {
+      this.failure = true;
+      break;
     }
   }
 }
@@ -555,7 +562,7 @@ URLStateMachine.prototype["parse" + STATES.NO_SCHEME] =
     function parseNoScheme(c, c_str) {
   //jshint unused:false
   if (this.base === null || (this.base.nonRelative && c !== p("#"))) {
-    throw new TypeError("Invalid URL");
+    return failure;
   } else if (this.base.nonRelative && c === p("#")) {
     this.url.scheme = this.base.scheme;
     this.url.path = this.base.path.slice();
@@ -724,10 +731,14 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
     function parseHostName(c, c_str) {
   if (c === p(":") && !this.arr_flag) {
     if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
-      throw new TypeError("Invalid URL");
+      return failure;
     }
 
     let host = parseHost(this.buffer);
+    if (host === failure) {
+      return failure;
+    }
+
     this.url.host = host;
     this.buffer = "";
     this.state = STATES.PORT;
@@ -738,10 +749,14 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
              (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     --this.pointer;
     if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
-      throw new TypeError("Invalid URL");
+      return failure;
     }
 
     let host = parseHost(this.buffer);
+    if (host === failure) {
+      return failure;
+    }
+
     this.url.host = host;
     this.buffer = "";
     this.state = STATES.PATH_START;
@@ -770,7 +785,7 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
     const port = parseInt(this.buffer, 10);
     if (port > Math.pow(2, 16) - 1) {
       this.parse_error = true;
-      throw new TypeError("Invalid port");
+      return failure;
     }
     this.url.port = isNaN(port) || port === specialSchemas[this.url.scheme] ? null : port;
     if (this.state_override) {
@@ -783,7 +798,7 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
     this.parse_error = true;
   } else {
     this.parse_error = true;
-    throw new TypeError("Invalid URL");
+    return failure;
   }
 };
 
@@ -856,6 +871,9 @@ URLStateMachine.prototype["parse" + STATES.FILE_HOST] =
       this.state = STATES.PATH_START;
     } else {
       let host = parseHost(this.buffer);
+      if (host === failure) {
+        return failure;
+      }
       if (host !== "localhost") {
         this.url.host = host;
       }
@@ -1085,13 +1103,15 @@ function setTheInput(obj, input, url) {
   obj[urlSymbol] = url ? url : null;
 
   if (input === null) {
-    try {
-      if (typeof obj[baseSymbol] === "function") {
-        obj[urlSymbol] = new URLStateMachine(input, new URLStateMachine(obj[baseSymbol]()).url);
-      } else {
-        obj[urlSymbol] = new URLStateMachine(input, obj[baseSymbol]);
-      }
-    } catch (e) {}
+    let parsed;
+    if (typeof obj[baseSymbol] === "function") {
+      parsed = new URLStateMachine(input, new URLStateMachine(obj[baseSymbol]()).url);
+    } else {
+      parsed = new URLStateMachine(input, obj[baseSymbol]);
+    }
+    if (!parsed.failure) {
+      obj[urlSymbol] = parsed;
+    }
   }
 
   const query = obj[urlSymbol] !== null && obj[urlSymbol].url.query !== null ? obj[urlSymbol].url.query : "";
@@ -1354,10 +1374,16 @@ function init(url, base) {
   let parsedBase = null;
   if (base) {
     parsedBase = new URLStateMachine(base);
+    if (parsedBase.failure) {
+      throw new TypeError("Invalid base URL");
+    }
     this[baseSymbol] = parsedBase.url;
   }
 
   const parsedURL = new URLStateMachine(url, parsedBase ? parsedBase.url : undefined);
+  if (parsedURL.failure) {
+    throw new TypeError("Invalid URL");
+  }
   setTheInput(this, "", parsedURL);
 }
 
