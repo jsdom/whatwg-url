@@ -1408,6 +1408,7 @@ function preUpdateSteps(obj, value) {
 module.exports.createURLConstructor = function () {
   function URL() {
     this[isURLSymbol] = true;
+    this[updateStepsSymbol] = function () {};
     init.apply(this, arguments);
   }
 
