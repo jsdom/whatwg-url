@@ -131,10 +131,10 @@ function utf8PercentDecode(str) {
 }
 
 function isSimpleEncode(c) {
-  return c < 0x20 || c > 0x7E;
+  return c <= 0x1F || c > 0x7E;
 }
 
-const defaultEncodeSet = [p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")];
+const defaultEncodeSet = [p(" "), p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")];
 function isDefaultEncode(c) {
   return isSimpleEncode(c) || defaultEncodeSet.indexOf(c) !== -1;
 }
@@ -548,7 +548,7 @@ URLStateMachine.prototype["parse" + STATES.SCHEME] =
       return false;
     }
     if (this.url.scheme === "file") {
-      if (this.input.substr(this.pointer, this.pointer + 3) !== "//") {
+      if (this.input[this.pointer + 1] === p("/") && this.input[this.pointer + 2] === p("/")) {
         this.parse_error = true;
       }
       this.state = STATES.FILE;
@@ -852,9 +852,16 @@ URLStateMachine.prototype["parse" + STATES.FILE] =
     this.state = STATES.FRAGMENT;
   } else {
     if (this.base !== null && this.base.scheme === "file") {
-      this.url.host = this.base.host;
-      this.url.path = this.base.path.slice();
-      this.url.path.pop();
+      if ((isASCIIAlpha(c) && // windows drive letter
+           (this.input[this.pointer + 1] === p(":") || this.input[this.pointer + 1] === p("|"))) ||
+          this.input.length - this.pointer === 1 || // remaining consists of 1 code point
+          [p("/"), p("\\"), p("?"), p("#")].indexOf(this.input[this.pointer + 1]) === -1) {
+        this.url.host = this.base.host;
+        this.url.path = this.base.path.slice();
+        this.url.path.pop();
+      } else {
+        this.parse_error = true;
+      }
     }
     this.state = STATES.PATH;
     --this.pointer;
