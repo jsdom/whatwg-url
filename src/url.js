@@ -469,6 +469,7 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
   this.state_override = state_override;
   this.url = url;
   this.failure = false;
+  this.parse_error = false;
 
   if (!this.url) {
     this.url = {
@@ -484,7 +485,11 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
       nonRelative: false
     };
 
-    this.input = trimControlChars(this.input);
+    const res = trimControlChars(this.input);
+    if (res !== this.input) {
+      this.parse_error = true;
+    }
+    this.input = res;
   }
 
   this.state = state_override || STATES.SCHEME_START;
@@ -492,7 +497,6 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
   this.buffer = "";
   this.at_flag = false;
   this.arr_flag = false;
-  this.parse_error = false;
 
   this.input = punycode.ucs2.decode(this.input);
 
@@ -544,6 +548,9 @@ URLStateMachine.prototype["parse" + STATES.SCHEME] =
       return false;
     }
     if (this.url.scheme === "file") {
+      if (this.input.substr(this.pointer, this.pointer + 3) !== "//") {
+        this.parse_error = true;
+      }
       this.state = STATES.FILE;
     } else if (specialSchemas[this.url.scheme] !== undefined && this.base !== null &&
                this.base.scheme === this.url.scheme) {
@@ -792,16 +799,18 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) ||
              this.state_override) {
-    const port = parseInt(this.buffer, 10);
-    if (port > Math.pow(2, 16) - 1) {
-      this.parse_error = true;
-      return failure;
+    if (this.buffer !== "") {
+      const port = parseInt(this.buffer, 10);
+      if (port > Math.pow(2, 16) - 1) {
+        this.parse_error = true;
+        return failure;
+      }
+      this.url.port = port === specialSchemas[this.url.scheme] ? null : port;
+      this.buffer = "";
     }
-    this.url.port = isNaN(port) || port === specialSchemas[this.url.scheme] ? null : port;
     if (this.state_override) {
       return false;
     }
-    this.buffer = "";
     this.state = STATES.PATH_START;
     --this.pointer;
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
@@ -927,7 +936,11 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
       this.url.path.push("");
     } else if (!isSingleDot(this.buffer)) {
       if (this.url.scheme === "file" && this.url.path.length === 0 &&
-        this.buffer.length === 2 && isASCIIAlpha(this.buffer.codePointAt(0)) && this.buffer[1] === "|") {
+        this.buffer.length === 2 && isASCIIAlpha(this.buffer.codePointAt(0)) &&
+        (this.buffer[1] === "|" || this.buffer[1] === ":")) {
+        if (this.url.host !== null) {
+          this.parse_error = true;
+        }
         this.url.host = null;
         this.buffer = this.buffer[0] + ":";
       }
@@ -1128,8 +1141,20 @@ function setTheInput(obj, input, url) {
   // TODO: Update URLSearchParams
 }
 
+function resetTheInput(obj) {
+  if (obj[isURLSymbol] || obj[inputSymbol] === null) {
+    return;
+  }
+
+  setTheInput(obj, obj[inputSymbol], obj[urlSymbol]);
+}
+
 const URLUtils = {
   get href() {
+    resetTheInput(this);
+    if (this[inputSymbol] === null) {
+      return "";
+    }
     if (this[urlSymbol] === null) {
       return this[inputSymbol];
     }
@@ -1154,6 +1179,7 @@ const URLUtils = {
   },
 
   get origin() {
+    resetTheInput(this);
     if (this[urlSymbol] === null) {
       return "";
     }
@@ -1189,6 +1215,7 @@ const URLUtils = {
   },
 
   get protocol() {
+    resetTheInput(this);
     if (this[urlSymbol] === null) {
       return ":";
     }
@@ -1203,6 +1230,7 @@ const URLUtils = {
   },
 
   get username() {
+    resetTheInput(this);
     return this[urlSymbol] === null ? "" : this[urlSymbol].url.username;
   },
   set username(val) {
@@ -1219,6 +1247,7 @@ const URLUtils = {
   },
 
   get password() {
+    resetTheInput(this);
     return this[urlSymbol] === null || this[urlSymbol].url.password === null ? "" : this[urlSymbol].url.password;
   },
   set password(val) {
@@ -1235,11 +1264,12 @@ const URLUtils = {
   },
 
   get host() {
+    resetTheInput(this);
     if (this[urlSymbol] === null || this[urlSymbol].url.host === null) {
       return "";
     }
     return serializeHost(this[urlSymbol].url.host) +
-           (this[urlSymbol].url.port === "" ? "" : ":" + this[urlSymbol].url.port);
+           (this[urlSymbol].url.port === null ? "" : ":" + this[urlSymbol].url.port);
   },
   set host(val) {
     if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative) {
@@ -1250,6 +1280,7 @@ const URLUtils = {
   },
 
   get hostname() {
+    resetTheInput(this);
     if (this[urlSymbol] === null || this[urlSymbol].url.host === null) {
       return "";
     }
@@ -1264,10 +1295,11 @@ const URLUtils = {
   },
 
   get port() {
-    if (this[urlSymbol] === null) {
+    resetTheInput(this);
+    if (this[urlSymbol] === null || this[urlSymbol].url.port === null) {
       return "";
     }
-    return this[urlSymbol].url.port ? this[urlSymbol].url.port : "";
+    return this[urlSymbol].url.port.toString();
   },
   set port(val) {
     if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative || this[urlSymbol].url.scheme === "file") {
@@ -1278,6 +1310,7 @@ const URLUtils = {
   },
 
   get pathname() {
+    resetTheInput(this);
     if (this[urlSymbol] === null) {
       return "";
     }
@@ -1297,6 +1330,7 @@ const URLUtils = {
   },
 
   get search() {
+    resetTheInput(this);
     if (this[urlSymbol] === null || !this[urlSymbol].url.query) {
       return "";
     }
@@ -1356,6 +1390,9 @@ const URLUtils = {
 function urlToASCII(domain) {
   try {
     const asciiDomain = parseHost(domain);
+    if (typeof asciiDomain !== "string") {
+      return "";
+    }
     return asciiDomain;
   } catch (e) {
     return "";
@@ -1365,6 +1402,9 @@ function urlToASCII(domain) {
 function urlToUnicode(domain) {
   try {
     const unicodeDomain = parseHost(domain, true);
+    if (typeof unicodeDomain !== "string") {
+      return "";
+    }
     return unicodeDomain;
   } catch (e) {
     return "";
