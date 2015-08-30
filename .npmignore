@@ -6,3 +6,6 @@
 scripts/
 src/
 test/
+
+.settings/
+jsconfig.json
