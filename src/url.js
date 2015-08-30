@@ -1428,8 +1428,6 @@ module.exports.mixinURLUtils = function (obj, base, updateSteps) {
   }
   obj[updateStepsSymbol] = updateSteps || function () {};
 
-  setTheInput(obj, null, null);
-
   mixin(URLUtils, obj);
 };
 
