@@ -1,6 +1,6 @@
 {
   "name": "whatwg-url",
-  "version": "0.6.5",
+  "version": "0.6.4",
   "description": "An implementation of the WHATWG URL algorithm",
   "main": "lib/url.js",
   "author": "Sebastian Mayr <github@smayr.name>",
@@ -14,12 +14,15 @@
     "jscs": "^1.13.0",
     "jshint": "^2.7.0",
     "mocha": "^2.2.4",
-    "request": "^2.55.0"
+    "request": "^2.55.0",
+    "recast": "~0.10.29"
   },
   "scripts": {
+    "build": "iojs bin/transform.js",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha",
-    "lint": "jscs lib/ test/ scripts/ && jshint lib/ test/ scripts/",
-    "pretest": "iojs scripts/get-latest-platform-tests.js",
+    "lint": "jscs src/ test/ scripts/ && jshint src/ test/ scripts/",
+    "prepublish": "npm run build",
+    "pretest": "iojs scripts/get-latest-platform-tests.js && npm run build",
     "test": "npm run lint && mocha"
   }
 }
