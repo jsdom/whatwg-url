@@ -1474,7 +1474,3 @@ module.exports.mixinURLUtils = function (obj, base, updateSteps) {
 module.exports.setTheInput = function (obj, input) {
   setTheInput(obj, input, null);
 };
-
-module.exports.reparse = function (obj) {
-  setTheInput(obj, obj[inputSymbol]);
-};
