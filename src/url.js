@@ -852,10 +852,10 @@ URLStateMachine.prototype["parse" + STATES.FILE] =
     this.state = STATES.FRAGMENT;
   } else {
     if (this.base !== null && this.base.scheme === "file") {
-      if ((isASCIIAlpha(c) && // windows drive letter
-           (this.input[this.pointer + 1] === p(":") || this.input[this.pointer + 1] === p("|"))) ||
-          this.input.length - this.pointer === 1 || // remaining consists of 1 code point
-          [p("/"), p("\\"), p("?"), p("#")].indexOf(this.input[this.pointer + 1]) === -1) {
+      if ((!isASCIIAlpha(c) || // windows drive letter
+           (this.input[this.pointer + 1] !== p(":") && this.input[this.pointer + 1] !== p("|"))) ||
+          this.input.length - this.pointer - 1 === 1 || // remaining consists of 1 code point
+          [p("/"), p("\\"), p("?"), p("#")].indexOf(this.input[this.pointer + 2]) === -1) {
         this.url.host = this.base.host;
         this.url.path = this.base.path.slice();
         this.url.path.pop();
@@ -889,6 +889,7 @@ URLStateMachine.prototype["parse" + STATES.FILE_SLASH] =
 URLStateMachine.prototype["parse" + STATES.FILE_HOST] =
     function parseFileHost(c, c_str) {
   if (isNaN(c) || c === p("/") || c === p("\\") || c === p("?") || c === p("#")) {
+    --this.pointer;
     // don't need to count symbols here since we check ASCII values
     if (this.buffer.length === 2 &&
       isASCIIAlpha(this.buffer.codePointAt(0)) && (this.buffer[1] === ":" || this.buffer[1] === "|")) {
