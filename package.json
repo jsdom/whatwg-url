@@ -2,27 +2,29 @@
   "name": "whatwg-url",
   "version": "0.6.4",
   "description": "An implementation of the WHATWG URL algorithm",
-  "main": "lib/url.js",
+  "main": "lib/public-api.js",
   "author": "Sebastian Mayr <github@smayr.name>",
   "license": "MIT",
   "repository": "jsdom/whatwg-url",
   "dependencies": {
-    "tr46": "~0.0.1"
+    "tr46": "~0.0.2",
+    "webidl-conversions": "^3.0.0"
   },
   "devDependencies": {
     "istanbul": "~0.3.14",
     "jscs": "^1.13.0",
     "jshint": "^2.7.0",
     "mocha": "^2.2.4",
+    "recast": "~0.10.29",
     "request": "^2.55.0",
-    "recast": "~0.10.29"
+    "webidl2js": "^3.0.2"
   },
   "scripts": {
-    "build": "iojs bin/transform.js",
+    "build": "node scripts/transform.js && node scripts/convert-idl.js",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha",
     "lint": "jscs src/ test/ scripts/ && jshint src/ test/ scripts/",
     "prepublish": "npm run build",
-    "pretest": "iojs scripts/get-latest-platform-tests.js && npm run build",
+    "pretest": "node scripts/get-latest-platform-tests.js && npm run build",
     "test": "npm run lint && mocha"
   }
 }

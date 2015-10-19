@@ -5,4 +5,6 @@ npm-debug.log
 # project specific
 coverage/
 test/web-platform-tests/
-lib/
+lib/URL.js
+lib/utils.js
+lib/url-state-machine.js

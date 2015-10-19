@@ -35,30 +35,6 @@ const bufferReplacement = {
 
 const failure = Symbol("failure");
 
-const STATES = {
-  SCHEME_START: 1,
-  SCHEME: 2,
-  NO_SCHEME: 3,
-  RELATIVE: 4,
-  SPECIAL_RELATIVE_OR_AUTHORITY: 5,
-  SPECIAL_AUTHORITY_SLASHES: 6,
-  NON_RELATIVE_PATH: 7,
-  QUERY: 8,
-  FRAGMENT: 9,
-  SPECIAL_AUTHORITY_IGNORE_SLASHES: 10,
-  RELATIVE_SLASH: 11,
-  PATH: 12,
-  FILE_HOST: 13,
-  AUTHORITY: 14,
-  HOST: 15,
-  PATH_START: 16,
-  HOST_NAME: 17,
-  PORT: 18,
-  FILE: 19,
-  FILE_SLASH: 20,
-  PATH_OR_AUTHORITY: 21
-};
-
 function countSymbols(str) {
   return punycode.ucs2.decode(str).length;
 }
@@ -492,7 +468,7 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
     this.input = res;
   }
 
-  this.state = state_override || STATES.SCHEME_START;
+  this.state = state_override || "scheme start";
 
   this.buffer = "";
   this.at_flag = false;
@@ -515,13 +491,13 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
   }
 }
 
-URLStateMachine.prototype["parse" + STATES.SCHEME_START] =
+URLStateMachine.prototype["parse" + "scheme start"] =
     function parseSchemeStart(c, c_str) {
   if (isASCIIAlpha(c)) {
     this.buffer += c_str.toLowerCase();
-    this.state = STATES.SCHEME;
+    this.state = "scheme";
   } else if (!this.state_override) {
-    this.state = STATES.NO_SCHEME;
+    this.state = "no scheme";
     --this.pointer;
   } else {
     this.parse_error = true;
@@ -529,7 +505,7 @@ URLStateMachine.prototype["parse" + STATES.SCHEME_START] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.SCHEME] =
+URLStateMachine.prototype["parse" + "scheme"] =
     function parseScheme(c, c_str) {
   if (isASCIIAlpha(c) || c === p("+") || c === p("-") || c === p(".")) {
     this.buffer += c_str.toLowerCase();
@@ -551,23 +527,23 @@ URLStateMachine.prototype["parse" + STATES.SCHEME] =
       if (this.input[this.pointer + 1] === p("/") && this.input[this.pointer + 2] === p("/")) {
         this.parse_error = true;
       }
-      this.state = STATES.FILE;
+      this.state = "file";
     } else if (specialSchemas[this.url.scheme] !== undefined && this.base !== null &&
                this.base.scheme === this.url.scheme) {
-      this.state = STATES.SPECIAL_RELATIVE_OR_AUTHORITY;
+      this.state = "special relative or authority";
     } else if (specialSchemas[this.url.scheme] !== undefined) {
-      this.state = STATES.SPECIAL_AUTHORITY_SLASHES;
+      this.state = "special authority slashes";
     } else if (this.input[this.pointer + 1] === p("/")) {
-      this.state = STATES.PATH_OR_AUTHORITY;
+      this.state = "path or authority";
       ++this.pointer;
     } else {
       this.url.nonRelative = true;
       this.url.path.push("");
-      this.state = STATES.NON_RELATIVE_PATH;
+      this.state = "non-relative path";
     }
   } else if (!this.state_override) {
     this.buffer = "";
-    this.state = STATES.NO_SCHEME;
+    this.state = "no scheme";
     this.pointer = -1;
   } else {
     this.parse_error = true;
@@ -575,7 +551,7 @@ URLStateMachine.prototype["parse" + STATES.SCHEME] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.NO_SCHEME] =
+URLStateMachine.prototype["parse" + "no scheme"] =
     function parseNoScheme(c, c_str) {
   //jshint unused:false
   if (this.base === null || (this.base.nonRelative && c !== p("#"))) {
@@ -586,39 +562,39 @@ URLStateMachine.prototype["parse" + STATES.NO_SCHEME] =
     this.url.query = this.base.query;
     this.url.fragment = "";
     this.url.nonRelative = true;
-    this.state = STATES.FRAGMENT;
+    this.state = "fragment";
   } else if (this.base.scheme === "file") {
-    this.state = STATES.FILE;
+    this.state = "file";
     --this.pointer;
   } else {
-    this.state = STATES.RELATIVE;
+    this.state = "relative";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.SPECIAL_RELATIVE_OR_AUTHORITY] =
+URLStateMachine.prototype["parse" + "special relative or authority"] =
     function parseSpecialRelativeOrAuthority(c, c_str) {
   if (c === p("/") && this.input[this.pointer + 1] === p("/")) {
-    this.state = STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES;
+    this.state = "special authority ignore slashes";
     ++this.pointer;
   } else {
     this.parse_error = true;
-    this.state = STATES.RELATIVE;
+    this.state = "relative";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.PATH_OR_AUTHORITY] =
+URLStateMachine.prototype["parse" + "path or authority"] =
     function parsePathOrAuthority(c, c_str) {
   if (c === p("/")) {
-    this.state = STATES.AUTHORITY;
+    this.state = "authority";
   } else {
-    this.state = STATES.PATH;
+    this.state = "path";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.RELATIVE] =
+URLStateMachine.prototype["parse" + "relative"] =
     function parseRelative(c, c_str) {
   this.url.scheme = this.base.scheme;
   if (isNaN(c)) {
@@ -629,7 +605,7 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.path = this.base.path.slice();
     this.url.query = this.base.query;
   } else if (c === p("/")) {
-    this.state = STATES.RELATIVE_SLASH;
+    this.state = "relative slash";
   } else if (c === p("?")) {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
@@ -637,7 +613,7 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.port = this.base.port;
     this.url.path = this.base.path.slice();
     this.url.query = "";
-    this.state = STATES.QUERY;
+    this.state = "query";
   } else if (c === p("#")) {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
@@ -646,10 +622,10 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.path = this.base.path.slice();
     this.url.query = this.base.query;
     this.url.fragment = "";
-    this.state = STATES.FRAGMENT;
+    this.state = "fragment";
   } else if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
     this.parse_error = true;
-    this.state = STATES.RELATIVE_SLASH;
+    this.state = "relative slash";
   } else {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
@@ -657,51 +633,51 @@ URLStateMachine.prototype["parse" + STATES.RELATIVE] =
     this.url.port = this.base.port;
     this.url.path = this.base.path.slice(0, this.base.path.length - 1);
 
-    this.state = STATES.PATH;
+    this.state = "path";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.RELATIVE_SLASH] =
+URLStateMachine.prototype["parse" + "relative slash"] =
     function parseRelativeSlash(c, c_str) {
   if (c === p("/") || (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     if (c === p("\\")) {
       this.parse_error = true;
     }
-    this.state = STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES;
+    this.state = "special authority ignore slashes";
   } else {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
     this.url.host = this.base.host;
     this.url.port = this.base.port;
-    this.state = STATES.PATH;
+    this.state = "path";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.SPECIAL_AUTHORITY_SLASHES] =
+URLStateMachine.prototype["parse" + "special authority slashes"] =
     function parseSpecialAuthoritySlashes(c, c_str) {
   if (c === p("/") && this.input[this.pointer + 1] === p("/")) {
-    this.state = STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES;
+    this.state = "special authority ignore slashes";
     ++this.pointer;
   } else {
     this.parse_error = true;
-    this.state = STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES;
+    this.state = "special authority ignore slashes";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.SPECIAL_AUTHORITY_IGNORE_SLASHES] =
+URLStateMachine.prototype["parse" + "special authority ignore slashes"] =
     function parseSpecialAuthorityIgnoreSlashes(c, c_str) {
   if (c !== p("/") && c !== p("\\")) {
-    this.state = STATES.AUTHORITY;
+    this.state = "authority";
     --this.pointer;
   } else {
     this.parse_error = true;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
+URLStateMachine.prototype["parse" + "authority"] =
     function parseAuthority(c, c_str) {
   if (c === p("@")) {
     this.parse_error = true;
@@ -737,14 +713,14 @@ URLStateMachine.prototype["parse" + STATES.AUTHORITY] =
              (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     this.pointer -= countSymbols(this.buffer) + 1;
     this.buffer = "";
-    this.state = STATES.HOST;
+    this.state = "host";
   } else {
     this.buffer += c_str;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.HOST_NAME] =
-URLStateMachine.prototype["parse" + STATES.HOST] =
+URLStateMachine.prototype["parse" + "host name"] =
+URLStateMachine.prototype["parse" + "host"] =
     function parseHostName(c, c_str) {
   if (c === p(":") && !this.arr_flag) {
     if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
@@ -758,8 +734,8 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
 
     this.url.host = host;
     this.buffer = "";
-    this.state = STATES.PORT;
-    if (this.state_override === STATES.HOST_NAME) {
+    this.state = "port";
+    if (this.state_override === "host name") {
       return false;
     }
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
@@ -776,7 +752,7 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
 
     this.url.host = host;
     this.buffer = "";
-    this.state = STATES.PATH_START;
+    this.state = "path start";
     if (this.state_override) {
       return false;
     }
@@ -792,7 +768,7 @@ URLStateMachine.prototype["parse" + STATES.HOST] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.PORT] =
+URLStateMachine.prototype["parse" + "port"] =
     function parsePort(c, c_str) {
   if (isASCIIDigit(c)) {
     this.buffer += c_str;
@@ -811,7 +787,7 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
     if (this.state_override) {
       return false;
     }
-    this.state = STATES.PATH_START;
+    this.state = "path start";
     --this.pointer;
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
     this.parse_error = true;
@@ -821,7 +797,7 @@ URLStateMachine.prototype["parse" + STATES.PORT] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.FILE] =
+URLStateMachine.prototype["parse" + "file"] =
     function parseFile(c, c_str) {
   this.url.scheme = "file";
   if (isNaN(c)) {
@@ -834,14 +810,14 @@ URLStateMachine.prototype["parse" + STATES.FILE] =
     if (c === p("\\")) {
       this.parse_error = true;
     }
-    this.state = STATES.FILE_SLASH;
+    this.state = "file slash";
   } else if (c === p("?")) {
     if (this.base !== null && this.base.scheme === "file") {
       this.url.host = this.base.host;
       this.url.path = this.base.path.slice();
       this.url.query = "";
     }
-    this.state = STATES.QUERY;
+    this.state = "query";
   } else if (c === p("#")) {
     if (this.base !== null && this.base.scheme === "file") {
       this.url.host = this.base.host;
@@ -849,7 +825,7 @@ URLStateMachine.prototype["parse" + STATES.FILE] =
       this.url.query = this.base.query;
       this.url.fragment = "";
     }
-    this.state = STATES.FRAGMENT;
+    this.state = "fragment";
   } else {
     if (this.base !== null && this.base.scheme === "file") {
       if ((!isASCIIAlpha(c) || // windows drive letter
@@ -863,39 +839,39 @@ URLStateMachine.prototype["parse" + STATES.FILE] =
         this.parse_error = true;
       }
     }
-    this.state = STATES.PATH;
+    this.state = "path";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.FILE_SLASH] =
+URLStateMachine.prototype["parse" + "file slash"] =
     function parseFileSlash(c, c_str) {
   if (c === p("/") || c === p("\\")) {
     if (c === p("\\")) {
       this.parse_error = true;
     }
-    this.state = STATES.FILE_HOST;
+    this.state = "file host";
   } else {
     if (this.base !== null && this.base.scheme === "file") {
       if (this.base.path.length && isASCIIAlpha(this.base.path[0][0].charCodeAt(0)) && this.base.path[0][1] === ":") {
         this.url.path.push(this.base.path[0]);
       }
     }
-    this.state = STATES.PATH;
+    this.state = "path";
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.FILE_HOST] =
+URLStateMachine.prototype["parse" + "file host"] =
     function parseFileHost(c, c_str) {
   if (isNaN(c) || c === p("/") || c === p("\\") || c === p("?") || c === p("#")) {
     --this.pointer;
     // don't need to count symbols here since we check ASCII values
     if (this.buffer.length === 2 &&
       isASCIIAlpha(this.buffer.codePointAt(0)) && (this.buffer[1] === ":" || this.buffer[1] === "|")) {
-      this.state = STATES.PATH;
+      this.state = "path";
     } else if (this.buffer === "") {
-      this.state = STATES.PATH_START;
+      this.state = "path start";
     } else {
       let host = parseHost(this.buffer);
       if (host === failure) {
@@ -906,7 +882,7 @@ URLStateMachine.prototype["parse" + STATES.FILE_HOST] =
       }
 
       this.buffer = "";
-      this.state = STATES.PATH_START;
+      this.state = "path start";
     }
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
     this.parse_error = true;
@@ -915,18 +891,18 @@ URLStateMachine.prototype["parse" + STATES.FILE_HOST] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.PATH_START] =
+URLStateMachine.prototype["parse" + "path start"] =
     function parsePathStart(c, c_str) {
   if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
     this.parse_error = true;
   }
-  this.state = STATES.PATH;
+  this.state = "path";
   if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
     --this.pointer;
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.PATH] =
+URLStateMachine.prototype["parse" + "path"] =
     function parsePath(c, c_str) {
   if (isNaN(c) || c === p("/") || (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) ||
       (!this.state_override && (c === p("?") || c === p("#")))) {
@@ -957,11 +933,11 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
     this.buffer = "";
     if (c === p("?")) {
       this.url.query = "";
-      this.state = STATES.QUERY;
+      this.state = "query";
     }
     if (c === p("#")) {
       this.url.fragment = "";
-      this.state = STATES.FRAGMENT;
+      this.state = "fragment";
     }
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
     this.parse_error = true;
@@ -977,14 +953,14 @@ URLStateMachine.prototype["parse" + STATES.PATH] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.NON_RELATIVE_PATH] =
+URLStateMachine.prototype["parse" + "non-relative path"] =
     function parseNonRelativePath(c, c_str) {
   if (c === p("?")) {
     this.url.query = "";
-    this.state = STATES.QUERY;
+    this.state = "query";
   } else if (c === p("#")) {
     this.url.fragment = "";
-    this.state = STATES.FRAGMENT;
+    this.state = "fragment";
   } else {
     // TODO: Add: not a URL code point
     if (!isNaN(c) && c !== p("%")) {
@@ -1003,7 +979,7 @@ URLStateMachine.prototype["parse" + STATES.NON_RELATIVE_PATH] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.QUERY] =
+URLStateMachine.prototype["parse" + "query"] =
     function parseQuery(c, c_str) {
   if (isNaN(c) || (!this.state_override && c === p("#"))) {
     if (specialSchemas[this.url.scheme] === undefined || this.url.scheme === "ws" || this.url.scheme === "wss") {
@@ -1023,7 +999,7 @@ URLStateMachine.prototype["parse" + STATES.QUERY] =
     this.buffer = "";
     if (c === p("#")) {
       this.url.fragment = "";
-      this.state = STATES.FRAGMENT;
+      this.state = "fragment";
     }
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
     this.parse_error = true;
@@ -1039,7 +1015,7 @@ URLStateMachine.prototype["parse" + STATES.QUERY] =
   }
 };
 
-URLStateMachine.prototype["parse" + STATES.FRAGMENT] =
+URLStateMachine.prototype["parse" + "fragment"] =
     function parseFragment(c, c_str) {
   if (isNaN(c)) { // do nothing
   } else if (c === 0x0 || c === 0x9 || c === 0xA || c === 0xD) {
@@ -1106,295 +1082,7 @@ function serializeOrigin(tuple) {
   return result;
 }
 
-function mixin(src, target) {
-  const props = Object.getOwnPropertyNames(src);
-
-  for (let i = 0; i < props.length; ++i) {
-    const descriptor = Object.getOwnPropertyDescriptor(src, props[i]);
-    Object.defineProperty(target, props[i], descriptor);
-  }
-
-  const symbols = Object.getOwnPropertySymbols(src);
-  for (var i = 0; i < symbols.length; ++i) {
-    target[symbols[i]] = src[symbols[i]];
-  }
-}
-
-const inputSymbol = Symbol("input");
-const encodingSymbol = Symbol("queryEncoding");
-const querySymbol = Symbol("queryObject");
-const urlSymbol = Symbol("url");
-
-const baseSymbol = Symbol("base");
-const isURLSymbol = Symbol("isURL");
-const updateStepsSymbol = Symbol("updateSteps");
-
-function setTheInput(obj, input, url) {
-  obj[inputSymbol] = input;
-  obj[urlSymbol] = url ? url : null;
-
-  if (input === null) {
-    let parsed;
-    if (typeof obj[baseSymbol] === "function") {
-      parsed = new URLStateMachine(input, new URLStateMachine(obj[baseSymbol]()).url);
-    } else {
-      parsed = new URLStateMachine(input, obj[baseSymbol]);
-    }
-    if (!parsed.failure) {
-      obj[urlSymbol] = parsed;
-    }
-  }
-
-  const query = obj[urlSymbol] !== null && obj[urlSymbol].url.query !== null ? obj[urlSymbol].url.query : "";
-  // TODO: Update URLSearchParams
-}
-
-function resetTheInput(obj) {
-  if (obj[isURLSymbol] || obj[inputSymbol] === null) {
-    return;
-  }
-
-  setTheInput(obj, obj[inputSymbol], obj[urlSymbol]);
-}
-
-const URLUtils = {
-  get href() {
-    resetTheInput(this);
-    if (this[inputSymbol] === null) {
-      return "";
-    }
-    if (this[urlSymbol] === null) {
-      return this[inputSymbol];
-    }
-
-    return serializeURL(this[urlSymbol].url);
-  },
-  set href(val) {
-    let input = String(val);
-
-    if (this[isURLSymbol]) {
-      // SPEC: says to use "get the base" algorithm,
-      // but the base might've already been provided by the constructor.
-      // Clarify!
-      // Can't set base symbol to function in URL constructor, so don't need to check this
-      const parsedURL = new URLStateMachine(input, this[baseSymbol]);
-      input = "";
-      setTheInput(this, "", parsedURL);
-    } else {
-      setTheInput(this, input);
-      preUpdateSteps(this, input);
-    }
-  },
-
-  get origin() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null) {
-      return "";
-    }
-
-    const url = this[urlSymbol].url;
-    switch (url.scheme) {
-      case "blob":
-        try {
-          return module.exports.createURLConstructor()(url.scheme_data).origin;
-        } catch (e) {
-          // serializing an opaque identifier returns "null"
-          return "null";
-        }
-        break;
-      case "ftp":
-      case "gopher":
-      case "http":
-      case "https":
-      case "ws":
-      case "wss":
-        return serializeOrigin({
-          scheme: url.scheme,
-          host: serializeHost(url.host),
-          port: url.port === null ? specialSchemas[url.scheme] : url.port
-        });
-      case "file":
-        // spec says "exercise to the reader", chrome says "file://"
-        return "file://";
-      default:
-        // serializing an opaque identifier returns "null"
-        return "null";
-    }
-  },
-
-  get protocol() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null) {
-      return ":";
-    }
-    return this[urlSymbol].url.scheme + ":";
-  },
-  set protocol(val) {
-    if (this[urlSymbol] === null) {
-      return;
-    }
-    this[urlSymbol] = new URLStateMachine(val + ":", null, null, this[urlSymbol].url, STATES.SCHEME_START);
-    preUpdateSteps(this);
-  },
-
-  get username() {
-    resetTheInput(this);
-    return this[urlSymbol] === null ? "" : this[urlSymbol].url.username;
-  },
-  set username(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.host === null || this[urlSymbol].url.nonRelative) {
-      return;
-    }
-
-    this[urlSymbol].url.username = "";
-    const decoded = punycode.ucs2.decode(val);
-    for (let i = 0; i < decoded.length; ++i) {
-      this[urlSymbol].url.username += encodeChar(decoded[i], isUserInfoEncode);
-    }
-    preUpdateSteps(this);
-  },
-
-  get password() {
-    resetTheInput(this);
-    return this[urlSymbol] === null || this[urlSymbol].url.password === null ? "" : this[urlSymbol].url.password;
-  },
-  set password(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.host === null || this[urlSymbol].url.nonRelative) {
-      return;
-    }
-
-    this[urlSymbol].url.password = "";
-    const decoded = punycode.ucs2.decode(val);
-    for (let i = 0; i < decoded.length; ++i) {
-      this[urlSymbol].url.password += encodeChar(decoded[i], isUserInfoEncode);
-    }
-    preUpdateSteps(this);
-  },
-
-  get host() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null || this[urlSymbol].url.host === null) {
-      return "";
-    }
-    return serializeHost(this[urlSymbol].url.host) +
-           (this[urlSymbol].url.port === null ? "" : ":" + this[urlSymbol].url.port);
-  },
-  set host(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative) {
-      return;
-    }
-    this[urlSymbol] = new URLStateMachine(val, null, null, this[urlSymbol].url, STATES.HOST);
-    preUpdateSteps(this);
-  },
-
-  get hostname() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null || this[urlSymbol].url.host === null) {
-      return "";
-    }
-    return serializeHost(this[urlSymbol].url.host);
-  },
-  set hostname(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative) {
-      return;
-    }
-    this[urlSymbol] = new URLStateMachine(val, null, null, this[urlSymbol].url, STATES.HOST_NAME);
-    preUpdateSteps(this);
-  },
-
-  get port() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null || this[urlSymbol].url.port === null) {
-      return "";
-    }
-    return this[urlSymbol].url.port.toString();
-  },
-  set port(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative || this[urlSymbol].url.scheme === "file") {
-      return;
-    }
-    this[urlSymbol] = new URLStateMachine(val, null, null, this[urlSymbol].url, STATES.PORT);
-    preUpdateSteps(this);
-  },
-
-  get pathname() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null) {
-      return "";
-    }
-    if (this[urlSymbol].url.nonRelative) {
-      return this[urlSymbol].url.path[0];
-    }
-
-    return "/" + this[urlSymbol].url.path.join("/");
-  },
-  set pathname(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.nonRelative) {
-      return;
-    }
-    this[urlSymbol].url.path = [];
-    this[urlSymbol] = new URLStateMachine(val, null, null, this[urlSymbol].url, STATES.PATH_START);
-    preUpdateSteps(this);
-  },
-
-  get search() {
-    resetTheInput(this);
-    if (this[urlSymbol] === null || !this[urlSymbol].url.query) {
-      return "";
-    }
-
-    return "?" + this[urlSymbol].url.query;
-  },
-  set search(val) {
-    if (this[urlSymbol] === null) {
-      return;
-    }
-    if (val === "") {
-      this[urlSymbol].url.query = null;
-      // TODO: empty query object
-      preUpdateSteps(this);
-      return;
-    }
-
-    const input = val[0] === "?" ? val.substr(1) : val;
-    this[urlSymbol].url.query = "";
-
-    // TODO: Add query encoding
-    this[urlSymbol] = new URLStateMachine(input, null, null, this[urlSymbol].url, STATES.QUERY);
-
-    // TODO: Update query object
-    // Since the query object isn't implemented, call updateSteps manually for now
-    preUpdateSteps(this);
-  },
-
-  get hash() {
-    if (this[urlSymbol] === null || !this[urlSymbol].url.fragment) {
-      return "";
-    }
-
-    return "#" + this[urlSymbol].url.fragment;
-  },
-  set hash(val) {
-    if (this[urlSymbol] === null || this[urlSymbol].url.scheme === "javascript") {
-      return;
-    }
-    if (val === "") {
-      this[urlSymbol].url.fragment = null;
-      preUpdateSteps(this);
-      return;
-    }
-
-    const input = val[0] === "#" ? val.substr(1) : val;
-    this[urlSymbol].url.fragment = "";
-    this[urlSymbol] = new URLStateMachine(input, null, null, this[urlSymbol].url, STATES.FRAGMENT);
-    preUpdateSteps(this);
-  },
-
-  toString() {
-    return this.href;
-  }
-};
-
+// TODO these will be useful for URL constructor
 function urlToASCII(domain) {
   try {
     const asciiDomain = parseHost(domain);
@@ -1419,66 +1107,82 @@ function urlToUnicode(domain) {
   }
 }
 
-function init(url, base) {
-  /*jshint validthis:true */
-  if (this === undefined) {
-    throw new TypeError("Failed to construct 'URL': Please use the 'new' operator, " +
-      "this DOM object constructor cannot be called as a function.");
+module.exports.serializeURL = serializeURL;
+
+module.exports.serializeURLToUnicodeOrigin = function (url) {
+  switch (url.scheme) {
+    case "blob":
+      try {
+        return module.exports.serializeURLToUnicodeOrigin(module.exports.parseURL(url.path[0]));
+      } catch (e) {
+        // serializing an opaque identifier returns "null"
+        return "null";
+      }
+      break;
+    case "ftp":
+    case "gopher":
+    case "http":
+    case "https":
+    case "ws":
+    case "wss":
+      return serializeOrigin({
+        scheme: url.scheme,
+        host: serializeHost(url.host),
+        port: url.port === null ? specialSchemas[url.scheme] : url.port
+      });
+    case "file":
+      // spec says "exercise to the reader", chrome says "file://"
+      return "file://";
+    default:
+      // serializing an opaque identifier returns "null"
+      return "null";
   }
-  if (arguments.length === 0) {
-    throw new TypeError("Failed to construct 'URL': 1 argument required, but only 0 present.");
+};
+
+module.exports.basicURLParse = function (input, options) {
+  if (options === undefined) {
+    options = {};
   }
 
-  let parsedBase = null;
-  if (base) {
-    parsedBase = new URLStateMachine(base);
-    if (parsedBase.failure) {
-      throw new TypeError("Invalid base URL");
-    }
-    this[baseSymbol] = parsedBase.url;
-  }
-
-  const parsedURL = new URLStateMachine(url, parsedBase ? parsedBase.url : undefined);
-  if (parsedURL.failure) {
+  const usm = new URLStateMachine(input, options.baseURL, options.encodingOverride, options.url, options.stateOverride);
+  if (usm.failure) {
     throw new TypeError("Invalid URL");
   }
-  setTheInput(this, "", parsedURL);
-}
 
-function preUpdateSteps(obj, value) {
-  if (value === undefined) {
-    value = serializeURL(obj[urlSymbol].url);
-  }
-
-  obj[updateStepsSymbol].call(obj, value);
-}
-
-module.exports.createURLConstructor = function () {
-  function URL() {
-    this[isURLSymbol] = true;
-    this[updateStepsSymbol] = function () {};
-    init.apply(this, arguments);
-  }
-
-  mixin(URLUtils, URL.prototype);
-  URL.toASCII = urlToASCII;
-  URL.toUnicode = urlToUnicode;
-
-  return URL;
+  return usm.url;
 };
 
-module.exports.mixinURLUtils = function (obj, base, updateSteps) {
-  obj[isURLSymbol] = false;
-  if (typeof base === "function") {
-    obj[baseSymbol] = base;
+module.exports.setTheUsername = function (url, username) {
+  url.username = "";
+  const decoded = punycode.ucs2.decode(username);
+  for (let i = 0; i < decoded.length; ++i) {
+    url.username += encodeChar(decoded[i], isUserInfoEncode);
+  }
+};
+
+module.exports.setThePassword = function (url, password) {
+  if (password === "") {
+    url.password = null;
   } else {
-    obj[baseSymbol] = new URLStateMachine(base).url;
+    url.password = "";
+    const decoded = punycode.ucs2.decode(password);
+    for (let i = 0; i < decoded.length; ++i) {
+      url.password += encodeChar(decoded[i], isUserInfoEncode);
+    }
   }
-  obj[updateStepsSymbol] = updateSteps || function () {};
-
-  mixin(URLUtils, obj);
 };
 
-module.exports.setTheInput = function (obj, input) {
-  setTheInput(obj, input, null);
+module.exports.serializeHost = serializeHost;
+
+module.exports.serializeInteger = function (integer) {
+  return String(integer);
+};
+
+module.exports.parseURL = function (input, options) {
+  if (options === undefined) {
+    options = {};
+  }
+
+  // We don't handle blobs, so this just delegates:
+  return module.exports.basicURLParse(input, { baseURL: options.baseURL, encodingOverride: options.encodingOverride });
 };

@@ -4,7 +4,7 @@ const fs = require("fs");
 const recast = require("recast");
 const types = recast.types;
 
-const code = fs.readFileSync(__dirname + "/../src/url.js", { encoding: "utf8" });
+const code = fs.readFileSync(__dirname + "/../src/url-state-machine.js", { encoding: "utf8" });
 const ast = recast.parse(code);
 
 function replaceP(body) {
@@ -32,4 +32,4 @@ function replaceP(body) {
 replaceP(ast.program.body);
 
 const output = recast.print(ast).code;
-fs.writeFileSync(__dirname + "/../lib/url.js", output);
+fs.writeFileSync(__dirname + "/../lib/url-state-machine.js", output);
