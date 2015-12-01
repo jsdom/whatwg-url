@@ -1,2 +1,3 @@
 http://127.0.0.1:10100/relative_import.html  s:http h:127.0.0.1 port:10100 p:/relative_import.html
 http://facebook.com/?foo=%7B%22abc%22  s:http h:facebook.com p:/ q:?foo=%7B%22abc%22
+https://localhost:3000/jqueryui@1.2.3 s:https h:localhost port:3000 p:/jqueryui@1.2.3
