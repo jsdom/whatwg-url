@@ -3,44 +3,53 @@
 /*global it */
 
 const assert = require("assert");
-const fs = require("fs");
 const URL = require("..").URL;
-const urlTestParser = require("./web-platform-tests/urltestparser");
-
-const testCases = fs.readFileSync(__dirname + "/web-platform-tests/urltestdata.txt", { encoding: "utf-8" }) + "\n" +
-                  fs.readFileSync(__dirname + "/additional-tests.txt", { encoding: "utf-8" });
-const urlTests = urlTestParser(testCases);
+const testCases = require("./web-platform-tests/urltestdata.json");
+const additionalTestCases = require("./to-upstream.json");
 
 function testURL(expected) {
-  return function () {
+  return () => {
     let url;
     try {
       url = new URL(expected.input, expected.base);
     } catch (e) {
-      if (e instanceof TypeError && expected.protocol === ":") {
+      if (e instanceof TypeError && expected.failure) {
         return;
       }
       throw e;
     }
 
-    if (expected.protocol === ":" && url.protocol !== ":") {
-      assert.fail(url.href, "", "Expected URL to fail parsing, got " + url.href);
-    }
-
-    assert.equal(url.protocol, expected.protocol, "scheme");
+    assert.equal(url.href, expected.href, "href");
+    assert.equal(url.origin, expected.origin, "origin");
+    assert.equal(url.protocol, expected.protocol, "protocol");
+    assert.equal(url.username, expected.username, "username");
+    assert.equal(url.password, expected.password, "password");
+    assert.equal(url.host, expected.host, "host");
     assert.equal(url.hostname, expected.hostname, "hostname");
     assert.equal(url.port, expected.port, "port");
-    assert.equal(url.pathname, expected.path, "path");
+    assert.equal(url.pathname, expected.pathname, "pathname");
     assert.equal(url.search, expected.search, "search");
     assert.equal(url.hash, expected.hash, "hash");
-    assert.equal(url.href, expected.href, "href");
   };
 }
 
-describe("Web Platform Tests", function () {
-  const l = urlTests.length;
-  for (let i = 0; i < l; i++) {
-    const expected = urlTests[i];
+describe("Web Platform Tests", () => {
+  for (const expected of testCases) {
+    if (typeof expected === "string") {
+      // It's a "comment"; skip it.
+      continue;
+    }
+
+    it("Parsing: <" + expected.input + "> against <" + expected.base + ">", testURL(expected));
+  }
+});
+
+describe("To-upstream tests", () => {
+  for (const expected of additionalTestCases) {
+    if (typeof expected === "string") {
+      // It's a "comment"; skip it.
+      continue;
+    }
 
     it("Parsing: <" + expected.input + "> against <" + expected.base + ">", testURL(expected));
   }
