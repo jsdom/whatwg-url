@@ -942,14 +942,22 @@ URLStateMachine.prototype["parse" + "path"] =
   } else if (c === 0x9 || c === 0xA || c === 0xD) {
     this.parse_error = true;
   } else {
-    //TODO:If c is not a URL code point and not "%", parse error.
+    // TODO: If c is not a URL code point and not "%", parse error.
+
     if (c === p("%") &&
       (!isASCIIHex(this.input[this.pointer + 1]) ||
         !isASCIIHex(this.input[this.pointer + 2]))) {
       this.parse_error = true;
     }
 
-    this.buffer += encodeChar(c, isDefaultEncode);
+    if (c === p("%") &&
+        this.input[this.pointer + 1] === p("2") &&
+        this.input[this.pointer + 2] === p("e")) {
+      this.buffer += ".";
+      this.pointer += 2;
+    } else {
+      this.buffer += encodeChar(c, isDefaultEncode);
+    }
   }
 };
 
