@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": "jsdom/whatwg-url",
   "dependencies": {
-    "tr46": "~0.0.2",
+    "tr46": "~0.0.3",
     "webidl-conversions": "^3.0.0"
   },
   "devDependencies": {
