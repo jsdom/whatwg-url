@@ -16,6 +16,6 @@
     "maxlen": 120,
     "sub": true,
 
-    "globalstrict": true,
+    "strict": "global",
     "multistr": true
 }
