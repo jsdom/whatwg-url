@@ -25,6 +25,6 @@
     "lint": "jscs src/ test/ scripts/ && jshint src/ test/ scripts/",
     "prepublish": "npm run build",
     "pretest": "node scripts/get-latest-platform-tests.js && npm run build",
-    "test": "npm run lint && mocha"
+    "test": "mocha"
   }
 }
