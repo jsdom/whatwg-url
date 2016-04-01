@@ -437,6 +437,10 @@ function trimControlChars(url) {
   return url.replace(/^[\u0000-\u001F\u0020]+|[\u0000-\u001F\u0020]+$/g, "");
 }
 
+function trimTabAndNewline(url) {
+  return url.replace(/\u0009|\u000A|\u000D/g, "");
+}
+
 function URLStateMachine(input, base, encoding_override, url, state_override) {
   this.pointer = 0;
   this.input = input;
@@ -467,6 +471,12 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
     }
     this.input = res;
   }
+
+  const res = trimTabAndNewline(this.input);
+  if (res !== this.input) {
+    this.parse_error = true;
+  }
+  this.input = res;
 
   this.state = state_override || "scheme start";
 
@@ -693,10 +703,6 @@ URLStateMachine.prototype["parse" + "authority"] =
       const c = this.buffer.codePointAt(pointer);
       /* jshint +W004 */
 
-      if (c === 0x9 || c === 0xA || c === 0xD) {
-        continue;
-      }
-
       if (c === p(":") && this.url.password === null) {
         this.url.password = "";
         continue;
@@ -756,8 +762,6 @@ URLStateMachine.prototype["parse" + "host"] =
     if (this.state_override) {
       return false;
     }
-  } else if (c === 0x9 || c === 0xA || c === 0xD) {
-    this.parse_error = true;
   } else {
     if (c === p("[")) {
       this.arr_flag = true;
@@ -789,8 +793,6 @@ URLStateMachine.prototype["parse" + "port"] =
     }
     this.state = "path start";
     --this.pointer;
-  } else if (c === 0x9 || c === 0xA || c === 0xD) {
-    this.parse_error = true;
   } else {
     this.parse_error = true;
     return failure;
@@ -884,8 +886,6 @@ URLStateMachine.prototype["parse" + "file host"] =
       this.buffer = "";
       this.state = "path start";
     }
-  } else if (c === 0x9 || c === 0xA || c === 0xD) {
-    this.parse_error = true;
   } else {
     this.buffer += c_str;
   }
@@ -939,8 +939,6 @@ URLStateMachine.prototype["parse" + "path"] =
       this.url.fragment = "";
       this.state = "fragment";
     }
-  } else if (c === 0x9 || c === 0xA || c === 0xD) {
-    this.parse_error = true;
   } else {
     // TODO: If c is not a URL code point and not "%", parse error.
 
@@ -981,7 +979,7 @@ URLStateMachine.prototype["parse" + "non-relative path"] =
       this.parse_error = true;
     }
 
-    if (!isNaN(c) && c !== 0x9 && c !== 0xA && c !== 0xD) {
+    if (!isNaN(c)) {
       this.url.path[0] = this.url.path[0] + encodeChar(c, isSimpleEncode);
     }
   }
@@ -1009,8 +1007,6 @@ URLStateMachine.prototype["parse" + "query"] =
       this.url.fragment = "";
       this.state = "fragment";
     }
-  } else if (c === 0x9 || c === 0xA || c === 0xD) {
-    this.parse_error = true;
   } else {
     //TODO: If c is not a URL code point and not "%", parse error.
     if (c === p("%") &&
@@ -1026,7 +1022,7 @@ URLStateMachine.prototype["parse" + "query"] =
 URLStateMachine.prototype["parse" + "fragment"] =
     function parseFragment(c, c_str) {
   if (isNaN(c)) { // do nothing
-  } else if (c === 0x0 || c === 0x9 || c === 0xA || c === 0xD) {
+  } else if (c === 0x0) {
     this.parse_error = true;
   } else {
     //TODO: If c is not a URL code point and not "%", parse error.
