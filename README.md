@@ -4,7 +4,7 @@ whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spe
 
 ## Current Status
 
-whatwg-url is currently up to date with the URL spec up to commit [7b4021](https://github.com/whatwg/url/tree/7b40216f809c7fe3c9a1680b5c1b06a771c9ebd8).
+whatwg-url is currently up to date with the URL spec up to commit [e322a8](https://github.com/whatwg/url/tree/e322a8a79246b3f7c026bc9e705f22f069d1bde6).
 
 ## API
 
@@ -59,6 +59,6 @@ The URL record type has the following API:
 - [`path`](https://url.spec.whatwg.org/#concept-url-path) (as an array)
 - [`query`](https://url.spec.whatwg.org/#concept-url-query)
 - [`fragment`](https://url.spec.whatwg.org/#concept-url-fragment)
-- [`nonRelative`](https://url.spec.whatwg.org/#non-relative-flag) (as a boolean)
+- [`cannotBeABaseURL`](https://url.spec.whatwg.org/#url-cannot-be-a-base-url-flag) (as a boolean)
 
 These properties should be treated with care, as in general changing them will cause the URL record to be in an inconsistent state until the appropriate invocation of `basicURLParse` is used to fix it up. You can see examples of this in the URL Standard, where there are many step sequences like "4. Set context object’s url’s fragment to the empty string. 5. Basic URL parse _input_ with context object’s url as _url_ and fragment state as _state override_." In between those two steps, a URL record is in an unusable state.

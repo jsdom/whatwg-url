@@ -462,7 +462,7 @@ function URLStateMachine(input, base, encoding_override, url, state_override) {
       query: null,
       fragment: null,
 
-      nonRelative: false
+      cannotBeABaseURL: false
     };
 
     const res = trimControlChars(this.input);
@@ -547,7 +547,7 @@ URLStateMachine.prototype["parse" + "scheme"] =
       this.state = "path or authority";
       ++this.pointer;
     } else {
-      this.url.nonRelative = true;
+      this.url.cannotBeABaseURL = true;
       this.url.path.push("");
       this.state = "non-relative path";
     }
@@ -564,14 +564,14 @@ URLStateMachine.prototype["parse" + "scheme"] =
 URLStateMachine.prototype["parse" + "no scheme"] =
     function parseNoScheme(c, c_str) {
   //jshint unused:false
-  if (this.base === null || (this.base.nonRelative && c !== p("#"))) {
+  if (this.base === null || (this.base.cannotBeABaseURL && c !== p("#"))) {
     return failure;
-  } else if (this.base.nonRelative && c === p("#")) {
+  } else if (this.base.cannotBeABaseURL && c === p("#")) {
     this.url.scheme = this.base.scheme;
     this.url.path = this.base.path.slice();
     this.url.query = this.base.query;
     this.url.fragment = "";
-    this.url.nonRelative = true;
+    this.url.cannotBeABaseURL = true;
     this.state = "fragment";
   } else if (this.base.scheme === "file") {
     this.state = "file";
@@ -1054,7 +1054,7 @@ function serializeURL(url, excludeFragment) {
     output += "//";
   }
 
-  if (url.nonRelative) {
+  if (url.cannotBeABaseURL) {
     output += url.path[0];
   } else {
     output += "/" + url.path.join("/");
