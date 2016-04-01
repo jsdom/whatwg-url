@@ -15,7 +15,7 @@ const request = require("request");
 // 1. Go to https://github.com/w3c/web-platform-tests/blob/master/url/urltestdata.json
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "77267eb15cbce849ac01c95fc4d85015a28539e5";
+const commitHash = "0d9deb2357a5e0c9eb9f1bdc096057e4d240963c";
 
 const sourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/urltestdata.json`;
 

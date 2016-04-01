@@ -20,7 +20,9 @@ function testURL(expected) {
     }
 
     assert.equal(url.href, expected.href, "href");
-    assert.equal(url.origin, expected.origin, "origin");
+    if ("origin" in expected) {
+      assert.equal(url.origin, expected.origin, "origin");
+    }
     assert.equal(url.protocol, expected.protocol, "protocol");
     assert.equal(url.username, expected.username, "username");
     assert.equal(url.password, expected.password, "password");
