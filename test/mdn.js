@@ -1,6 +1,4 @@
 "use strict";
-/*global specify */
-
 const assert = require("assert");
 const URL = require("..").URL;
 

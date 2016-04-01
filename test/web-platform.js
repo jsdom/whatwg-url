@@ -1,7 +1,4 @@
 "use strict";
-/*global describe */
-/*global it */
-
 const assert = require("assert");
 const URL = require("..").URL;
 const testCases = require("./web-platform-tests/urltestdata.json");

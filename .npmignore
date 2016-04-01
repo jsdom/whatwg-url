@@ -1,7 +1,6 @@
 .npmignore
 .gitattributes
-.jshint*
-.jscsrc
+.eslintrc.json
 .travis.yml
 
 scripts/

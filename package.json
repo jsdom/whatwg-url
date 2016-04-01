@@ -11,9 +11,8 @@
     "webidl-conversions": "^3.0.0"
   },
   "devDependencies": {
+    "eslint": "^2.6.0",
     "istanbul": "~0.3.14",
-    "jscs": "^1.13.0",
-    "jshint": "^2.7.0",
     "mocha": "^2.2.4",
     "recast": "~0.10.29",
     "request": "^2.55.0",
@@ -22,7 +21,7 @@
   "scripts": {
     "build": "node scripts/transform.js && node scripts/convert-idl.js",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha",
-    "lint": "jscs src/ test/ scripts/ && jshint src/ test/ scripts/",
+    "lint": "eslint .",
     "prepublish": "npm run build",
     "pretest": "node scripts/get-latest-platform-tests.js && npm run build",
     "test": "mocha"
