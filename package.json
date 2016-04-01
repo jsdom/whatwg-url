@@ -1,7 +1,7 @@
 {
   "name": "whatwg-url",
   "version": "1.0.1",
-  "description": "An implementation of the WHATWG URL algorithm",
+  "description": "An implementation of the WHATWG URL Standard's URL API and parsing machinery",
   "main": "lib/public-api.js",
   "author": "Sebastian Mayr <github@smayr.name>",
   "license": "MIT",
