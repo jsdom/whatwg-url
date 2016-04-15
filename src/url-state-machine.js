@@ -1079,7 +1079,7 @@ function serializeOrigin(tuple) {
   let result = tuple.scheme + "://";
   result += tr46.toUnicode(tuple.host, false).domain;
 
-  if (specialSchemas[tuple.scheme] && tuple.port !== specialSchemas[tuple.scheme]) {
+  if (tuple.port !== null) {
     result += ":" + tuple.port;
   }
 
@@ -1106,7 +1106,7 @@ module.exports.serializeURLToUnicodeOrigin = function (url) {
       return serializeOrigin({
         scheme: url.scheme,
         host: serializeHost(url.host),
-        port: url.port === null ? specialSchemas[url.scheme] : url.port
+        port: url.port
       });
     case "file":
       // spec says "exercise to the reader", chrome says "file://"
