@@ -45,7 +45,7 @@ The `stateOverride` parameter is one of the following strings:
 - [`"file host"`](https://url.spec.whatwg.org/#file-host-state)
 - [`"path start"`](https://url.spec.whatwg.org/#path-start-state)
 - [`"path"`](https://url.spec.whatwg.org/#path-state)
-- [`"non-relative path"`](https://url.spec.whatwg.org/#non-relative-path-state)
+- [`"cannot-be-a-base-URL path"`](https://url.spec.whatwg.org/#cannot-be-a-base-url-path-state)
 - [`"query"`](https://url.spec.whatwg.org/#query-state)
 - [`"fragment"`](https://url.spec.whatwg.org/#fragment-state)
 
