@@ -504,10 +504,11 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
     this.buffer += cStr.toLowerCase();
   } else if (c === p(":")) {
     if (this.stateOverride) {
-      // TODO: XOR
-      if (specialSchemas[this.url.scheme] !== undefined && !specialSchemas[this.buffer]) {
+      if (specialSchemas[this.url.scheme] !== undefined && specialSchemas[this.buffer] === undefined) {
         return false;
-      } else if (specialSchemas[this.url.scheme] === undefined && specialSchemas[this.buffer]) {
+      }
+
+      if (specialSchemas[this.url.scheme] === undefined && specialSchemas[this.buffer] !== undefined) {
         return false;
       }
     }
@@ -517,7 +518,7 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
       return false;
     }
     if (this.url.scheme === "file") {
-      if (this.input[this.pointer + 1] === p("/") && this.input[this.pointer + 2] === p("/")) {
+      if (this.input[this.pointer + 1] !== p("/") || this.input[this.pointer + 2] !== p("/")) {
         this.parseError = true;
       }
       this.state = "file";
@@ -532,7 +533,7 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
     } else {
       this.url.cannotBeABaseURL = true;
       this.url.path.push("");
-      this.state = "non-relative path";
+      this.state = "cannot-be-a-base-URL path";
     }
   } else if (!this.stateOverride) {
     this.buffer = "";
@@ -956,7 +957,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
   return true;
 };
 
-URLStateMachine.prototype["parse non-relative path"] = function parseNonRelativePath(c) {
+URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCannotBeABaseURLPath(c) {
   if (c === p("?")) {
     this.url.query = "";
     this.state = "query";
