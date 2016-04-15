@@ -15,11 +15,15 @@ const request = require("request");
 // 1. Go to https://github.com/w3c/web-platform-tests/blob/master/url/urltestdata.json
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "a8e267d32ff41ee2963e4ad6d8f4af5bdd414595";
+const commitHash = "4ec7252a7a16d8ff3dc0b02b2f4c858b4bff9e9b";
 
 const sourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/urltestdata.json`;
+const setterSourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/setters_tests.json`;
 
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
 request.get(sourceURL)
   .pipe(fs.createWriteStream(path.resolve(targetDir, "urltestdata.json")));
+
+request.get(setterSourceURL)
+  .pipe(fs.createWriteStream(path.resolve(targetDir, "setters_tests.json")));

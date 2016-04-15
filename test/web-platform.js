@@ -1,8 +1,9 @@
 "use strict";
 const assert = require("assert");
 const URL = require("..").URL;
-const testCases = require("./web-platform-tests/urltestdata.json");
-const additionalTestCases = require("./to-upstream.json");
+const parsingTestCases = require("./web-platform-tests/urltestdata.json");
+const additionalParsingTestCases = require("./to-upstream.json");
+const setterTestData = require("./web-platform-tests/setters_tests.json");
 
 function testURL(expected) {
   return () => {
@@ -32,24 +33,54 @@ function testURL(expected) {
   };
 }
 
-describe("Web Platform Tests", () => {
-  for (const expected of testCases) {
-    if (typeof expected === "string") {
-      // It's a "comment"; skip it.
-      continue;
-    }
+function testSetterCase(testCase, propertyName) {
+  return () => {
+    const url = new URL(testCase.href);
+    url[propertyName] = testCase.new_value;
 
-    it("Parsing: <" + expected.input + "> against <" + expected.base + ">", testURL(expected));
-  }
+    for (const expectedProperty in testCase.expected) {
+      assert.equal(url[expectedProperty], testCase.expected[expectedProperty]);
+    }
+  };
+}
+
+describe("Web platform tests", () => {
+  describe("parsing", () => {
+    for (const expected of parsingTestCases) {
+      if (typeof expected === "string") {
+        // It's a "comment"; skip it.
+        continue;
+      }
+
+      specify(`<${expected.input}> against <${expected.base}>`, testURL(expected));
+    }
+  });
+
+  describe("setters", () => {
+    for (const key of Object.keys(setterTestData)) {
+      if (key === "comment") {
+        continue;
+      }
+
+      describe(key, () => {
+        for (const testCase of setterTestData[key]) {
+          specify(`<${testCase.href}>.${key} = "${testCase.new_value}" ${testCase.comment || ""}`,
+                  testSetterCase(testCase, key));
+        }
+      });
+    }
+  });
 });
 
 describe("To-upstream tests", () => {
-  for (const expected of additionalTestCases) {
-    if (typeof expected === "string") {
-      // It's a "comment"; skip it.
-      continue;
-    }
+  describe("parsing", () => {
+    for (const expected of additionalParsingTestCases) {
+      if (typeof expected === "string") {
+        // It's a "comment"; skip it.
+        continue;
+      }
 
-    it("Parsing: <" + expected.input + "> against <" + expected.base + ">", testURL(expected));
-  }
+      specify("<" + expected.input + "> against <" + expected.base + ">", testURL(expected));
+    }
+  });
 });
