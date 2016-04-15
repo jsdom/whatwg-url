@@ -715,7 +715,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
   return true;
 };
 
-URLStateMachine.prototype["parse host name"] =
+URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   if (c === p(":") && !this.arrFlag) {
     if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
@@ -730,7 +730,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
     this.url.host = host;
     this.buffer = "";
     this.state = "port";
-    if (this.stateOverride === "host name") {
+    if (this.stateOverride === "hostname") {
       return false;
     }
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
