@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "eslint": "^2.6.0",
-    "istanbul": "~0.3.14",
+    "istanbul": "~0.4.3",
     "mocha": "^2.2.4",
     "recast": "~0.10.29",
     "request": "^2.55.0",
