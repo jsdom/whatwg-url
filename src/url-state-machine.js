@@ -1129,7 +1129,7 @@ module.exports.basicURLParse = function (input, options) {
 
   const usm = new URLStateMachine(input, options.baseURL, options.encodingOverride, options.url, options.stateOverride);
   if (usm.failure) {
-    throw new TypeError("Invalid URL");
+    return "failure";
   }
 
   return usm.url;
