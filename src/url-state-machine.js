@@ -911,7 +911,11 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
     }
 
     if (isDoubleDot(this.buffer)) {
-      this.url.path.pop();
+      if (this.url.scheme === "file") {
+        this.url.path.push(this.buffer);
+      } else {
+        this.url.path.pop();
+      }
       if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
         this.url.path.push("");
       }
