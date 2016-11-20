@@ -1,10 +1,6 @@
 [Constructor(USVString url, optional USVString base),
  Exposed=(Window,Worker)]
-interface URL
- {
-  static USVString domainToASCII(USVString domain);
-  static USVString domainToUnicode(USVString domain);
-
+interface URL {
   stringifier attribute USVString href;
   readonly attribute USVString origin;
            attribute USVString protocol;
@@ -15,6 +11,6 @@ interface URL
            attribute USVString port;
            attribute USVString pathname;
            attribute USVString search;
-//  readonly attribute URLSearchParams searchParams;
+//  [SameObject] readonly attribute URLSearchParams searchParams;
            attribute USVString hash;
 };
