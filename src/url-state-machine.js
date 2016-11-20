@@ -429,7 +429,7 @@ function trimTabAndNewline(url) {
 }
 
 function popPath(url) {
-  if (url.scheme !== "file" || !url.path.filter((seg) => /^[A-Za-z](|:)$/.test(seg)).length) {
+  if (url.scheme !== "file" || !url.path.filter(seg => /^[A-Za-z](|:)$/.test(seg)).length) {
     url.path.pop();
   }
 }
