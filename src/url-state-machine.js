@@ -46,16 +46,16 @@ function isASCIIHex(c) {
 function isURLCodePoint(c) {
   return (
     isASCIIAlphanumeric(c) ||
-      c == 0x21 ||
-      c == 0x24 ||
+      c === 0x21 ||
+      c === 0x24 ||
       (c >= 0x26 && c <= 0x2F) ||
-      c == 0x3A ||
-      c == 0x3B ||
-      c == 0x3D ||
-      c == 0x3F ||
-      c == 0x40 ||
-      c == 0x5F ||
-      c == 0x7E ||
+      c === 0x3A ||
+      c === 0x3B ||
+      c === 0x3D ||
+      c === 0x3F ||
+      c === 0x40 ||
+      c === 0x5F ||
+      c === 0x7E ||
       (c >= 0xA0 && c <= 0xD7FF) ||
       (c >= 0xE000 && c <= 0xFDCF) ||
       (c >= 0xFDF0 && c <= 0xFFFD) ||
