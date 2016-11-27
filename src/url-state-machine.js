@@ -1012,8 +1012,7 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
     this.url.fragment = "";
     this.state = "fragment";
   } else {
-    // TODO: Add: not a URL code point
-    if (!isNaN(c) && c !== p("%")) {
+    if (!isNaN(c) && !isURLCodePoint(c) && c !== p("%")) {
       this.parseError = true;
     }
 
@@ -1053,7 +1052,10 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
       this.state = "fragment";
     }
   } else {
-    // TODO: If c is not a URL code point and not "%", parse error.
+    if (!isURLCodePoint(c) && c !== p('%')) {
+      this.parseError = true;
+    }
+
     if (c === p("%") &&
       (!isASCIIHex(this.input[this.pointer + 1]) ||
         !isASCIIHex(this.input[this.pointer + 2]))) {
@@ -1071,7 +1073,10 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c, cStr) {
   } else if (c === 0x0) {
     this.parseError = true;
   } else {
-    // TODO: If c is not a URL code point and not "%", parse error.
+    if (!isURLCodePoint(c) && c !== '%') {
+      this.parseError = true;
+    }
+
     if (c === p("%") &&
       (!isASCIIHex(this.input[this.pointer + 1]) ||
         !isASCIIHex(this.input[this.pointer + 2]))) {
