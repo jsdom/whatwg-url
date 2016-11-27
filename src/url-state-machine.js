@@ -1052,7 +1052,7 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
       this.state = "fragment";
     }
   } else {
-    if (!isURLCodePoint(c) && c !== p('%')) {
+    if (!isURLCodePoint(c) && c !== p("%")) {
       this.parseError = true;
     }
 
@@ -1073,7 +1073,7 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c, cStr) {
   } else if (c === 0x0) {
     this.parseError = true;
   } else {
-    if (!isURLCodePoint(c) && c !== '%') {
+    if (!isURLCodePoint(c) && c !== "%") {
       this.parseError = true;
     }
 
