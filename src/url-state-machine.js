@@ -981,7 +981,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.state = "fragment";
     }
   } else {
-    if(!isURLCodePoint(c) && c !== p("%")) {
+    if (!isURLCodePoint(c) && c !== p("%")) {
       this.parseError = true;
     }
 
