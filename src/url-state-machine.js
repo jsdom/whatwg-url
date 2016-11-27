@@ -45,36 +45,36 @@ function isASCIIHex(c) {
 
 function isURLCodePoint(c) {
   return (
-    isASCIIAlphanumeric(c)
-    || c == 0x21
-    || c == 0x24
-    || (c >= 0x26 && c <= 0x2F)
-    || c == 0x3A
-    || c == 0x3B
-    || c == 0x3D
-    || c == 0x3F
-    || c == 0x40
-    || c == 0x5F
-    || c == 0x7E
-    || (c >= 0xA0 && c <= 0xD7FF)
-    || (c >= 0xE000 && c <= 0xFDCF)
-    || (c >= 0xFDF0 && c <= 0xFFFD)
-    || (c >= 0x10000 && c <= 0x1FFFD)
-    || (c >= 0x20000 && c <= 0x2FFFD)
-    || (c >= 0x30000 && c <= 0x3FFFD)
-    || (c >= 0x40000 && c <= 0x4FFFD)
-    || (c >= 0x50000 && c <= 0x5FFFD)
-    || (c >= 0x60000 && c <= 0x6FFFD)
-    || (c >= 0x70000 && c <= 0x7FFFD)
-    || (c >= 0x80000 && c <= 0x8FFFD)
-    || (c >= 0x90000 && c <= 0x9FFFD)
-    || (c >= 0xA0000 && c <= 0xAFFFD)
-    || (c >= 0xB0000 && c <= 0xBFFFD)
-    || (c >= 0xC0000 && c <= 0xCFFFD)
-    || (c >= 0xD0000 && c <= 0xDFFFD)
-    || (c >= 0xE0000 && c <= 0xEFFFD)
-    || (c >= 0xF0000 && c <= 0xFFFFD)
-    || (c >= 0x100000 && c <= 0x10FFFD)
+    isASCIIAlphanumeric(c) ||
+      c == 0x21 ||
+      c == 0x24 ||
+      (c >= 0x26 && c <= 0x2F) ||
+      c == 0x3A ||
+      c == 0x3B ||
+      c == 0x3D ||
+      c == 0x3F ||
+      c == 0x40 ||
+      c == 0x5F ||
+      c == 0x7E ||
+      (c >= 0xA0 && c <= 0xD7FF) ||
+      (c >= 0xE000 && c <= 0xFDCF) ||
+      (c >= 0xFDF0 && c <= 0xFFFD) ||
+      (c >= 0x10000 && c <= 0x1FFFD) ||
+      (c >= 0x20000 && c <= 0x2FFFD) ||
+      (c >= 0x30000 && c <= 0x3FFFD) ||
+      (c >= 0x40000 && c <= 0x4FFFD) ||
+      (c >= 0x50000 && c <= 0x5FFFD) ||
+      (c >= 0x60000 && c <= 0x6FFFD) ||
+      (c >= 0x70000 && c <= 0x7FFFD) ||
+      (c >= 0x80000 && c <= 0x8FFFD) ||
+      (c >= 0x90000 && c <= 0x9FFFD) ||
+      (c >= 0xA0000 && c <= 0xAFFFD) ||
+      (c >= 0xB0000 && c <= 0xBFFFD) ||
+      (c >= 0xC0000 && c <= 0xCFFFD) ||
+      (c >= 0xD0000 && c <= 0xDFFFD) ||
+      (c >= 0xE0000 && c <= 0xEFFFD) ||
+      (c >= 0xF0000 && c <= 0xFFFFD) ||
+      (c >= 0x100000 && c <= 0x10FFFD)
   );
 }
 
