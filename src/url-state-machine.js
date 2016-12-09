@@ -1041,7 +1041,7 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c, cStr) {
       this.parseError = true;
     }
 
-    this.url.fragment += cStr;
+    this.url.fragment += encodeChar(c, isSimpleEncode);
   }
 
   return true;
