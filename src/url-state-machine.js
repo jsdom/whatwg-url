@@ -429,9 +429,19 @@ function trimTabAndNewline(url) {
 }
 
 function shortenPath(url) {
-  if (url.scheme !== "file" || !url.path.filter(seg => /^[A-Za-z](|:)$/.test(seg)).length) {
-    url.path.pop();
+  const path = url.path;
+  if (path.length === 0) {
+    return;
   }
+  if (url.scheme === "file" && path.length === 1 && isNormalizedWindowsDriveLetter(path[0])) {
+    return;
+  }
+
+  path.pop();
+}
+
+function isNormalizedWindowsDriveLetter(string) {
+  return /^[A-Za-z]:$/.test(string);
 }
 
 function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
