@@ -428,7 +428,7 @@ function trimTabAndNewline(url) {
   return url.replace(/\u0009|\u000A|\u000D/g, "");
 }
 
-function popPath(url) {
+function shortenPath(url) {
   if (url.scheme !== "file" || !url.path.filter(seg => /^[A-Za-z](|:)$/.test(seg)).length) {
     url.path.pop();
   }
@@ -838,7 +838,7 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
           [p("/"), p("\\"), p("?"), p("#")].indexOf(this.input[this.pointer + 2]) === -1) {
         this.url.host = this.base.host;
         this.url.path = this.base.path.slice();
-        popPath(this.url);
+        shortenPath(this.url);
       } else {
         this.parseError = true;
       }
@@ -917,7 +917,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
     }
 
     if (isDoubleDot(this.buffer)) {
-      popPath(this.url);
+      shortenPath(this.url);
       if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
         this.url.path.push("");
       }
