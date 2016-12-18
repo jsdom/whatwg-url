@@ -1029,7 +1029,7 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
   return true;
 };
 
-URLStateMachine.prototype["parse fragment"] = function parseFragment(c, cStr) {
+URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
   if (isNaN(c)) { // do nothing
   } else if (c === 0x0) {
     this.parseError = true;
