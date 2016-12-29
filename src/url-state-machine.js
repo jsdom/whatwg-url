@@ -390,6 +390,23 @@ function parseHost(input, isUnicode) {
   return isUnicode ? tr46.toUnicode(asciiDomain, false).domain : asciiDomain;
 }
 
+function parseURLHost(input, isSpecial) {
+  if (isSpecial) {
+    if (input === "") {
+      return failure;
+    }
+
+    return parseHost(input);
+  }
+
+  let output = "";
+  const decoded = punycode.ucs2.decode(input);
+  for (let i = 0; i < decoded.length; ++i) {
+    output += encodeChar(decoded[i], isSimpleEncode);
+  }
+  return output;
+}
+
 function findLongestZeroSequence(arr) {
   let maxIdx = null;
   let maxLen = 1; // only find elements > 1
@@ -750,11 +767,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
 URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   if (c === p(":") && !this.arrFlag) {
-    if (isSpecial(this.url) && this.buffer === "") {
-      return failure;
-    }
-
-    const host = parseHost(this.buffer);
+    const host = parseURLHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -768,11 +781,8 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (isSpecial(this.url) && c === p("\\"))) {
     --this.pointer;
-    if (isSpecial(this.url) && this.buffer === "") {
-      return failure;
-    }
 
-    const host = parseHost(this.buffer);
+    const host = parseURLHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -1078,7 +1088,13 @@ function serializeURL(url, excludeFragment) {
     if (url.username !== "" || url.password !== null) {
       output += "@";
     }
-    output += serializeHost(url.host);
+
+    if (isSpecial(url)) {
+      output += serializeHost(url.host);
+    } else {
+      output += url.host;
+    }
+
     if (url.port !== null) {
       output += ":" + url.port;
     }
@@ -1089,6 +1105,9 @@ function serializeURL(url, excludeFragment) {
   if (url.cannotBeABaseURL) {
     output += url.path[0];
   } else {
+    if (!isSpecial(url) && url.path.length === 0) {
+      return output;
+    }
     output += "/" + url.path.join("/");
   }
 
@@ -1196,3 +1215,5 @@ module.exports.parseURL = function (input, options) {
   // We don't handle blobs, so this just delegates:
   return module.exports.basicURLParse(input, { baseURL: options.baseURL, encodingOverride: options.encodingOverride });
 };
+
+module.exports.isSpecial = isSpecial;
