@@ -976,14 +976,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.parseError = true;
     }
 
-    if (c === p("%") &&
-        this.input[this.pointer + 1] === p("2") &&
-        (this.input[this.pointer + 2] === p("e") || this.input[this.pointer + 2] === p("E"))) {
-      this.buffer += ".";
-      this.pointer += 2;
-    } else {
-      this.buffer += encodeChar(c, isDefaultEncode);
-    }
+    this.buffer += encodeChar(c, isDefaultEncode);
   }
 
   return true;

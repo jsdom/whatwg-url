@@ -15,7 +15,11 @@ const request = require("request");
 // 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
+<<<<<<< HEAD
 const commitHash = "e0012406859014e8f31dbaf12122d0cd10249db4";
+=======
+const commitHash = "d179f7eadbe83a6fa9bf7ee85c2de440b8c6dc7d";
+>>>>>>> Spec update: stop decoding all %2es in paths
 
 const sourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/urltestdata.json`;
 const setterSourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/setters_tests.json`;
