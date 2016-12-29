@@ -6,7 +6,7 @@ function p(char) {
   return char.codePointAt(0);
 }
 
-const specialSchemas = {
+const specialSchemes = {
   ftp: 21,
   file: null,
   gopher: 70,
@@ -50,6 +50,18 @@ function isSingleDot(buffer) {
 function isDoubleDot(buffer) {
   buffer = buffer.toLowerCase();
   return buffer === ".." || buffer === "%2e." || buffer === ".%2e" || buffer === "%2e%2e";
+}
+
+function isSpecialScheme(scheme) {
+  return specialSchemes[scheme] !== undefined;
+}
+
+function isSpecial(url) {
+  return isSpecialScheme(url.scheme);
+}
+
+function defaultPort(scheme) {
+  return specialSchemes[scheme];
 }
 
 function percentEncode(c) {
@@ -524,11 +536,11 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
     this.buffer += cStr.toLowerCase();
   } else if (c === p(":")) {
     if (this.stateOverride) {
-      if (specialSchemas[this.url.scheme] !== undefined && specialSchemas[this.buffer] === undefined) {
+      if (isSpecial(this.url) && !isSpecialScheme(this.buffer)) {
         return false;
       }
 
-      if (specialSchemas[this.url.scheme] === undefined && specialSchemas[this.buffer] !== undefined) {
+      if (!isSpecial(this.url) && isSpecialScheme(this.buffer)) {
         return false;
       }
     }
@@ -542,10 +554,9 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
         this.parseError = true;
       }
       this.state = "file";
-    } else if (specialSchemas[this.url.scheme] !== undefined && this.base !== null &&
-               this.base.scheme === this.url.scheme) {
+    } else if (isSpecial(this.url) && this.base !== null && this.base.scheme === this.url.scheme) {
       this.state = "special relative or authority";
-    } else if (specialSchemas[this.url.scheme] !== undefined) {
+    } else if (isSpecial(this.url)) {
       this.state = "special authority slashes";
     } else if (this.input[this.pointer + 1] === p("/")) {
       this.state = "path or authority";
@@ -640,7 +651,7 @@ URLStateMachine.prototype["parse relative"] = function parseRelative(c) {
     this.url.query = this.base.query;
     this.url.fragment = "";
     this.state = "fragment";
-  } else if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
+  } else if (isSpecial(this.url) && c === p("\\")) {
     this.parseError = true;
     this.state = "relative slash";
   } else {
@@ -658,7 +669,7 @@ URLStateMachine.prototype["parse relative"] = function parseRelative(c) {
 };
 
 URLStateMachine.prototype["parse relative slash"] = function parseRelativeSlash(c) {
-  if (c === p("/") || (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+  if (c === p("/") || (isSpecial(this.url) && c === p("\\"))) {
     if (c === p("\\")) {
       this.parseError = true;
     }
@@ -725,7 +736,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
     }
     this.buffer = "";
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
-             (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+             (isSpecial(this.url) && c === p("\\"))) {
     this.pointer -= countSymbols(this.buffer) + 1;
     this.buffer = "";
     this.state = "host";
@@ -739,7 +750,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
 URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   if (c === p(":") && !this.arrFlag) {
-    if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
+    if (isSpecial(this.url) && this.buffer === "") {
       return failure;
     }
 
@@ -755,9 +766,9 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
       return false;
     }
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
-             (specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+             (isSpecial(this.url) && c === p("\\"))) {
     --this.pointer;
-    if (specialSchemas[this.url.scheme] !== undefined && this.buffer === "") {
+    if (isSpecial(this.url) && this.buffer === "") {
       return failure;
     }
 
@@ -788,7 +799,7 @@ URLStateMachine.prototype["parse port"] = function parsePort(c, cStr) {
   if (isASCIIDigit(c)) {
     this.buffer += cStr;
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
-             (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) ||
+             (isSpecial(this.url) && c === p("\\")) ||
              this.stateOverride) {
     if (this.buffer !== "") {
       const port = parseInt(this.buffer);
@@ -796,7 +807,7 @@ URLStateMachine.prototype["parse port"] = function parsePort(c, cStr) {
         this.parseError = true;
         return failure;
       }
-      this.url.port = port === specialSchemas[this.url.scheme] ? null : port;
+      this.url.port = port === defaultPort(this.url.scheme) ? null : port;
       this.buffer = "";
     }
     if (this.stateOverride) {
@@ -908,11 +919,11 @@ URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
 };
 
 URLStateMachine.prototype["parse path start"] = function parsePathStart(c) {
-  if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
+  if (isSpecial(this.url) && c === p("\\")) {
     this.parseError = true;
   }
   this.state = "path";
-  if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+  if (c !== p("/") && !(isSpecial(this.url) && c === p("\\"))) {
     --this.pointer;
   }
 
@@ -920,19 +931,19 @@ URLStateMachine.prototype["parse path start"] = function parsePathStart(c) {
 };
 
 URLStateMachine.prototype["parse path"] = function parsePath(c) {
-  if (isNaN(c) || c === p("/") || (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) ||
+  if (isNaN(c) || c === p("/") || (isSpecial(this.url) && c === p("\\")) ||
       (!this.stateOverride && (c === p("?") || c === p("#")))) {
-    if (specialSchemas[this.url.scheme] !== undefined && c === p("\\")) {
+    if (isSpecial(this.url) && c === p("\\")) {
       this.parseError = true;
     }
 
     if (isDoubleDot(this.buffer)) {
       shortenPath(this.url);
-      if (c !== p("/") && !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+      if (c !== p("/") && !(isSpecial(this.url) && c === p("\\"))) {
         this.url.path.push("");
       }
     } else if (isSingleDot(this.buffer) && c !== p("/") &&
-               !(specialSchemas[this.url.scheme] !== undefined && c === p("\\"))) {
+               !(isSpecial(this.url) && c === p("\\"))) {
       this.url.path.push("");
     } else if (!isSingleDot(this.buffer)) {
       if (this.url.scheme === "file" && this.url.path.length === 0 &&
@@ -1006,7 +1017,7 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
 
 URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
   if (isNaN(c) || (!this.stateOverride && c === p("#"))) {
-    if (specialSchemas[this.url.scheme] === undefined || this.url.scheme === "ws" || this.url.scheme === "wss") {
+    if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
       this.encodingOverride = "utf-8";
     }
 
