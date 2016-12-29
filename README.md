@@ -23,7 +23,8 @@ The following methods are exported for use by places like jsdom that need to imp
 - [Serialize an integer](https://url.spec.whatwg.org/#serialize-an-integer): `serializeInteger(number)`
 - [Origin](https://url.spec.whatwg.org/#concept-url-origin) [Unicode serializer](https://html.spec.whatwg.org/multipage/browsers.html#unicode-serialisation-of-an-origin): `serializeURLToUnicodeOrigin(urlRecord)`
 - [Set the username](https://url.spec.whatwg.org/#set-the-username): `setTheUsername(urlRecord, usernameString)`
-- [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`.
+- [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`
+- [Is special](https://url.spec.whatwg.org/#is-special): `isSpecial(urlRecord)`
 
 The `stateOverride` parameter is one of the following strings:
 
