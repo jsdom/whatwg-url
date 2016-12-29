@@ -458,7 +458,7 @@ function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
     this.url = {
       scheme: "",
       username: "",
-      password: null,
+      password: "",
       host: null,
       port: null,
       path: [],
@@ -707,17 +707,19 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
     }
     this.atFlag = true;
 
+    let passwordTokenSeenFlag = false;
+
     // careful, this is based on buffer and has its own pointer (this.pointer != pointer) and inner chars
     const len = countSymbols(this.buffer);
     for (let pointer = 0; pointer < len; ++pointer) {
       const codePoint = this.buffer.codePointAt(pointer);
 
-      if (codePoint === p(":") && this.url.password === null) {
-        this.url.password = "";
+      if (codePoint === p(":") && !passwordTokenSeenFlag) {
+        passwordTokenSeenFlag = true;
         continue;
       }
       const encodedCodePoints = encodeChar(codePoint, isUserInfoEncode);
-      if (this.url.password !== null) {
+      if (passwordTokenSeenFlag) {
         this.url.password += encodedCodePoints;
       } else {
         this.url.username += encodedCodePoints;
@@ -1060,14 +1062,18 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
 function serializeURL(url, excludeFragment) {
   let output = url.scheme + ":";
   if (url.host !== null) {
-    output += "//" + url.username;
-    if (url.password !== null) {
-      output += ":" + url.password;
-    }
-    if (url.username !== "" || url.password !== null) {
+    output += "//";
+
+    if (url.username !== "" || url.password !== "") {
+      output += url.username;
+      if (url.password !== "") {
+        output += ":" + url.password;
+      }
       output += "@";
     }
+
     output += serializeHost(url.host);
+
     if (url.port !== null) {
       output += ":" + url.port;
     }
@@ -1160,14 +1166,10 @@ module.exports.setTheUsername = function (url, username) {
 };
 
 module.exports.setThePassword = function (url, password) {
-  if (password === "") {
-    url.password = null;
-  } else {
-    url.password = "";
-    const decoded = punycode.ucs2.decode(password);
-    for (let i = 0; i < decoded.length; ++i) {
-      url.password += encodeChar(decoded[i], isUserInfoEncode);
-    }
+  url.password = "";
+  const decoded = punycode.ucs2.decode(password);
+  for (let i = 0; i < decoded.length; ++i) {
+    url.password += encodeChar(decoded[i], isUserInfoEncode);
   }
 };
 
