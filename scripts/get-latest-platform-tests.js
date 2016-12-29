@@ -12,10 +12,10 @@ const request = require("request");
 // At the moment we are pinned to a branch.
 //
 // To get the latest commit:
-// 1. Go to https://github.com/w3c/web-platform-tests/blob/master/url/urltestdata.json
+// 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "ea1216ceb6495b8d58ec5fd43bc1abaf7110cf40";
+const commitHash = "5be497b5f5a7036e26dc14739aa8d42f643cf94f";
 
 const sourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/urltestdata.json`;
 const setterSourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/setters_tests.json`;
