@@ -486,6 +486,7 @@ function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
   this.buffer = "";
   this.atFlag = false;
   this.arrFlag = false;
+  this.passwordTokenSeenFlag = false;
 
   this.input = punycode.ucs2.decode(this.input);
 
@@ -707,19 +708,17 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
     }
     this.atFlag = true;
 
-    let passwordTokenSeenFlag = false;
-
     // careful, this is based on buffer and has its own pointer (this.pointer != pointer) and inner chars
     const len = countSymbols(this.buffer);
     for (let pointer = 0; pointer < len; ++pointer) {
       const codePoint = this.buffer.codePointAt(pointer);
 
-      if (codePoint === p(":") && !passwordTokenSeenFlag) {
-        passwordTokenSeenFlag = true;
+      if (codePoint === p(":") && !this.passwordTokenSeenFlag) {
+        this.passwordTokenSeenFlag = true;
         continue;
       }
       const encodedCodePoints = encodeChar(codePoint, isUserInfoEncode);
-      if (passwordTokenSeenFlag) {
+      if (this.passwordTokenSeenFlag) {
         this.url.password += encodedCodePoints;
       } else {
         this.url.username += encodedCodePoints;
