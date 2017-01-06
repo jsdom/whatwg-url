@@ -301,22 +301,24 @@ function parseIPv6(input) {
         }
       }
 
-      if (dotsSeen < 3 && input[pointer] !== p(".")) {
-        return failure;
-      }
       ip[piecePtr] = ip[piecePtr] * 0x100 + value;
+
       if (dotsSeen === 1 || dotsSeen === 3) {
         ++piecePtr;
       }
 
-      if (input[pointer] !== undefined) {
-        ++pointer;
-      }
-
-      if (dotsSeen === 3 && input[pointer] !== undefined) {
+      if (input[pointer] === undefined && dotsSeen !== 3) {
         return failure;
       }
-      ++dotsSeen;
+
+      if (input[pointer] === p(".")) {
+        ++pointer;
+        ++dotsSeen;
+
+        if (input[pointer] === undefined) {
+          return failure;
+        }
+      }
     }
   }
 
