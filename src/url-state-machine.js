@@ -417,6 +417,12 @@ function findLongestZeroSequence(arr) {
     }
   }
 
+  // if trailing zeros
+  if (currLen > maxLen) {
+    maxIdx = currStart;
+    maxLen = currLen;
+  }
+
   return {
     idx: maxIdx,
     len: maxLen
