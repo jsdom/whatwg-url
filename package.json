@@ -1,6 +1,6 @@
 {
   "name": "whatwg-url",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "An implementation of the WHATWG URL Standard's URL API and parsing machinery",
   "main": "lib/public-api.js",
   "author": "Sebastian Mayr <github@smayr.name>",
