@@ -278,10 +278,19 @@ function parseIPv6(input) {
   if (ipv4 && piecePtr > 6) {
     return failure;
   } else if (input[pointer] !== undefined) {
-    let dotsSeen = 0;
+    let numbersSeen = 0;
 
     while (input[pointer] !== undefined) {
       let value = null;
+
+      if (numbersSeen > 0) {
+        if (input[pointer] === p(".") && numbersSeen < 4) {
+          ++pointer;
+        } else {
+          return failure;
+        }
+      }
+
       if (!isASCIIDigit(input[pointer])) {
         return failure;
       }
@@ -301,22 +310,17 @@ function parseIPv6(input) {
         }
       }
 
-      if (dotsSeen < 3 && input[pointer] !== p(".")) {
-        return failure;
-      }
       ip[piecePtr] = ip[piecePtr] * 0x100 + value;
-      if (dotsSeen === 1 || dotsSeen === 3) {
+
+      ++numbersSeen;
+
+      if (numbersSeen === 2 || numbersSeen === 4) {
         ++piecePtr;
       }
 
-      if (input[pointer] !== undefined) {
-        ++pointer;
-      }
-
-      if (dotsSeen === 3 && input[pointer] !== undefined) {
+      if (input[pointer] === undefined && numbersSeen !== 4) {
         return failure;
       }
-      ++dotsSeen;
     }
   }
 
