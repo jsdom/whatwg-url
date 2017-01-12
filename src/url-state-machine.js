@@ -530,7 +530,7 @@ URLStateMachine.prototype["parse scheme start"] = function parseSchemeStart(c, c
     --this.pointer;
   } else {
     this.parseError = true;
-    return false;
+    return failure;
   }
 
   return true;
@@ -577,7 +577,7 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
     this.pointer = -1;
   } else {
     this.parseError = true;
-    return false;
+    return failure;
   }
 
   return true;
