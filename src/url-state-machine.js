@@ -394,6 +394,23 @@ function parseHost(input, isUnicode) {
   return isUnicode ? tr46.toUnicode(asciiDomain, false).domain : asciiDomain;
 }
 
+function parseURLHost(input, isSpecialArg) {
+  if (isSpecialArg) {
+    return parseHost(input);
+  }
+
+  if (input.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|\/|:|\?|@/) !== -1) {
+    return failure;
+  }
+
+  let output = "";
+  const decoded = punycode.ucs2.decode(input);
+  for (let i = 0; i < decoded.length; ++i) {
+    output += encodeChar(decoded[i], isSimpleEncode);
+  }
+  return output;
+}
+
 function findLongestZeroSequence(arr) {
   let maxIdx = null;
   let maxLen = 1; // only find elements > 1
@@ -748,6 +765,10 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
     this.buffer = "";
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (isSpecial(this.url) && c === p("\\"))) {
+    if (this.atFlag && this.buffer === "") {
+      return failure;
+    }
+
     this.pointer -= countSymbols(this.buffer) + 1;
     this.buffer = "";
     this.state = "host";
@@ -761,11 +782,11 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
 URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   if (c === p(":") && !this.arrFlag) {
-    if (isSpecial(this.url) && this.buffer === "") {
+    if (this.buffer === "") {
       return failure;
     }
 
-    const host = parseHost(this.buffer);
+    const host = parseURLHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -783,7 +804,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
       return failure;
     }
 
-    const host = parseHost(this.buffer);
+    const host = parseURLHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -966,7 +987,10 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
         this.url.host = null;
         this.buffer = this.buffer[0] + ":";
       }
-      this.url.path.push(this.buffer);
+
+      if (this.url.path.length !== 0 || isSpecial(this.url) || (c !== undefined && c !== p("?") && c !== p("#"))) {
+        this.url.path.push(this.buffer);
+      }
     }
     this.buffer = "";
     if (c === p("?")) {
@@ -1096,7 +1120,7 @@ function serializeURL(url, excludeFragment) {
 
   if (url.cannotBeABaseURL) {
     output += url.path[0];
-  } else {
+  } else if (url.path.length !== 0) {
     output += "/" + url.path.join("/");
   }
 
