@@ -52,6 +52,10 @@ function isDoubleDot(buffer) {
   return buffer === ".." || buffer === "%2e." || buffer === ".%2e" || buffer === "%2e%2e";
 }
 
+function containsForbiddenHostCodePoint(string) {
+  return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|\?|@|\[|\\|\]/) !== -1;
+}
+
 function isSpecialScheme(scheme) {
   return specialSchemes[scheme] !== undefined;
 }
@@ -382,7 +386,7 @@ function parseHost(input, isUnicode) {
     return failure;
   }
 
-  if (asciiDomain.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|\?|@|\[|\\|\]/) !== -1) {
+  if (containsForbiddenHostCodePoint(asciiDomain)) {
     return failure;
   }
 
@@ -392,6 +396,23 @@ function parseHost(input, isUnicode) {
   }
 
   return isUnicode ? tr46.toUnicode(asciiDomain, false).domain : asciiDomain;
+}
+
+function parseURLHost(input, isSpecialArg) {
+  if (isSpecialArg) {
+    return parseHost(input);
+  }
+
+  if (containsForbiddenHostCodePoint(input)) {
+    return failure;
+  }
+
+  let output = "";
+  const decoded = punycode.ucs2.decode(input);
+  for (let i = 0; i < decoded.length; ++i) {
+    output += encodeChar(decoded[i], isSimpleEncode);
+  }
+  return output;
 }
 
 function findLongestZeroSequence(arr) {
@@ -748,6 +769,10 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
     this.buffer = "";
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (isSpecial(this.url) && c === p("\\"))) {
+    if (this.atFlag && this.buffer === "") {
+      this.parseError = true;
+      return failure;
+    }
     this.pointer -= countSymbols(this.buffer) + 1;
     this.buffer = "";
     this.state = "host";
@@ -761,11 +786,12 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
 URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   if (c === p(":") && !this.arrFlag) {
-    if (isSpecial(this.url) && this.buffer === "") {
+    if (this.buffer === "") {
+      this.parseError = true;
       return failure;
     }
 
-    const host = parseHost(this.buffer);
+    const host = parseURLHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -780,10 +806,11 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
              (isSpecial(this.url) && c === p("\\"))) {
     --this.pointer;
     if (isSpecial(this.url) && this.buffer === "") {
+      this.parseError = true;
       return failure;
     }
 
-    const host = parseHost(this.buffer);
+    const host = parseURLHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
