@@ -113,14 +113,14 @@ function isSimpleEncode(c) {
   return c <= 0x1F || c > 0x7E;
 }
 
-const defaultEncodeSet = [p(" "), p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")];
+const defaultEncodeSet = new Set([p(" "), p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")]);
 function isDefaultEncode(c) {
-  return isSimpleEncode(c) || defaultEncodeSet.indexOf(c) !== -1;
+  return isSimpleEncode(c) || defaultEncodeSet.has(c);
 }
 
-const userInfoEncodeSet = [p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")];
+const userInfoEncodeSet = new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
 function isUserInfoEncode(c) {
-  return isDefaultEncode(c) || userInfoEncodeSet.indexOf(c) !== -1;
+  return isDefaultEncode(c) || userInfoEncodeSet.has(c);
 }
 
 function encodeChar(c, checkCb) {
