@@ -159,7 +159,9 @@ function parseIPv4Number(input) {
 function parseIPv4(input) {
   const parts = input.split(".");
   if (parts[parts.length - 1] === "") {
-    parts.pop();
+    if (parts.length > 1) {
+      parts.pop();
+    }
   }
 
   if (parts.length > 4) {
