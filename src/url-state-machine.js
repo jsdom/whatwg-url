@@ -706,9 +706,10 @@ URLStateMachine.prototype["parse relative slash"] = function parseRelativeSlash(
   if (isSpecial(this.url) && (c === p("/") || c === p("\\"))) {
     if (c === p("\\")) {
       this.parseError = true;
-    } else if (c === p("/")) {
-      this.state = "authority";
     }
+    this.state = "special authority ignore slashes";
+  } else if (c === p("/")) {
+    this.state = "authority";
   } else {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
