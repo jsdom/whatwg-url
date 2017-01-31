@@ -703,11 +703,13 @@ URLStateMachine.prototype["parse relative"] = function parseRelative(c) {
 };
 
 URLStateMachine.prototype["parse relative slash"] = function parseRelativeSlash(c) {
-  if (c === p("/") || (isSpecial(this.url) && c === p("\\"))) {
+  if (isSpecial(this.url) && (c === p("/") || c === p("\\"))) {
     if (c === p("\\")) {
       this.parseError = true;
     }
     this.state = "special authority ignore slashes";
+  } else if (c === p("/")) {
+    this.state = "authority";
   } else {
     this.url.username = this.base.username;
     this.url.password = this.base.password;
@@ -959,12 +961,26 @@ URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
 };
 
 URLStateMachine.prototype["parse path start"] = function parsePathStart(c) {
-  if (isSpecial(this.url) && c === p("\\")) {
-    this.parseError = true;
-  }
-  this.state = "path";
-  if (c !== p("/") && !(isSpecial(this.url) && c === p("\\"))) {
-    --this.pointer;
+  if (isSpecial(this.url)) {
+    if (c === p("\\")) {
+      this.parseError = true;
+    }
+    this.state = "path";
+
+    if (c !== p("/") && c !== p("\\")) {
+      --this.pointer;
+    }
+  } else if (!this.stateOverride && c === p("?")) {
+    this.url.query = "";
+    this.state = "query";
+  } else if (!this.stateOverride && c === p("#")) {
+    this.url.fragment = "";
+    this.state = "fragment";
+  } else if (c !== undefined) {
+    this.state = "path";
+    if (c !== p("/")) {
+      --this.pointer;
+    }
   }
 
   return true;
@@ -1126,7 +1142,9 @@ function serializeURL(url, excludeFragment) {
   if (url.cannotBeABaseURL) {
     output += url.path[0];
   } else {
-    output += "/" + url.path.join("/");
+    for (const string of url.path) {
+      output += "/" + string;
+    }
   }
 
   if (url.query !== null) {
