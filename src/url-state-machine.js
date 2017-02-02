@@ -497,6 +497,14 @@ function shortenPath(url) {
   path.pop();
 }
 
+function includesCredentials(url) {
+  return url.username !== "" || url.password !== "";
+}
+
+function cannotHaveAUsernamePasswordPort(url) {
+  return url.host === null || url.host === "" || url.cannotBeABaseURL || url.scheme === "file";
+}
+
 function isNormalizedWindowsDriveLetter(string) {
   return /^[A-Za-z]:$/.test(string);
 }
@@ -801,7 +809,10 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
 
 URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
-  if (c === p(":") && !this.arrFlag) {
+  if (this.stateOverride && this.url.scheme === "file") {
+    --this.pointer;
+    this.state = "file host";
+  } else if (c === p(":") && !this.arrFlag) {
     if (this.buffer === "") {
       this.parseError = true;
       return failure;
@@ -824,6 +835,10 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
     if (isSpecial(this.url) && this.buffer === "") {
       this.parseError = true;
       return failure;
+    } else if (this.stateOverride && this.buffer === "" &&
+               (includesCredentials(this.url) || this.url.port !== null)) {
+      this.parseError = true;
+      return false;
     }
 
     const host = parseURLHost(this.buffer, isSpecial(this.url));
@@ -947,19 +962,31 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
 URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
   if (isNaN(c) || c === p("/") || c === p("\\") || c === p("?") || c === p("#")) {
     --this.pointer;
-    // don't need to count symbols here since we check ASCII values
-    if (isWindowsDriveLetterString(this.buffer)) {
+    if (!this.stateOverride && isWindowsDriveLetterString(this.buffer)) {
       this.parseError = true;
       this.state = "path";
     } else if (this.buffer === "") {
+      if (this.stateOverride && includesCredentials(this.url)) {
+        this.parseError = true;
+        return false;
+      }
+      this.url.host = "";
+      if (this.stateOverride) {
+        return false;
+      }
       this.state = "path start";
     } else {
-      const host = parseHost(this.buffer);
+      let host = parseHost(this.buffer);
       if (host === failure) {
         return failure;
       }
-      if (host !== "localhost") {
-        this.url.host = host;
+      if (host === "localhost") {
+        host = "";
+      }
+      this.url.host = host;
+
+      if (this.stateOverride) {
+        return false;
       }
 
       this.buffer = "";
@@ -1244,6 +1271,8 @@ module.exports.setThePassword = function (url, password) {
 };
 
 module.exports.serializeHost = serializeHost;
+
+module.exports.cannotHaveAUsernamePasswordPort = cannotHaveAUsernamePasswordPort;
 
 module.exports.serializeInteger = function (integer) {
   return String(integer);
