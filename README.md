@@ -4,7 +4,7 @@ whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spe
 
 ## Current Status
 
-whatwg-url is currently up to date with the URL spec up to commit [ac6489](https://github.com/whatwg/url/commit/ac6489f9b0cf55b27fd1401ab77bc452c97d1457).
+whatwg-url is currently up to date with the URL spec up to commit [cf616f](https://github.com/whatwg/url/commit/cf616f9d3fca44bd5329e992519a4236a39b0cb7).
 
 ## API
 
@@ -23,7 +23,8 @@ The following methods are exported for use by places like jsdom that need to imp
 - [Serialize an integer](https://url.spec.whatwg.org/#serialize-an-integer): `serializeInteger(number)`
 - [Origin](https://url.spec.whatwg.org/#concept-url-origin) [Unicode serializer](https://html.spec.whatwg.org/multipage/browsers.html#unicode-serialisation-of-an-origin): `serializeURLToUnicodeOrigin(urlRecord)`
 - [Set the username](https://url.spec.whatwg.org/#set-the-username): `setTheUsername(urlRecord, usernameString)`
-- [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`.
+- [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`
+- [Cannot have a username/password/port](https://url.spec.whatwg.org/#cannot-have-a-username-password-port): `cannotHaveAUsernamePasswordPort(urlRecord)`
 
 The `stateOverride` parameter is one of the following strings:
 
