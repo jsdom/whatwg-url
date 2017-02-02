@@ -52,6 +52,18 @@ function isDoubleDot(buffer) {
   return buffer === ".." || buffer === "%2e." || buffer === ".%2e" || buffer === "%2e%2e";
 }
 
+function isWindowsDriveLetterCodePoints(cp1, cp2) {
+  return isASCIIAlpha(cp1) && (cp2 === p(":") || cp2 === p("|"));
+}
+
+function isWindowsDriveLetterString(string) {
+  return string.length === 2 && isASCIIAlpha(string.codePointAt(0)) && (string[1] === ":" || string[1] === "|");
+}
+
+function isNormalizedWindowsDriveLetterString(string) {
+  return string.length === 2 && isASCIIAlpha(string.codePointAt(0)) && string[1] === ":";
+}
+
 function containsForbiddenHostCodePoint(string) {
   return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|\?|@|\[|\\|\]/) !== -1;
 }
@@ -865,6 +877,8 @@ URLStateMachine.prototype["parse port"] = function parsePort(c, cStr) {
   return true;
 };
 
+const fileOtherwiseCodePoints = new Set([p("/"), p("\\"), p("?"), p("#")]);
+
 URLStateMachine.prototype["parse file"] = function parseFile(c) {
   this.url.scheme = "file";
   if (isNaN(c)) {
@@ -895,10 +909,9 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
     this.state = "fragment";
   } else {
     if (this.base !== null && this.base.scheme === "file") {
-      if ((!isASCIIAlpha(c) || // windows drive letter
-           (this.input[this.pointer + 1] !== p(":") && this.input[this.pointer + 1] !== p("|"))) ||
+      if (!isWindowsDriveLetterCodePoints(c, this.input[this.pointer + 1]) ||
           this.input.length - this.pointer - 1 === 1 || // remaining consists of 1 code point
-          [p("/"), p("\\"), p("?"), p("#")].indexOf(this.input[this.pointer + 2]) === -1) {
+          !fileOtherwiseCodePoints.has(this.input[this.pointer + 2])) {
         this.url.host = this.base.host;
         this.url.path = this.base.path.slice();
         shortenPath(this.url);
@@ -921,7 +934,7 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
     this.state = "file host";
   } else {
     if (this.base !== null && this.base.scheme === "file") {
-      if (this.base.path.length && isASCIIAlpha(this.base.path[0][0].charCodeAt(0)) && this.base.path[0][1] === ":") {
+      if (this.base.path.length > 0 && isNormalizedWindowsDriveLetterString(this.base.path[0])) {
         this.url.path.push(this.base.path[0]);
       }
     }
@@ -936,8 +949,8 @@ URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
   if (isNaN(c) || c === p("/") || c === p("\\") || c === p("?") || c === p("#")) {
     --this.pointer;
     // don't need to count symbols here since we check ASCII values
-    if (this.buffer.length === 2 &&
-      isASCIIAlpha(this.buffer.codePointAt(0)) && (this.buffer[1] === ":" || this.buffer[1] === "|")) {
+    if (isWindowsDriveLetterString(this.buffer)) {
+      this.parseError = true;
       this.state = "path";
     } else if (this.buffer === "") {
       this.state = "path start";
@@ -1002,9 +1015,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
                !(isSpecial(this.url) && c === p("\\"))) {
       this.url.path.push("");
     } else if (!isSingleDot(this.buffer)) {
-      if (this.url.scheme === "file" && this.url.path.length === 0 &&
-        this.buffer.length === 2 && isASCIIAlpha(this.buffer.codePointAt(0)) &&
-        (this.buffer[1] === "|" || this.buffer[1] === ":")) {
+      if (this.url.scheme === "file" && this.url.path.length === 0 && isWindowsDriveLetterString(this.buffer)) {
         if (this.url.host !== null) {
           this.parseError = true;
         }
