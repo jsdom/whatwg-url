@@ -881,34 +881,29 @@ const fileOtherwiseCodePoints = new Set([p("/"), p("\\"), p("?"), p("#")]);
 
 URLStateMachine.prototype["parse file"] = function parseFile(c) {
   this.url.scheme = "file";
-  if (isNaN(c)) {
-    if (this.base !== null && this.base.scheme === "file") {
-      this.url.host = this.base.host;
-      this.url.path = this.base.path.slice();
-      this.url.query = this.base.query;
-    }
-  } else if (c === p("/") || c === p("\\")) {
+
+  if (c === p("/") || c === p("\\")) {
     if (c === p("\\")) {
       this.parseError = true;
     }
     this.state = "file slash";
-  } else if (c === p("?")) {
-    if (this.base !== null && this.base.scheme === "file") {
+  } else if (this.base !== null && this.base.scheme === "file") {
+    if (isNaN(c)) {
+      this.url.host = this.base.host;
+      this.url.path = this.base.path.slice();
+      this.url.query = this.base.query;
+    } else if (c === p("?")) {
       this.url.host = this.base.host;
       this.url.path = this.base.path.slice();
       this.url.query = "";
-    }
-    this.state = "query";
-  } else if (c === p("#")) {
-    if (this.base !== null && this.base.scheme === "file") {
+      this.state = "query";
+    } else if (c === p("#")) {
       this.url.host = this.base.host;
       this.url.path = this.base.path.slice();
       this.url.query = this.base.query;
       this.url.fragment = "";
-    }
-    this.state = "fragment";
-  } else {
-    if (this.base !== null && this.base.scheme === "file") {
+      this.state = "fragment";
+    } else {
       if (!isWindowsDriveLetterCodePoints(c, this.input[this.pointer + 1]) ||
           this.input.length - this.pointer - 1 === 1 || // remaining consists of 1 code point
           !fileOtherwiseCodePoints.has(this.input[this.pointer + 2])) {
@@ -918,7 +913,11 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
       } else {
         this.parseError = true;
       }
+
+      this.state = "path";
+      --this.pointer;
     }
+  } else {
     this.state = "path";
     --this.pointer;
   }
