@@ -68,6 +68,10 @@ function containsForbiddenHostCodePoint(string) {
   return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|\?|@|\[|\\|\]/) !== -1;
 }
 
+function containsForbiddenHostCodePointExcludingPercent(string) {
+  return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|\/|:|\?|@|\[|\\|\]/) !== -1;
+}
+
 function isSpecialScheme(scheme) {
   return specialSchemes[scheme] !== undefined;
 }
@@ -385,13 +389,17 @@ function serializeIPv6(address) {
   return output;
 }
 
-function parseHost(input, isUnicode) {
+function parseHost(input, isSpecialArg, isUnicode) {
   if (input[0] === "[") {
     if (input[input.length - 1] !== "]") {
       return failure;
     }
 
     return parseIPv6(input.substring(1, input.length - 1));
+  }
+
+  if (!isSpecialArg) {
+    return parseOpaqueHost(input);
   }
 
   const domain = utf8PercentDecode(input);
@@ -412,12 +420,8 @@ function parseHost(input, isUnicode) {
   return isUnicode ? tr46.toUnicode(asciiDomain, false).domain : asciiDomain;
 }
 
-function parseURLHost(input, isSpecialArg) {
-  if (isSpecialArg) {
-    return parseHost(input);
-  }
-
-  if (containsForbiddenHostCodePoint(input)) {
+function parseOpaqueHost(input) {
+  if (containsForbiddenHostCodePointExcludingPercent(input)) {
     return failure;
   }
 
@@ -818,7 +822,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
       return failure;
     }
 
-    const host = parseURLHost(this.buffer, isSpecial(this.url));
+    const host = parseHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -841,7 +845,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
       return false;
     }
 
-    const host = parseURLHost(this.buffer, isSpecial(this.url));
+    const host = parseHost(this.buffer, isSpecial(this.url));
     if (host === failure) {
       return failure;
     }
@@ -976,7 +980,7 @@ URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
       }
       this.state = "path start";
     } else {
-      let host = parseHost(this.buffer);
+      let host = parseHost(this.buffer, isSpecial(this.url));
       if (host === failure) {
         return failure;
       }
