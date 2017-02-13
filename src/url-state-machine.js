@@ -400,7 +400,7 @@ function parseHost(input, isSpecialArg) {
   }
 
   const domain = utf8PercentDecode(input);
-  const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.TRANSITIONAL, false);
+  const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.NONTRANSITIONAL, false);
   if (asciiDomain === null) {
     return failure;
   }
