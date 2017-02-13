@@ -389,7 +389,7 @@ function serializeIPv6(address) {
   return output;
 }
 
-function parseHost(input, isSpecialArg, isUnicode) {
+function parseHost(input, isSpecialArg) {
   if (input[0] === "[") {
     if (input[input.length - 1] !== "]") {
       return failure;
@@ -417,7 +417,7 @@ function parseHost(input, isSpecialArg, isUnicode) {
     return ipv4Host;
   }
 
-  return isUnicode ? tr46.toUnicode(asciiDomain, false).domain : asciiDomain;
+  return asciiDomain;
 }
 
 function parseOpaqueHost(input) {
