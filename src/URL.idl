@@ -13,4 +13,6 @@ interface URL {
            attribute USVString search;
 //  [SameObject] readonly attribute URLSearchParams searchParams;
            attribute USVString hash;
+
+  USVString toJSON();
 };
