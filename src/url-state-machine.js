@@ -121,24 +121,24 @@ function utf8PercentDecode(str) {
   return new Buffer(output).toString();
 }
 
-function isSimpleEncode(c) {
+function isC0ControlPercentEncode(c) {
   return c <= 0x1F || c > 0x7E;
 }
 
-const defaultEncodeSet = new Set([p(" "), p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")]);
-function isDefaultEncode(c) {
-  return isSimpleEncode(c) || defaultEncodeSet.has(c);
+const extraPathPercentEncodeSet = new Set([p(" "), p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")]);
+function isPathPercentEncode(c) {
+  return isC0ControlPercentEncode(c) || extraPathPercentEncodeSet.has(c);
 }
 
-const userInfoEncodeSet = new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
-function isUserInfoEncode(c) {
-  return isDefaultEncode(c) || userInfoEncodeSet.has(c);
+const extraUserinfoPercentEncodeSet = new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
+function isUserinfoPercentEncode(c) {
+  return isPathPercentEncode(c) || extraUserinfoPercentEncodeSet.has(c);
 }
 
-function encodeChar(c, checkCb) {
+function percentEncodeChar(c, encodeSetPredicate) {
   const cStr = String.fromCodePoint(c);
 
-  if (checkCb(c)) {
+  if (encodeSetPredicate(c)) {
     return utf8PercentEncode(cStr);
   }
 
@@ -424,7 +424,7 @@ function parseOpaqueHost(input) {
   let output = "";
   const decoded = punycode.ucs2.decode(input);
   for (let i = 0; i < decoded.length; ++i) {
-    output += encodeChar(decoded[i], isSimpleEncode);
+    output += percentEncodeChar(decoded[i], isC0ControlPercentEncode);
   }
   return output;
 }
@@ -783,7 +783,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
         this.passwordTokenSeenFlag = true;
         continue;
       }
-      const encodedCodePoints = encodeChar(codePoint, isUserInfoEncode);
+      const encodedCodePoints = percentEncodeChar(codePoint, isUserinfoPercentEncode);
       if (this.passwordTokenSeenFlag) {
         this.url.password += encodedCodePoints;
       } else {
@@ -1064,7 +1064,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.parseError = true;
     }
 
-    this.buffer += encodeChar(c, isDefaultEncode);
+    this.buffer += percentEncodeChar(c, isPathPercentEncode);
   }
 
   return true;
@@ -1090,7 +1090,7 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
     }
 
     if (!isNaN(c)) {
-      this.url.path[0] = this.url.path[0] + encodeChar(c, isSimpleEncode);
+      this.url.path[0] = this.url.path[0] + percentEncodeChar(c, isC0ControlPercentEncode);
     }
   }
 
@@ -1144,7 +1144,7 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
       this.parseError = true;
     }
 
-    this.url.fragment += encodeChar(c, isSimpleEncode);
+    this.url.fragment += percentEncodeChar(c, isC0ControlPercentEncode);
   }
 
   return true;
@@ -1254,7 +1254,7 @@ module.exports.setTheUsername = function (url, username) {
   url.username = "";
   const decoded = punycode.ucs2.decode(username);
   for (let i = 0; i < decoded.length; ++i) {
-    url.username += encodeChar(decoded[i], isUserInfoEncode);
+    url.username += percentEncodeChar(decoded[i], isUserinfoPercentEncode);
   }
 };
 
@@ -1262,7 +1262,7 @@ module.exports.setThePassword = function (url, password) {
   url.password = "";
   const decoded = punycode.ucs2.decode(password);
   for (let i = 0; i < decoded.length; ++i) {
-    url.password += encodeChar(decoded[i], isUserInfoEncode);
+    url.password += percentEncodeChar(decoded[i], isUserinfoPercentEncode);
   }
 };
 
