@@ -970,10 +970,6 @@ URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
       this.parseError = true;
       this.state = "path";
     } else if (this.buffer === "") {
-      if (this.stateOverride && includesCredentials(this.url)) {
-        this.parseError = true;
-        return false;
-      }
       this.url.host = "";
       if (this.stateOverride) {
         return false;
