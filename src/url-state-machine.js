@@ -130,7 +130,8 @@ function isPathPercentEncode(c) {
   return isC0ControlPercentEncode(c) || extraPathPercentEncodeSet.has(c);
 }
 
-const extraUserinfoPercentEncodeSet = new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
+const extraUserinfoPercentEncodeSet =
+  new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
 function isUserinfoPercentEncode(c) {
   return isPathPercentEncode(c) || extraUserinfoPercentEncodeSet.has(c);
 }
