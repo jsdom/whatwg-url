@@ -93,12 +93,8 @@ function percentEncode(c) {
   return "%" + hex;
 }
 
-const invalidCodePoint = String.fromCodePoint(65533);
 function utf8PercentEncode(c) {
   const buf = new Buffer(c);
-  if (buf.toString() === invalidCodePoint) {
-    return "";
-  }
 
   let str = "";
 
