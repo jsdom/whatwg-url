@@ -364,20 +364,26 @@ function serializeIPv6(address) {
   let output = "";
   const seqResult = findLongestZeroSequence(address);
   const compressPtr = seqResult.idx;
+  let ignore0 = false;
 
   for (let i = 0; i < address.length; ++i) {
-    if (compressPtr === i) {
-      if (i === 0) {
-        output += "::";
-      } else {
-        output += ":";
-      }
+    const piece = address[i];
 
-      i += seqResult.len - 1;
+    if (ignore0 && piece === 0) {
+      continue;
+    } else if (ignore0) {
+      ignore0 = false;
+    }
+
+    if (compressPtr === i) {
+      const separator = i === 0 ? "::" : ":";
+      output += separator;
+      ignore0 = true;
       continue;
     }
 
-    output += address[i].toString(16);
+    output += piece.toString(16);
+
     if (i !== address.length - 1) {
       output += ":";
     }
