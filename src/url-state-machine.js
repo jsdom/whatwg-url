@@ -598,6 +598,14 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
       if (!isSpecial(this.url) && isSpecialScheme(this.buffer)) {
         return false;
       }
+
+      if ((includesCredentials(this.url) || this.url.port !== null) && this.buffer === "file") {
+        return false;
+      }
+
+      if (this.url.scheme === "file" && (this.url.host === "" || this.url.host === null)) {
+        return false;
+      }
     }
     this.url.scheme = this.buffer;
     this.buffer = "";
