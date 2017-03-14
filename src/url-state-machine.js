@@ -1039,10 +1039,10 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.url.path.push("");
     } else if (!isSingleDot(this.buffer)) {
       if (this.url.scheme === "file" && this.url.path.length === 0 && isWindowsDriveLetterString(this.buffer)) {
-        if (this.url.host !== null) {
+        if (this.url.host !== "" && this.url.host !== null) {
           this.parseError = true;
+          this.url.host = "";
         }
-        this.url.host = null;
         this.buffer = this.buffer[0] + ":";
       }
       this.url.path.push(this.buffer);
