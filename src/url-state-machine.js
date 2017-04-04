@@ -244,8 +244,6 @@ function parseIPv6(input) {
     compressPtr = piecePtr;
   }
 
-  let ipv4 = false;
-  Main:
   while (pointer < input.length) {
     if (piecePtr === 8) {
       return failure;
@@ -270,77 +268,74 @@ function parseIPv6(input) {
       ++length;
     }
 
-    switch (at(input, pointer)) {
-      case ".":
-        if (length === 0) {
-          return failure;
-        }
-        pointer -= length;
-        ipv4 = true;
-        break Main;
-      case ":":
-        ++pointer;
-        if (input[pointer] === undefined) {
-          return failure;
-        }
-        break;
-      case undefined:
-        break;
-      default:
+    if (input[pointer] === p(".")) {
+      if (length === 0) {
         return failure;
+      }
+
+      pointer -= length;
+
+      if (piecePtr > 6) {
+        return failure;
+      }
+
+      let numbersSeen = 0;
+
+      while (input[pointer] !== undefined) {
+        let ipv4Piece = null;
+
+        if (numbersSeen > 0) {
+          if (input[pointer] === p(".") && numbersSeen < 4) {
+            ++pointer;
+          } else {
+            return failure;
+          }
+        }
+
+        if (!isASCIIDigit(input[pointer])) {
+          return failure;
+        }
+
+        while (isASCIIDigit(input[pointer])) {
+          const number = parseInt(at(input, pointer));
+          if (ipv4Piece === null) {
+            ipv4Piece = number;
+          } else if (ipv4Piece === 0) {
+            return failure;
+          } else {
+            ipv4Piece = ipv4Piece * 10 + number;
+          }
+          ++pointer;
+          if (ipv4Piece > 255) {
+            return failure;
+          }
+        }
+
+        ip[piecePtr] = ip[piecePtr] * 0x100 + ipv4Piece;
+
+        ++numbersSeen;
+
+        if (numbersSeen === 2 || numbersSeen === 4) {
+          ++piecePtr;
+        }
+
+        if (input[pointer] === undefined && numbersSeen !== 4) {
+          return failure;
+        }
+      }
+
+      break;
+    } else if (input[pointer] === p(":")) {
+      ++pointer;
+      if (input[pointer] === undefined) {
+        return failure;
+      }
+    } else if (input[pointer] !== undefined) {
+      return failure;
     }
 
     ip[piecePtr] = value;
     ++piecePtr;
-  }
-
-  if (ipv4 && piecePtr > 6) {
-    return failure;
-  } else if (input[pointer] !== undefined) {
-    let numbersSeen = 0;
-
-    while (input[pointer] !== undefined) {
-      let value = null;
-
-      if (numbersSeen > 0) {
-        if (input[pointer] === p(".") && numbersSeen < 4) {
-          ++pointer;
-        } else {
-          return failure;
-        }
-      }
-
-      if (!isASCIIDigit(input[pointer])) {
-        return failure;
-      }
-
-      while (isASCIIDigit(input[pointer])) {
-        const number = parseInt(at(input, pointer));
-        if (value === null) {
-          value = number;
-        } else if (value === 0) {
-          return failure;
-        } else {
-          value = value * 10 + number;
-        }
-        ++pointer;
-        if (value > 255) {
-          return failure;
-        }
-      }
-
-      ip[piecePtr] = ip[piecePtr] * 0x100 + value;
-
-      ++numbersSeen;
-
-      if (numbersSeen === 2 || numbersSeen === 4) {
-        ++piecePtr;
-      }
-
-      if (input[pointer] === undefined && numbersSeen !== 4) {
-        return failure;
-      }
-    }
   }
 
   if (compressPtr !== null) {
@@ -353,7 +348,7 @@ function parseIPv6(input) {
       --piecePtr;
       --swaps;
     }
-  } else if (piecePtr !== 8) {
+  } else if (compressPtr === null && piecePtr !== 8) {
     return failure;
   }
 
