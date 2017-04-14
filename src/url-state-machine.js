@@ -305,10 +305,10 @@ function parseIPv6(input) {
           } else {
             ipv4Piece = ipv4Piece * 10 + number;
           }
-          ++pointer;
           if (ipv4Piece > 255) {
             return failure;
           }
+          ++pointer;
         }
 
         ip[piecePtr] = ip[piecePtr] * 0x100 + ipv4Piece;
@@ -318,10 +318,10 @@ function parseIPv6(input) {
         if (numbersSeen === 2 || numbersSeen === 4) {
           ++piecePtr;
         }
+      }
 
-        if (input[pointer] === undefined && numbersSeen !== 4) {
-          return failure;
-        }
+      if (numbersSeen !== 4) {
+        return failure;
       }
 
       break;
