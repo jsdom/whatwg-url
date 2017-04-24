@@ -218,9 +218,9 @@ function serializeIPv4(address) {
   let output = "";
   let n = address;
 
-  for (let i = 0; i < 4; ++i) {
+  for (let i = 1; i <= 4; ++i) {
     output = String(n % 256) + output;
-    if (i !== 3) {
+    if (i !== 4) {
       output = "." + output;
     }
     n = Math.floor(n / 256);
@@ -230,9 +230,9 @@ function serializeIPv4(address) {
 }
 
 function parseIPv6(input) {
-  const ip = [0, 0, 0, 0, 0, 0, 0, 0];
-  let piecePtr = 0;
-  let compressPtr = null;
+  const address = [0, 0, 0, 0, 0, 0, 0, 0];
+  let pieceIndex = 0;
+  let compress = null;
   let pointer = 0;
 
   input = punycode.ucs2.decode(input);
@@ -243,22 +243,22 @@ function parseIPv6(input) {
     }
 
     pointer += 2;
-    ++piecePtr;
-    compressPtr = piecePtr;
+    ++pieceIndex;
+    compress = pieceIndex;
   }
 
   while (pointer < input.length) {
-    if (piecePtr === 8) {
+    if (pieceIndex === 8) {
       return failure;
     }
 
     if (input[pointer] === p(":")) {
-      if (compressPtr !== null) {
+      if (compress !== null) {
         return failure;
       }
       ++pointer;
-      ++piecePtr;
-      compressPtr = piecePtr;
+      ++pieceIndex;
+      compress = pieceIndex;
       continue;
     }
 
@@ -278,7 +278,7 @@ function parseIPv6(input) {
 
       pointer -= length;
 
-      if (piecePtr > 6) {
+      if (pieceIndex > 6) {
         return failure;
       }
 
@@ -314,12 +314,12 @@ function parseIPv6(input) {
           ++pointer;
         }
 
-        ip[piecePtr] = ip[piecePtr] * 0x100 + ipv4Piece;
+        address[pieceIndex] = address[pieceIndex] * 0x100 + ipv4Piece;
 
         ++numbersSeen;
 
         if (numbersSeen === 2 || numbersSeen === 4) {
-          ++piecePtr;
+          ++pieceIndex;
         }
       }
 
@@ -337,52 +337,50 @@ function parseIPv6(input) {
       return failure;
     }
 
-    ip[piecePtr] = value;
-    ++piecePtr;
+    address[pieceIndex] = value;
+    ++pieceIndex;
   }
 
-  if (compressPtr !== null) {
-    let swaps = piecePtr - compressPtr;
-    piecePtr = 7;
-    while (piecePtr !== 0 && swaps > 0) {
-      const temp = ip[compressPtr + swaps - 1]; // piece
-      ip[compressPtr + swaps - 1] = ip[piecePtr];
-      ip[piecePtr] = temp;
-      --piecePtr;
+  if (compress !== null) {
+    let swaps = pieceIndex - compress;
+    pieceIndex = 7;
+    while (pieceIndex !== 0 && swaps > 0) {
+      const temp = address[compress + swaps - 1];
+      address[compress + swaps - 1] = address[pieceIndex];
+      address[pieceIndex] = temp;
+      --pieceIndex;
       --swaps;
     }
-  } else if (compressPtr === null && piecePtr !== 8) {
+  } else if (compress === null && pieceIndex !== 8) {
     return failure;
   }
 
-  return ip;
+  return address;
 }
 
 function serializeIPv6(address) {
   let output = "";
   const seqResult = findLongestZeroSequence(address);
-  const compressPtr = seqResult.idx;
+  const compress = seqResult.idx;
   let ignore0 = false;
 
-  for (let i = 0; i < address.length; ++i) {
-    const piece = address[i];
-
-    if (ignore0 && piece === 0) {
+  for (let pieceIndex = 0; pieceIndex <= 7; ++pieceIndex) {
+    if (ignore0 && address[pieceIndex] === 0) {
       continue;
     } else if (ignore0) {
       ignore0 = false;
     }
 
-    if (compressPtr === i) {
-      const separator = i === 0 ? "::" : ":";
+    if (compress === pieceIndex) {
+      const separator = pieceIndex === 0 ? "::" : ":";
       output += separator;
       ignore0 = true;
       continue;
     }
 
-    output += piece.toString(16);
+    output += address[pieceIndex].toString(16);
 
-    if (i !== address.length - 1) {
+    if (pieceIndex !== 7) {
       output += ":";
     }
   }
