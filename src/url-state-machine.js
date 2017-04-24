@@ -183,6 +183,9 @@ function parseIPv4(input) {
 
   const numbers = [];
   for (const part of parts) {
+    if (part === "") {
+      return input;
+    }
     const n = parseIPv4Number(part);
     if (n === failure) {
       return input;
