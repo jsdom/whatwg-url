@@ -6,7 +6,12 @@ if (process.env.NO_UPDATE) {
 
 const path = require("path");
 const fs = require("fs");
+const { JSDOM } = require("jsdom");
 const request = require("request");
+
+process.on("unhandledRejection", err => {
+  throw err;
+});
 
 // Pin to specific version, reflecting the spec version in the readme.
 //
@@ -16,13 +21,33 @@ const request = require("request");
 // 3. Copy the commit hash
 const commitHash = "c5dcb1ff960183a100d295f02a46c193c45c801d";
 
-const sourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/urltestdata.json`;
-const setterSourceURL = `https://raw.githubusercontent.com/w3c/web-platform-tests/${commitHash}/url/setters_tests.json`;
-
+// Have to use RawGit as JSDOM.fromURL checks Content-Type header.
+const urlPrefix = `https://rawgit.com/w3c/web-platform-tests/${commitHash}/url/`
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
-request.get(sourceURL)
-  .pipe(fs.createWriteStream(path.resolve(targetDir, "urltestdata.json")));
+for (const file of ["urltestdata.json", "setters_tests.json"]) {
+  request(`${urlPrefix}${file}`)
+    .pipe(fs.createWriteStream(path.resolve(targetDir, file)));
+}
 
-request.get(setterSourceURL)
-  .pipe(fs.createWriteStream(path.resolve(targetDir, "setters_tests.json")));
+for (const file of [
+  "urlencoded-parser.html",
+  "urlsearchparams-append.html",
+  "urlsearchparams-constructor.html",
+  "urlsearchparams-delete.html",
+  "urlsearchparams-foreach.html",
+  "urlsearchparams-getall.html",
+  "urlsearchparams-get.html",
+  "urlsearchparams-has.html",
+  "urlsearchparams-set.html",
+  "urlsearchparams-sort.html",
+  "urlsearchparams-stringifier.html"
+]) {
+  JSDOM.fromURL(`${urlPrefix}${file}`).then(({ window }) => {
+    // Get last <script> in the WPT file
+    const { document } = window;
+    const scripts = document.getElementsByTagName("script");
+    const body = scripts[scripts.length - 1].text;
+    fs.writeFileSync(path.resolve(targetDir, file.replace(/\.html$/, ".js")), body);
+  });
+}

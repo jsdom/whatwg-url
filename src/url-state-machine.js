@@ -2,6 +2,9 @@
 const punycode = require("punycode");
 const tr46 = require("tr46");
 
+const infra = require("./infra");
+const { percentEncode, percentDecode } = require("./urlencoded");
+
 function p(char) {
   return char.codePointAt(0);
 }
@@ -27,22 +30,6 @@ function at(input, idx) {
   return isNaN(c) ? undefined : String.fromCodePoint(c);
 }
 
-function isASCIIDigit(c) {
-  return c >= 0x30 && c <= 0x39;
-}
-
-function isASCIIAlpha(c) {
-  return (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A);
-}
-
-function isASCIIAlphanumeric(c) {
-  return isASCIIAlpha(c) || isASCIIDigit(c);
-}
-
-function isASCIIHex(c) {
-  return isASCIIDigit(c) || (c >= 0x41 && c <= 0x46) || (c >= 0x61 && c <= 0x66);
-}
-
 function isSingleDot(buffer) {
   return buffer === "." || buffer.toLowerCase() === "%2e";
 }
@@ -53,15 +40,15 @@ function isDoubleDot(buffer) {
 }
 
 function isWindowsDriveLetterCodePoints(cp1, cp2) {
-  return isASCIIAlpha(cp1) && (cp2 === p(":") || cp2 === p("|"));
+  return infra.isASCIIAlpha(cp1) && (cp2 === p(":") || cp2 === p("|"));
 }
 
 function isWindowsDriveLetterString(string) {
-  return string.length === 2 && isASCIIAlpha(string.codePointAt(0)) && (string[1] === ":" || string[1] === "|");
+  return string.length === 2 && infra.isASCIIAlpha(string.codePointAt(0)) && (string[1] === ":" || string[1] === "|");
 }
 
 function isNormalizedWindowsDriveLetterString(string) {
-  return string.length === 2 && isASCIIAlpha(string.codePointAt(0)) && string[1] === ":";
+  return string.length === 2 && infra.isASCIIAlpha(string.codePointAt(0)) && string[1] === ":";
 }
 
 function containsForbiddenHostCodePoint(string) {
@@ -84,15 +71,6 @@ function defaultPort(scheme) {
   return specialSchemes[scheme];
 }
 
-function percentEncode(c) {
-  let hex = c.toString(16).toUpperCase();
-  if (hex.length === 1) {
-    hex = "0" + hex;
-  }
-
-  return "%" + hex;
-}
-
 function utf8PercentEncode(c) {
   const buf = new Buffer(c);
 
@@ -103,22 +81,6 @@ function utf8PercentEncode(c) {
   }
 
   return str;
-}
-
-function utf8PercentDecode(str) {
-  const input = new Buffer(str);
-  const output = [];
-  for (let i = 0; i < input.length; ++i) {
-    if (input[i] !== p("%")) {
-      output.push(input[i]);
-    } else if (input[i] === p("%") && isASCIIHex(input[i + 1]) && isASCIIHex(input[i + 2])) {
-      output.push(parseInt(input.slice(i + 1, i + 3).toString(), 16));
-      i += 2;
-    } else {
-      output.push(input[i]);
-    }
-  }
-  return new Buffer(output).toString();
 }
 
 function isC0ControlPercentEncode(c) {
@@ -265,7 +227,7 @@ function parseIPv6(input) {
     let value = 0;
     let length = 0;
 
-    while (length < 4 && isASCIIHex(input[pointer])) {
+    while (length < 4 && infra.isASCIIHex(input[pointer])) {
       value = value * 0x10 + parseInt(at(input, pointer), 16);
       ++pointer;
       ++length;
@@ -295,11 +257,11 @@ function parseIPv6(input) {
           }
         }
 
-        if (!isASCIIDigit(input[pointer])) {
+        if (!infra.isASCIIDigit(input[pointer])) {
           return failure;
         }
 
-        while (isASCIIDigit(input[pointer])) {
+        while (infra.isASCIIDigit(input[pointer])) {
           const number = parseInt(at(input, pointer));
           if (ipv4Piece === null) {
             ipv4Piece = number;
@@ -401,7 +363,7 @@ function parseHost(input, isSpecialArg) {
     return parseOpaqueHost(input);
   }
 
-  const domain = utf8PercentDecode(input);
+  const domain = percentDecode(Buffer.from(input)).toString();
   const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.NONTRANSITIONAL, false);
   if (asciiDomain === null) {
     return failure;
@@ -574,7 +536,7 @@ function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
 }
 
 URLStateMachine.prototype["parse scheme start"] = function parseSchemeStart(c, cStr) {
-  if (isASCIIAlpha(c)) {
+  if (infra.isASCIIAlpha(c)) {
     this.buffer += cStr.toLowerCase();
     this.state = "scheme";
   } else if (!this.stateOverride) {
@@ -589,7 +551,7 @@ URLStateMachine.prototype["parse scheme start"] = function parseSchemeStart(c, c
 };
 
 URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
-  if (isASCIIAlphanumeric(c) || c === p("+") || c === p("-") || c === p(".")) {
+  if (infra.isASCIIAlphanumeric(c) || c === p("+") || c === p("-") || c === p(".")) {
     this.buffer += cStr.toLowerCase();
   } else if (c === p(":")) {
     if (this.stateOverride) {
@@ -876,7 +838,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
 };
 
 URLStateMachine.prototype["parse port"] = function parsePort(c, cStr) {
-  if (isASCIIDigit(c)) {
+  if (infra.isASCIIDigit(c)) {
     this.buffer += cStr;
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (isSpecial(this.url) && c === p("\\")) ||
@@ -1079,8 +1041,8 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
     // TODO: If c is not a URL code point and not "%", parse error.
 
     if (c === p("%") &&
-      (!isASCIIHex(this.input[this.pointer + 1]) ||
-        !isASCIIHex(this.input[this.pointer + 2]))) {
+      (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
+        !infra.isASCIIHex(this.input[this.pointer + 2]))) {
       this.parseError = true;
     }
 
@@ -1104,8 +1066,8 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
     }
 
     if (c === p("%") &&
-        (!isASCIIHex(this.input[this.pointer + 1]) ||
-         !isASCIIHex(this.input[this.pointer + 2]))) {
+        (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
+         !infra.isASCIIHex(this.input[this.pointer + 2]))) {
       this.parseError = true;
     }
 
@@ -1141,8 +1103,8 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
   } else {
     // TODO: If c is not a URL code point and not "%", parse error.
     if (c === p("%") &&
-      (!isASCIIHex(this.input[this.pointer + 1]) ||
-        !isASCIIHex(this.input[this.pointer + 2]))) {
+      (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
+        !infra.isASCIIHex(this.input[this.pointer + 2]))) {
       this.parseError = true;
     }
 
@@ -1159,8 +1121,8 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
   } else {
     // TODO: If c is not a URL code point and not "%", parse error.
     if (c === p("%") &&
-      (!isASCIIHex(this.input[this.pointer + 1]) ||
-        !isASCIIHex(this.input[this.pointer + 2]))) {
+      (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
+        !infra.isASCIIHex(this.input[this.pointer + 2]))) {
       this.parseError = true;
     }
 

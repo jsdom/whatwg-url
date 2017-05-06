@@ -5,9 +5,6 @@ const path = require("path");
 const recast = require("recast");
 const types = recast.types;
 
-const code = fs.readFileSync(path.resolve(__dirname, "../src/url-state-machine.js"), { encoding: "utf8" });
-const ast = recast.parse(code);
-
 function replaceP(body) {
   types.visit(body, {
     /* eslint-disable consistent-return */
@@ -31,7 +28,10 @@ function replaceP(body) {
   });
 }
 
-replaceP(ast.program.body);
-
-const output = recast.print(ast).code;
-fs.writeFileSync(path.resolve(__dirname, "../lib/url-state-machine.js"), output);
+for (const file of ["urlencoded.js", "url-state-machine.js"]) {
+  const code = fs.readFileSync(path.resolve(__dirname, "../src", file), { encoding: "utf8" });
+  const ast = recast.parse(code);
+  replaceP(ast.program.body);
+  const output = recast.print(ast).code;
+  fs.writeFileSync(path.resolve(__dirname, "../lib", file), output);
+}

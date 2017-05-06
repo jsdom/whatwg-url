@@ -6,5 +6,7 @@ npm-debug.log
 coverage/
 test/web-platform-tests/
 lib/URL.js
-lib/utils.js
+lib/URLSearchParams.js
 lib/url-state-machine.js
+lib/urlencoded.js
+lib/utils.js
