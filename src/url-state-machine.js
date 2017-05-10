@@ -932,9 +932,10 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
       this.url.fragment = "";
       this.state = "fragment";
     } else {
-      if (!isWindowsDriveLetterCodePoints(c, this.input[this.pointer + 1]) ||
-          this.input.length - this.pointer - 1 === 1 || // remaining consists of 1 code point
-          !fileOtherwiseCodePoints.has(this.input[this.pointer + 2])) {
+      if (this.input.length - this.pointer - 1 === 0 || // remaining consists of 0 code points
+          !isWindowsDriveLetterCodePoints(c, this.input[this.pointer + 1]) ||
+          (this.input.length - this.pointer - 1 >= 2 && // remaining has at least 2 code points
+           !fileOtherwiseCodePoints.has(this.input[this.pointer + 2]))) {
         this.url.host = this.base.host;
         this.url.path = this.base.path.slice();
         shortenPath(this.url);
