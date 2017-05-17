@@ -1212,12 +1212,8 @@ function serializeURL(url, excludeFragment) {
 }
 
 function serializeOrigin(tuple) {
-  if (tuple.scheme === undefined || tuple.host === undefined || tuple.port === undefined) {
-    return "null";
-  }
-
   let result = tuple.scheme + "://";
-  result += tr46.toUnicode(tuple.host, false).domain;
+  result += serializeHost(tuple.host);
 
   if (tuple.port !== null) {
     result += ":" + tuple.port;
@@ -1228,13 +1224,14 @@ function serializeOrigin(tuple) {
 
 module.exports.serializeURL = serializeURL;
 
-module.exports.serializeURLToUnicodeOrigin = function (url) {
+module.exports.serializeURLOrigin = function (url) {
+  // https://url.spec.whatwg.org/#concept-url-origin
   switch (url.scheme) {
     case "blob":
       try {
-        return module.exports.serializeURLToUnicodeOrigin(module.exports.parseURL(url.path[0]));
+        return module.exports.serializeURLOrigin(module.exports.parseURL(url.path[0]));
       } catch (e) {
-        // serializing an opaque identifier returns "null"
+        // serializing an opaque origin returns "null"
         return "null";
       }
     case "ftp":
@@ -1245,14 +1242,14 @@ module.exports.serializeURLToUnicodeOrigin = function (url) {
     case "wss":
       return serializeOrigin({
         scheme: url.scheme,
-        host: serializeHost(url.host),
+        host: url.host,
         port: url.port
       });
     case "file":
       // spec says "exercise to the reader", chrome says "file://"
       return "file://";
     default:
-      // serializing an opaque identifier returns "null"
+      // serializing an opaque origin returns "null"
       return "null";
   }
 };
