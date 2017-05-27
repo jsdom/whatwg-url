@@ -402,7 +402,7 @@ function parseHost(input, isSpecialArg) {
   }
 
   const domain = utf8PercentDecode(input);
-  const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.NONTRANSITIONAL, false);
+  const asciiDomain = tr46.toASCII(domain, false, tr46.PROCESSING_OPTIONS.NONTRANSITIONAL, false, false);
   if (asciiDomain === null) {
     return failure;
   }
