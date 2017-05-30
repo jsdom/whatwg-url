@@ -613,14 +613,15 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
     this.buffer = "";
     if (this.stateOverride) {
       return false;
-    }
-    if (this.url.scheme === "file") {
-      if (this.input[this.pointer + 1] !== p("/") || this.input[this.pointer + 2] !== p("/")) {
-        this.parseError = true;
-      }
-      this.state = "file";
     } else if (isSpecial(this.url) && this.base !== null && this.base.scheme === this.url.scheme) {
-      this.state = "special relative or authority";
+      if (this.url.scheme === "file") {
+        if (this.input[this.pointer + 1] !== p("/") || this.input[this.pointer + 2] !== p("/")) {
+          this.parseError = true;
+        }
+        this.state = "file";
+      } else {
+        this.state = "special relative or authority";
+      }
     } else if (isSpecial(this.url)) {
       this.state = "special authority slashes";
     } else if (this.input[this.pointer + 1] === p("/")) {
@@ -768,7 +769,14 @@ URLStateMachine.prototype["parse special authority slashes"] = function parseSpe
 
 URLStateMachine.prototype["parse special authority ignore slashes"] = function parseSpecialAuthorityIgnoreSlashes(c) {
   if (c !== p("/") && c !== p("\\")) {
-    this.state = "authority";
+    if (this.url.scheme === "file") {
+      if (this.input[this.pointer + 1] !== p("/")) {
+        this.parseError = true;
+      }
+      this.state = "file";
+    } else {
+      this.state = "authority";
+    }
     --this.pointer;
   } else {
     this.parseError = true;
