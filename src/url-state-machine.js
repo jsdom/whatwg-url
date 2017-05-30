@@ -1,5 +1,7 @@
 "use strict";
 const punycode = require("punycode");
+const TextDecoder = require("./utf8").TextDecoder;
+const TextEncoder = require("./utf8").TextEncoder;
 const tr46 = require("tr46");
 
 function p(char) {
@@ -94,31 +96,40 @@ function percentEncode(c) {
 }
 
 function utf8PercentEncode(c) {
-  const buf = new Buffer(c);
+  const bytes = utf8Encode(c);
 
   let str = "";
 
-  for (let i = 0; i < buf.length; ++i) {
-    str += percentEncode(buf[i]);
+  for (let i = 0; i < bytes.length; ++i) {
+    str += percentEncode(bytes[i]);
   }
 
   return str;
 }
 
 function utf8PercentDecode(str) {
-  const input = new Buffer(str);
-  const output = [];
+  const input = utf8Encode(str);
+  const output = new Uint8Array(input.length);
+  let j = 0;
   for (let i = 0; i < input.length; ++i) {
     if (input[i] !== p("%")) {
-      output.push(input[i]);
+      output[j++] = input[i];
     } else if (input[i] === p("%") && isASCIIHex(input[i + 1]) && isASCIIHex(input[i + 2])) {
-      output.push(parseInt(input.slice(i + 1, i + 3).toString(), 16));
+      output[j++] = parseInt(utf8Decode(input.slice(i + 1, i + 3)), 16);
       i += 2;
     } else {
-      output.push(input[i]);
+      output[j++] = input[i];
     }
   }
-  return new Buffer(output).toString();
+  return utf8Decode(output.slice(0, j));
+}
+
+function utf8Decode(bytes) {
+  return new TextDecoder().decode(bytes);
+}
+
+function utf8Encode(string) {
+  return new TextEncoder().encode(string);
 }
 
 function isC0ControlPercentEncode(c) {
@@ -1123,13 +1134,13 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
       this.encodingOverride = "utf-8";
     }
 
-    const buffer = new Buffer(this.buffer); // TODO: Use encoding override instead
-    for (let i = 0; i < buffer.length; ++i) {
-      if (buffer[i] < 0x21 || buffer[i] > 0x7E || buffer[i] === 0x22 || buffer[i] === 0x23 ||
-          buffer[i] === 0x3C || buffer[i] === 0x3E) {
-        this.url.query += percentEncode(buffer[i]);
+    const bytes = utf8Encode(this.buffer); // TODO: Use encoding override instead
+    for (let i = 0; i < bytes.length; ++i) {
+      if (bytes[i] < 0x21 || bytes[i] > 0x7E || bytes[i] === 0x22 || bytes[i] === 0x23 ||
+          bytes[i] === 0x3C || bytes[i] === 0x3E) {
+        this.url.query += percentEncode(bytes[i]);
       } else {
-        this.url.query += String.fromCodePoint(buffer[i]);
+        this.url.query += String.fromCodePoint(bytes[i]);
       }
     }
 
