@@ -4,6 +4,7 @@ const URL = require("..").URL;
 const parsingTestCases = require("./web-platform-tests/urltestdata.json");
 const additionalParsingTestCases = require("./to-upstream.json");
 const setterTestData = require("./web-platform-tests/setters_tests.json");
+const toASCIITestCases = require("./web-platform-tests/toascii.json");
 
 function testURL(expected) {
   return () => {
@@ -44,6 +45,36 @@ function testSetterCase(testCase, propertyName) {
   };
 }
 
+function testToASCII(testCase) {
+  return () => {
+    if (testCase.output !== null) {
+      const url = new URL(`https://${testCase.input}/x`);
+      assert.equal(url.host, testCase.output);
+      assert.equal(url.hostname, testCase.output);
+      assert.equal(url.pathname, "/x");
+      assert.equal(url.href, `https://${testCase.output}/x`);
+
+      const url2 = new URL("https://x/x");
+      url2.hostname = testCase.input;
+      assert.equal(url2.hostname, testCase.output);
+
+      const url3 = new URL("https://x/x");
+      url3.host = testCase.input;
+      assert.equal(url3.host, testCase.output);
+    } else {
+      assert.throws(() => new URL(`https://${testCase.input}/x`), TypeError);
+
+      const url2 = new URL("https://x/x");
+      url2.hostname = testCase.input;
+      assert.equal(url2.hostname, "x");
+
+      const url3 = new URL("https://x/x");
+      url3.host = testCase.input;
+      assert.equal(url3.host, "x");
+    }
+  };
+}
+
 describe("Web platform tests", () => {
   describe("parsing", () => {
     for (const expected of parsingTestCases) {
@@ -68,6 +99,22 @@ describe("Web platform tests", () => {
                   testSetterCase(testCase, key));
         }
       });
+    }
+  });
+
+  describe("toASCII", () => {
+    for (const testCase of toASCIITestCases) {
+      if (typeof testCase === "string") {
+        // It's a "comment"; skip it.
+        continue;
+      }
+
+      let description = testCase.input;
+      if (testCase.comment) {
+        description += ` (${testCase.comment})`;
+      }
+
+      specify(description, testToASCII(testCase));
     }
   });
 });
