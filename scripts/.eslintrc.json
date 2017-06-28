@@ -1,6 +1,7 @@
 {
   "rules": {
-    "no-process-env": 0,
-    "no-process-exit": 0
+    "no-process-env": "off",
+    "no-process-exit": "off",
+    "no-console": "off"
   }
 }

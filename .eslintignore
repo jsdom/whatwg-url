@@ -1,4 +1,5 @@
 /test/web-platform-tests/**
 /lib/url-state-machine.js
 /lib/URL.js
+/lib/utils.js
 /coverage/**

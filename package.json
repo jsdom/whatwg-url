@@ -11,7 +11,7 @@
   "repository": "jsdom/whatwg-url",
   "dependencies": {
     "tr46": "~0.0.3",
-    "webidl-conversions": "^3.0.0"
+    "webidl-conversions": "^4.0.1"
   },
   "devDependencies": {
     "eslint": "^2.6.0",
@@ -19,7 +19,7 @@
     "mocha": "^2.2.4",
     "recast": "~0.10.29",
     "request": "^2.55.0",
-    "webidl2js": "^3.0.2"
+    "webidl2js": "^7.1.0"
   },
   "scripts": {
     "build": "node scripts/transform.js && node scripts/convert-idl.js",
