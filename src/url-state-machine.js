@@ -94,7 +94,7 @@ function percentEncode(c) {
 }
 
 // https://url.spec.whatwg.org/#percent-encode
-module.exports = function utf8PercentEncode(c) {
+function utf8PercentEncode(c) {
   const buf = new Buffer(c);
 
   let str = "";
@@ -105,9 +105,10 @@ module.exports = function utf8PercentEncode(c) {
 
   return str;
 }
+module.exports.utf8PercentEncode = utf8PercentEncode;
 
 // https://url.spec.whatwg.org/#percent-decode
-module.exports = function utf8PercentDecode(str) {
+function utf8PercentDecode(str) {
   const input = new Buffer(str);
   const output = [];
   for (let i = 0; i < input.length; ++i) {
@@ -122,6 +123,7 @@ module.exports = function utf8PercentDecode(str) {
   }
   return new Buffer(output).toString();
 }
+module.exports.utf8PercentDecode = utf8PercentDecode;
 
 function isC0ControlPercentEncode(c) {
   return c <= 0x1F || c > 0x7E;
