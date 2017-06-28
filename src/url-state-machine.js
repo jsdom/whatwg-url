@@ -93,7 +93,8 @@ function percentEncode(c) {
   return "%" + hex;
 }
 
-function utf8PercentEncode(c) {
+// https://url.spec.whatwg.org/#percent-encode
+module.exports = function utf8PercentEncode(c) {
   const buf = new Buffer(c);
 
   let str = "";
@@ -105,7 +106,8 @@ function utf8PercentEncode(c) {
   return str;
 }
 
-function utf8PercentDecode(str) {
+// https://url.spec.whatwg.org/#percent-decode
+module.exports = function utf8PercentDecode(str) {
   const input = new Buffer(str);
   const output = [];
   for (let i = 0; i < input.length; ++i) {
