@@ -64,8 +64,10 @@ describe("Web platform tests", () => {
 
       describe(key, () => {
         for (const testCase of setterTestData[key]) {
-          specify(`<${testCase.href}>.${key} = "${testCase.new_value}" ${testCase.comment || ""}`,
-                  testSetterCase(testCase, key));
+          specify(
+            `<${testCase.href}>.${key} = "${testCase.new_value}" ${testCase.comment || ""}`,
+            testSetterCase(testCase, key)
+          );
         }
       });
     }

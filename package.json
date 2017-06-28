@@ -14,10 +14,10 @@
     "webidl-conversions": "^4.0.1"
   },
   "devDependencies": {
-    "eslint": "^2.6.0",
+    "eslint": "^4.1.1",
     "istanbul": "~0.4.3",
-    "mocha": "^2.2.4",
-    "recast": "~0.10.29",
+    "mocha": "^3.4.2",
+    "recast": "~0.12.6",
     "request": "^2.55.0",
     "webidl2js": "^7.1.0"
   },
