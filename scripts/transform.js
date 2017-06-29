@@ -32,6 +32,6 @@ for (const file of ["urlencoded.js", "url-state-machine.js"]) {
   const code = fs.readFileSync(path.resolve(__dirname, "../src", file), { encoding: "utf8" });
   const ast = recast.parse(code);
   replaceP(ast.program.body);
-  const output = recast.print(ast).code;
+  const output = recast.print(ast, { lineTerminator: "\n" }).code;
   fs.writeFileSync(path.resolve(__dirname, "../lib", file), output);
 }
