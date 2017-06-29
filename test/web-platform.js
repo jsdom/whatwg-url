@@ -127,13 +127,15 @@ describe("Web platform tests", () => {
     }
   });
 
-  for (const file of fs.readdirSync(wptDir)) {
-    if (/\.js$/.test(file)) {
-      describe(file, () => {
-        runWPTFile(path.join(wptDir, file));
-      });
+  describe("Other tests extracted from .html files", () => {
+    for (const file of fs.readdirSync(wptDir)) {
+      if (path.extname(file) === ".js") {
+        describe(file, () => {
+          runWPTFile(path.join(wptDir, file));
+        });
+      }
     }
-  }
+  });
 });
 
 describe("To-upstream tests", () => {
