@@ -22,7 +22,7 @@ process.on("unhandledRejection", err => {
 const commitHash = "c5dcb1ff960183a100d295f02a46c193c45c801d";
 
 // Have to use RawGit as JSDOM.fromURL checks Content-Type header.
-const urlPrefix = `https://rawgit.com/w3c/web-platform-tests/${commitHash}/url/`
+const urlPrefix = `https://rawgit.com/w3c/web-platform-tests/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
 for (const file of ["urltestdata.json", "setters_tests.json"]) {
