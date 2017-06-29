@@ -2,19 +2,19 @@
 
 whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spec.whatwg.org/). It can be used standalone, but it also exposes a lot of the internal algorithms that are useful for integrating a URL parser into a project like [jsdom](https://github.com/tmpvar/jsdom).
 
-## Current Status
+## Current status
 
 whatwg-url is currently up to date with the URL spec up to commit [a62223](https://github.com/whatwg/url/commit/a622235308342c9adc7fc2fd1659ff059f7d5e2a).
 
 ## API
 
-### The `URL` Constructor
+### The `URL` and `URLSearchParams` classes
 
-The main API is the [`URL`](https://url.spec.whatwg.org/#url) export, which follows the spec's behavior in all ways (including e.g. `USVString` conversion). Most consumers of this library will want to use this.
+The main API is provided by the [`URL`](https://url.spec.whatwg.org/#url-class) and [`URLSearchParams`](https://url.spec.whatwg.org/#interface-urlsearchparams) exports, which follows the spec's behavior in all ways (including e.g. `USVString` conversion). Most consumers of this library will want to use these.
 
 ### Low-level URL Standard API
 
-The following methods are exported for use by places like jsdom that need to implement things like [`HTMLHyperlinkElementUtils`](https://html.spec.whatwg.org/#htmlhyperlinkelementutils). They operate on or return an "internal URL" or ["URL record"](https://url.spec.whatwg.org/#concept-url) type.
+The following methods are exported for use by places like jsdom that need to implement things like [`HTMLHyperlinkElementUtils`](https://html.spec.whatwg.org/#htmlhyperlinkelementutils). They mostly operate on or return an "internal URL" or ["URL record"](https://url.spec.whatwg.org/#concept-url) type.
 
 - [URL parser](https://url.spec.whatwg.org/#concept-url-parser): `parseURL(input, { baseURL, encodingOverride })`
 - [Basic URL parser](https://url.spec.whatwg.org/#concept-basic-url-parser): `basicURLParse(input, { baseURL, encodingOverride, url, stateOverride })`
@@ -25,6 +25,7 @@ The following methods are exported for use by places like jsdom that need to imp
 - [Set the username](https://url.spec.whatwg.org/#set-the-username): `setTheUsername(urlRecord, usernameString)`
 - [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`
 - [Cannot have a username/password/port](https://url.spec.whatwg.org/#cannot-have-a-username-password-port): `cannotHaveAUsernamePasswordPort(urlRecord)`
+- [Percent decode](https://url.spec.whatwg.org/#percent-decode): `percentDecode(buffer)`
 
 The `stateOverride` parameter is one of the following strings:
 
