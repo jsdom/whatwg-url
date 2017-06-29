@@ -39,7 +39,7 @@ function percentEncode(c) {
 }
 
 function percentDecode(input) {
-  const output = Buffer.alloc(input.length);
+  const output = Buffer.alloc(input.byteLength);
   let ptr = 0;
   for (let i = 0; i < input.length; ++i) {
     if (input[i] !== p("%") || !isASCIIHex(input[i + 1]) || !isASCIIHex(input[i + 2])) {
