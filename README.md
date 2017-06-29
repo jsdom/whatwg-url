@@ -65,4 +65,4 @@ The URL record type has the following API:
 
 These properties should be treated with care, as in general changing them will cause the URL record to be in an inconsistent state until the appropriate invocation of `basicURLParse` is used to fix it up. You can see examples of this in the URL Standard, where there are many step sequences like "4. Set context object’s url’s fragment to the empty string. 5. Basic URL parse _input_ with context object’s url as _url_ and fragment state as _state override_." In between those two steps, a URL record is in an unusable state.
 
-The return value of "failure" in the spec is represented by the string `"failure"`. That is, functions like `parseURL` and `basicURLParse` can return _either_ a URL record _or_ the string `"failure"`.
+The return value of "failure" in the spec is represented by `null`. That is, functions like `parseURL` and `basicURLParse` can return _either_ a URL record _or_ `null`.

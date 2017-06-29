@@ -1223,7 +1223,7 @@ module.exports.basicURLParse = function (input, options) {
 
   const usm = new URLStateMachine(input, options.baseURL, options.encodingOverride, options.url, options.stateOverride);
   if (usm.failure) {
-    return "failure";
+    return null;
   }
 
   return usm.url;
