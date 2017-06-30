@@ -572,10 +572,13 @@ URLStateMachine.prototype["parse scheme"] = function parseScheme(c, cStr) {
       }
     }
     this.url.scheme = this.buffer;
-    this.buffer = "";
     if (this.stateOverride) {
+      if (this.url.port === defaultPort(this.url.scheme)) {
+        this.url.port = null;
+      }
       return false;
     }
+    this.buffer = "";
     if (this.url.scheme === "file") {
       if (this.input[this.pointer + 1] !== p("/") || this.input[this.pointer + 2] !== p("/")) {
         this.parseError = true;
