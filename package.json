@@ -15,6 +15,7 @@
     "webidl-conversions": "^4.0.1"
   },
   "devDependencies": {
+    "domexception": "^1.0.0",
     "eslint": "^4.1.1",
     "istanbul": "~0.4.3",
     "jsdom": "^11.0.0",
