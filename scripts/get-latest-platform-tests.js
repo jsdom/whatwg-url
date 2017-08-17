@@ -19,12 +19,13 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "b30abaecf44cb9d20cb6066245dcf12e7ea0b74d";
+const commitHash = "2d85926668f43c019fc47762e5527f8350d6782d";
 
 // Have to use RawGit as JSDOM.fromURL checks Content-Type header.
 const urlPrefix = `https://rawgit.com/w3c/web-platform-tests/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
+// TODO: enable toascii.json
 for (const file of ["urltestdata.json", "setters_tests.json"]) {
   request(`${urlPrefix}${file}`)
     .pipe(fs.createWriteStream(path.resolve(targetDir, file)));
