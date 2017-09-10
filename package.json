@@ -11,7 +11,7 @@
   "repository": "jsdom/whatwg-url",
   "dependencies": {
     "lodash.sortby": "^4.7.0",
-    "tr46": "~0.0.3",
+    "tr46": "^1.0.0",
     "webidl-conversions": "^4.0.1"
   },
   "devDependencies": {
