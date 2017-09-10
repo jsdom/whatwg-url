@@ -1,5 +1,6 @@
 {
   "env": {
-    "mocha": true
+    "jasmine": true,
+    "jest": true
   }
 }

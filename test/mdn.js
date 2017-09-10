@@ -2,7 +2,7 @@
 const assert = require("assert");
 const URL = require("..").URL;
 
-specify("Checking all examples on MDN pass", () => {
+test("Checking all examples on MDN pass", () => {
   const a = new URL("/", "https://developer.mozilla.org");
   assert.strictEqual(a.href, "https://developer.mozilla.org/");
 
