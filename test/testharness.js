@@ -4,7 +4,7 @@ const assert = require("assert");
 /* eslint-disable camelcase */
 module.exports = {
   test(func, name) {
-    specify(name, func);
+    test(name, func);
   },
 
   promise_test() {

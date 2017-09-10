@@ -110,7 +110,7 @@ describe("Web platform tests", () => {
         continue;
       }
 
-      specify(`<${expected.input}> against <${expected.base}>`, testURL(expected));
+      test(`<${expected.input}> against <${expected.base}>`, testURL(expected));
     }
   });
 
@@ -122,7 +122,7 @@ describe("Web platform tests", () => {
 
       describe(key, () => {
         for (const testCase of setterTestData[key]) {
-          specify(
+          test(
             `<${testCase.href}>.${key} = "${testCase.new_value}" ${testCase.comment || ""}`,
             testSetterCase(testCase, key)
           );
@@ -153,7 +153,7 @@ describe("Web platform tests", () => {
         description += ` (${testCase.comment})`;
       }
 
-      specify(description, testToASCII(testCase));
+      test(description, testToASCII(testCase));
     }
   });
 });
@@ -166,7 +166,10 @@ describe("To-upstream tests", () => {
         continue;
       }
 
-      specify("<" + expected.input + "> against <" + expected.base + ">", testURL(expected));
+      test(
+        "<" + expected.input + "> against <" + expected.base + ">",
+        testURL(expected)
+      );
     }
   });
 });
