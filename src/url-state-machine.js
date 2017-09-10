@@ -884,6 +884,13 @@ URLStateMachine.prototype["parse port"] = function parsePort(c, cStr) {
 
 const fileOtherwiseCodePoints = new Set([p("/"), p("\\"), p("?"), p("#")]);
 
+function startsWithWindowsDriveLetter(input, pointer) {
+  const length = input.length - pointer;
+  return length >= 2 &&
+    isWindowsDriveLetterCodePoints(input[pointer], input[pointer + 1]) &&
+    (length === 2 || fileOtherwiseCodePoints.has(input[pointer + 2]));
+}
+
 URLStateMachine.prototype["parse file"] = function parseFile(c) {
   this.url.scheme = "file";
 
@@ -909,10 +916,7 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
       this.url.fragment = "";
       this.state = "fragment";
     } else {
-      if (this.input.length - this.pointer - 1 === 0 || // remaining consists of 0 code points
-          !isWindowsDriveLetterCodePoints(c, this.input[this.pointer + 1]) ||
-          (this.input.length - this.pointer - 1 >= 2 && // remaining has at least 2 code points
-           !fileOtherwiseCodePoints.has(this.input[this.pointer + 2]))) {
+      if (!startsWithWindowsDriveLetter(this.input, this.pointer)) {
         this.url.host = this.base.host;
         this.url.path = this.base.path.slice();
         shortenPath(this.url);
@@ -938,7 +942,8 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
     }
     this.state = "file host";
   } else {
-    if (this.base !== null && this.base.scheme === "file") {
+    if (this.base !== null && this.base.scheme === "file" &&
+        !startsWithWindowsDriveLetter(this.input, this.pointer)) {
       if (isNormalizedWindowsDriveLetterString(this.base.path[0])) {
         this.url.path.push(this.base.path[0]);
       } else {
