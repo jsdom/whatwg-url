@@ -25,8 +25,7 @@ const commitHash = "785ec55ddc2dc2e5dfecac65832d68c82f72e50b";
 const urlPrefix = `https://rawgit.com/w3c/web-platform-tests/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
-// TODO: enable toascii.json
-for (const file of ["urltestdata.json", "setters_tests.json"]) {
+for (const file of ["urltestdata.json", "setters_tests.json", "toascii.json"]) {
   request(`${urlPrefix}${file}`)
     .pipe(fs.createWriteStream(path.resolve(targetDir, file)));
 }
