@@ -1,6 +1,6 @@
 {
   "name": "whatwg-url",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "An implementation of the WHATWG URL Standard's URL API and parsing machinery",
   "main": "lib/public-api.js",
   "files": [
@@ -38,7 +38,10 @@
       "!lib/utils.js"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["lcov", "text-summary"],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ],
     "testEnvironment": "node",
     "testMatch": [
       "<rootDir>/test/**/*.js"
