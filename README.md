@@ -4,7 +4,7 @@ whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spe
 
 ## Current status
 
-whatwg-url is currently up to date with the URL spec up to commit [2eef975](https://github.com/whatwg/url/commit/2eef975e989cb5ae2d62467394778fd6778ddec9).
+whatwg-url is currently up to date with the URL spec up to commit [7a3c69f](https://github.com/whatwg/url/commit/7a3c69f8a1583b33e730c3fea85141a618e7c697).
 
 ## API
 

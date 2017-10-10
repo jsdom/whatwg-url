@@ -87,15 +87,20 @@ function isC0ControlPercentEncode(c) {
   return c <= 0x1F || c > 0x7E;
 }
 
-const extraPathPercentEncodeSet = new Set([p(" "), p("\""), p("#"), p("<"), p(">"), p("?"), p("`"), p("{"), p("}")]);
-function isPathPercentEncode(c) {
-  return isC0ControlPercentEncode(c) || extraPathPercentEncodeSet.has(c);
-}
-
 const extraUserinfoPercentEncodeSet =
   new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
 function isUserinfoPercentEncode(c) {
   return isPathPercentEncode(c) || extraUserinfoPercentEncodeSet.has(c);
+}
+
+const extraFragmentPercentEncodeSet = new Set([p(" "), p("\""), p("<"), p(">"), p("`")]);
+function isFragmentPercentEncode(c) {
+  return isC0ControlPercentEncode(c) || extraFragmentPercentEncodeSet.has(c);
+}
+
+const extraPathPercentEncodeSet = new Set([p("#"), p("?"), p("{"), p("}")]);
+function isPathPercentEncode(c) {
+  return isFragmentPercentEncode(c) || extraPathPercentEncodeSet.has(c);
 }
 
 function percentEncodeChar(c, encodeSetPredicate) {
@@ -1148,7 +1153,7 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
       this.parseError = true;
     }
 
-    this.url.fragment += percentEncodeChar(c, isC0ControlPercentEncode);
+    this.url.fragment += percentEncodeChar(c, isFragmentPercentEncode);
   }
 
   return true;
