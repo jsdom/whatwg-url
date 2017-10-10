@@ -1,6 +1,7 @@
 # node specific
 node_modules/
 npm-debug.log
+package-lock.json
 
 # project specific
 coverage/
