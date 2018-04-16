@@ -13,12 +13,48 @@ const toASCIITestCases = require("./web-platform-tests/toascii.json");
 
 const wptDir = path.join(__dirname, "web-platform-tests");
 
+function asyncTest() {
+  return {
+    step(cb) {
+      cb();
+    },
+    step_func(cb) { // eslint-disable-line camelcase
+      return cb;
+    },
+    done() {}
+  };
+}
+
+class FauxXMLHttpRequest {
+  constructor() {
+    this._path = undefined;
+    this.responseType = undefined;
+    this.response = undefined;
+  }
+
+  open(method, pathToOpen) {
+    this._path = pathToOpen;
+  }
+
+  send() {}
+
+  set onload(cb) {
+    assert(this.responseType === "json");
+    const buf = fs.readFileSync(path.resolve(__dirname, `web-platform-tests/${this._path}`), "utf8");
+    this.response = JSON.parse(buf);
+    cb();
+  }
+}
+
 function createSandbox() {
   const sandbox = {
     URL,
     URLSearchParams,
     // Shim for urlsearchparams-constructor.js
-    DOMException
+    DOMException,
+    // Shim for url-constructor.js
+    async_test: asyncTest, // eslint-disable-line camelcase
+    XMLHttpRequest: FauxXMLHttpRequest
   };
   Object.assign(sandbox, testharness);
   vm.createContext(sandbox);
