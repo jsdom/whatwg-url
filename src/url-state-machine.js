@@ -128,7 +128,14 @@ function parseIPv4Number(input) {
     return 0;
   }
 
-  const regex = R === 10 ? /[^0-9]/ : (R === 16 ? /[^0-9A-Fa-f]/ : /[^0-7]/);
+  let regex = /[^0-7]/;
+  if (R === 10) {
+    regex = /[^0-9]/;
+  }
+  if (R === 16) {
+    regex = /[^0-9A-Fa-f]/;
+  }
+
   if (regex.test(input)) {
     return failure;
   }
@@ -470,7 +477,7 @@ function trimTabAndNewline(url) {
 }
 
 function shortenPath(url) {
-  const path = url.path;
+  const { path } = url;
   if (path.length === 0) {
     return;
   }

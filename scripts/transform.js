@@ -3,10 +3,9 @@
 const fs = require("fs");
 const path = require("path");
 const recast = require("recast");
-const types = recast.types;
 
 function replaceP(body) {
-  types.visit(body, {
+  recast.types.visit(body, {
     /* eslint-disable consistent-return */
     visitFunction(p) {
       if (p.node.id && p.node.id.name === "p") {
@@ -20,7 +19,7 @@ function replaceP(body) {
     visitCallExpression(p) {
       if (p.node.callee.name === "p") {
         const codePoint = p.node.arguments[0].value.codePointAt(0);
-        p.replace(types.builders.literal(codePoint));
+        p.replace(recast.types.builders.literal(codePoint));
       }
 
       this.traverse(p);

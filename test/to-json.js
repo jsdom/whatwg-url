@@ -1,6 +1,6 @@
 "use strict";
 const assert = require("assert");
-const URL = require("..").URL;
+const { URL } = require("..");
 
 test("toJSON() works as expected", () => {
   const u = new URL("/", "https://developer.mozilla.org");

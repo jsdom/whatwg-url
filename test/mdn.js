@@ -1,6 +1,6 @@
 "use strict";
 const assert = require("assert");
-const URL = require("..").URL;
+const { URL } = require("..");
 
 test("Checking all examples on MDN pass", () => {
   const a = new URL("/", "https://developer.mozilla.org");

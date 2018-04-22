@@ -11,18 +11,18 @@
   "repository": "jsdom/whatwg-url",
   "dependencies": {
     "lodash.sortby": "^4.7.0",
-    "tr46": "^1.0.0",
-    "webidl-conversions": "^4.0.1"
+    "tr46": "^1.0.1",
+    "webidl-conversions": "^4.0.2"
   },
   "devDependencies": {
-    "domexception": "^1.0.0",
-    "eslint": "^4.1.1",
-    "istanbul": "~0.4.3",
-    "jest": "^21.0.2",
-    "jsdom": "^11.0.0",
-    "recast": "~0.12.6",
-    "request": "^2.55.0",
-    "webidl2js": "^7.1.0"
+    "domexception": "^1.0.1",
+    "eslint": "^4.19.1",
+    "istanbul": "~0.4.5",
+    "jest": "^22.4.3",
+    "jsdom": "^11.8.0",
+    "recast": "~0.14.7",
+    "request": "^2.85.0",
+    "webidl2js": "^7.4.0"
   },
   "scripts": {
     "build": "node scripts/transform.js && node scripts/convert-idl.js",

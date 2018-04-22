@@ -88,10 +88,10 @@ function serializeUrlencodedByte(input) {
     } else if (byte === p("*") ||
                byte === p("-") ||
                byte === p(".") ||
-               byte >= p("0") && byte <= p("9") ||
-               byte >= p("A") && byte <= p("Z") ||
+               (byte >= p("0") && byte <= p("9")) ||
+               (byte >= p("A") && byte <= p("Z")) ||
                byte === p("_") ||
-               byte >= p("a") && byte <= p("z")) {
+               (byte >= p("a") && byte <= p("z"))) {
       output += String.fromCodePoint(byte);
     } else {
       output += percentEncode(byte);
