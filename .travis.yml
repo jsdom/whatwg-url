@@ -1,7 +1,7 @@
-language: node_js
-
-node_js: stable
 sudo: false
+
+language: node_js
+node_js: stable
 
 install:
   - yarn
@@ -9,3 +9,14 @@ install:
 script:
   - yarn lint
   - yarn test
+
+before_deploy:
+  - bash scripts/deploy-live-viewer.sh
+
+deploy:
+  provider: pages
+  local-dir: out
+  committer-from-gh: true
+  skip-cleanup: true
+  keep-history: true
+  github-token: $GH_TOKEN

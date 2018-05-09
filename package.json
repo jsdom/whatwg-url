@@ -15,6 +15,7 @@
     "webidl-conversions": "^4.0.2"
   },
   "devDependencies": {
+    "browserify": "^16.2.2",
     "domexception": "^1.0.1",
     "eslint": "^4.19.1",
     "istanbul": "~0.4.5",
@@ -30,6 +31,7 @@
     "lint": "eslint .",
     "prepublish": "node scripts/transform.js && node scripts/convert-idl.js",
     "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js && node scripts/convert-idl.js",
+    "build-live-viewer": "browserify lib/public-api.js --standalone whatwgURL > live-viewer/whatwg-url.js",
     "test": "jest"
   },
   "jest": {

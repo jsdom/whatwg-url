@@ -11,3 +11,5 @@ lib/URLSearchParams.js
 lib/url-state-machine.js
 lib/urlencoded.js
 lib/utils.js
+live-viewer/whatwg-url.js
+out/
