@@ -19,8 +19,8 @@
 
   urlInput.addEventListener("input", update);
   baseInput.addEventListener("input", update);
+  window.addEventListener("hashchange", setFromFragment);
   setFromFragment();
-  update();
 
   function update() {
     const browserResult = getBrowserResult();
@@ -108,7 +108,20 @@
       return;
     }
     const [, urlEncoded, baseEncoded] = pieces;
-    urlInput.value = atob(urlEncoded);
-    baseInput.value = atob(baseEncoded);
+    try {
+      urlInput.value = atob(urlEncoded);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("url hash parameter was not decodeable as forgiving base64.");
+    }
+
+    try {
+      baseInput.value = atob(baseEncoded);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn("base hash parameter was not decodeable as forgiving base64.");
+    }
+
+    update();
   }
 })();
