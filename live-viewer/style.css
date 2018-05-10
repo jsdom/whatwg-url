@@ -85,3 +85,7 @@ form input {
   font-style: italic;
   color: #CCC;
 }
+
+.output td.non-string {
+  font-style: italic;
+}

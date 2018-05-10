@@ -52,9 +52,13 @@
   }
 
   function setComponentElValue(componentEl, value) {
+    // This shows up in Edge where username/password are undefined.
+    const isNonString = typeof value !== "string";
     const isEmptyString = value === "";
+
     componentEl.textContent = isEmptyString ? "(empty string)" : value;
     componentEl.classList.toggle("empty-string", isEmptyString);
+    componentEl.classList.toggle("non-string", isNonString);
   }
 
   function setComponentElMismatch(componentEl, isMismatched) {
