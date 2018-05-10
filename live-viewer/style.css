@@ -83,6 +83,9 @@ form input {
   font-family: inherit;
   font-size: smaller;
   font-style: italic;
+}
+
+.output td.empty-string:not(.fail) {
   color: #CCC;
 }
 
