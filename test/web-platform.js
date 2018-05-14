@@ -150,6 +150,22 @@ describe("Web platform tests", () => {
     }
   });
 
+  describe("bad base URL", () => {
+    for (const rawExpected of parsingTestCases) {
+      if (typeof rawExpected === "string" || !rawExpected.failure) {
+        continue;
+      }
+
+      const expected = {
+        input: "about:blank",
+        base: rawExpected.input,
+        failure: true
+      };
+
+      test(`<${expected.input}> against <${expected.base}>`, testURL(expected));
+    }
+  });
+
   describe("setters", () => {
     for (const key of Object.keys(setterTestData)) {
       if (key === "comment") {
