@@ -19,7 +19,7 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "0050cfbe145bc9c24981186fa47e714147c1674d";
+const commitHash = "88b75886e68ce5197019a2707fc6f1b9645a4639";
 
 // Have to use RawGit as JSDOM.fromURL checks Content-Type header.
 const urlPrefix = `https://rawgit.com/w3c/web-platform-tests/${commitHash}/url/`;
