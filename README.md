@@ -6,6 +6,23 @@ whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spe
 
 whatwg-url is currently up to date with the URL spec up to commit [6ef17eb](https://github.com/whatwg/url/commit/6ef17ebe1220a7e7c0cfff0785017502ee18808b).
 
+## Instructions
+
+First, install `npm`.
+
+    npm update -D
+
+To run tests:
+
+    npm test
+
+To build and run the live viewer:
+
+    npm run-script build
+    npm run-script build-live-viewer
+
+Serve the contents of the `live-viewer` directory using any web server.
+
 ## API
 
 ### The `URL` and `URLSearchParams` classes
