@@ -8,7 +8,7 @@ whatwg-url is currently up to date with the URL spec up to commit [6ef17eb](http
 
 ## Instructions
 
-First, install [`npm`](https://nodejs.org/en/download/package-manager/). Then, fetch the dependencies of whatwg-url, by running from this directory:
+First, install [Node.js](https://nodejs.org/en/download/package-manager/). Then, fetch the dependencies of whatwg-url, by running from this directory:
 
     npm install
 
