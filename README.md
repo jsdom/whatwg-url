@@ -8,9 +8,9 @@ whatwg-url is currently up to date with the URL spec up to commit [6ef17eb](http
 
 ## Instructions
 
-First, install `npm`.
+First, install [`npm`](https://nodejs.org/en/download/package-manager/). Then, fetch the dependencies of whatwg-url, by running from this directory:
 
-    npm update -D
+    npm install
 
 To run tests:
 
@@ -18,8 +18,8 @@ To run tests:
 
 To build and run the live viewer:
 
-    npm run-script build
-    npm run-script build-live-viewer
+    npm run build
+    npm run build-live-viewer
 
 Serve the contents of the `live-viewer` directory using any web server.
 
