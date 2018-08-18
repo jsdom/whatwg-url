@@ -2,9 +2,11 @@
 
 whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spec.whatwg.org/). It can be used standalone, but it also exposes a lot of the internal algorithms that are useful for integrating a URL parser into a project like [jsdom](https://github.com/tmpvar/jsdom).
 
-## Current status
+## Specification conformance
 
 whatwg-url is currently up to date with the URL spec up to commit [6ef17eb](https://github.com/whatwg/url/commit/6ef17ebe1220a7e7c0cfff0785017502ee18808b).
+
+For `file:` URLs, whose [origin is left unspecified](https://url.spec.whatwg.org/#concept-url-origin), whatwg-url chooses to use a new opaque origin (which serializes to `"null"`).
 
 ## API
 
