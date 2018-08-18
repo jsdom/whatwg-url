@@ -14,5 +14,5 @@ transformer.addSource(srcDir, implDir);
 transformer.generate(outputDir)
   .catch(err => {
     console.error(err.stack);
-    process.exit(0);
+    process.exit(1);
   });
