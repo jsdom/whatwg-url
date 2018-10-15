@@ -18,10 +18,9 @@
     "browserify": "^16.2.2",
     "domexception": "^1.0.1",
     "eslint": "^5.4.0",
+    "got": "^9.2.2",
     "jest": "^23.5.0",
-    "jsdom": "^11.12.0",
     "recast": "^0.15.3",
-    "request": "^2.88.0",
     "webidl2js": "^9.0.1"
   },
   "scripts": {

@@ -6,10 +6,10 @@ const vm = require("vm");
 const { URL, URLSearchParams } = require("..");
 const DOMException = require("domexception");
 const testharness = require("./testharness");
-const parsingTestCases = require("./web-platform-tests/urltestdata.json");
+const parsingTestCases = require("./web-platform-tests/resources/urltestdata.json");
 const additionalParsingTestCases = require("./to-upstream.json");
-const setterTestData = require("./web-platform-tests/setters_tests.json");
-const toASCIITestCases = require("./web-platform-tests/toascii.json");
+const setterTestData = require("./web-platform-tests/resources/setters_tests.json");
+const toASCIITestCases = require("./web-platform-tests/resources/toascii.json");
 
 const wptDir = path.join(__dirname, "web-platform-tests");
 
