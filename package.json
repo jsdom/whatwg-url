@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": "jsdom/whatwg-url",
   "dependencies": {
-    "lodash.sortby": "^4.7.0",
+    "lodash": "^4.17.11",
     "tr46": "^1.0.1",
     "webidl-conversions": "^4.0.2"
   },
