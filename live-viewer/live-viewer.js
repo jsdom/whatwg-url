@@ -3,6 +3,9 @@
   const urlInput = document.querySelector("#url");
   const baseInput = document.querySelector("#base");
 
+  const te = new TextEncoder();
+  const td = new TextDecoder();
+
   // Use an iframe to avoid <base> affecting the main page. This is especially bad in Edge where it
   // appears to break Edge's DevTools.
   const browserIframeDocument = document.querySelector("#browser-iframe").contentDocument;
@@ -103,7 +106,7 @@
   }
 
   function updateFragmentForSharing() {
-    location.hash = `url=${btoa(urlInput.value)}&base=${btoa(baseInput.value)}`;
+    location.hash = `url=${encodeToBase64(urlInput.value)}&base=${encodeToBase64(baseInput.value)}`;
   }
 
   function setFromFragment() {
@@ -113,19 +116,36 @@
     }
     const [, urlEncoded, baseEncoded] = pieces;
     try {
-      urlInput.value = atob(urlEncoded);
+      urlInput.value = decodeFromBase64(urlEncoded);
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.warn("url hash parameter was not decodeable as forgiving base64.");
+      console.warn("url hash parameter was not deserializable.");
     }
 
     try {
-      baseInput.value = atob(baseEncoded);
+      baseInput.value = decodeFromBase64(baseEncoded);
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.warn("base hash parameter was not decodeable as forgiving base64.");
+      console.warn("base hash parameter was not deserializable.");
     }
 
     update();
+  }
+
+  // btoa / atob don't work on Unicode.
+  // This version is a superset of btoa / atob, so it maintains compatibility with older versions of
+  // the live viewer which used btoa / atob directly.
+  function encodeToBase64(originalString) {
+    const bytes = te.encode(originalString);
+    const byteString = Array.from(bytes, byte => String.fromCharCode(byte)).join("");
+    const encoded = btoa(byteString);
+    return encoded;
+  }
+
+  function decodeFromBase64(encoded) {
+    const byteString = atob(encoded);
+    const bytes = Uint8Array.from(byteString, char => char.charCodeAt(0));
+    const originalString = td.decode(bytes);
+    return originalString;
   }
 })();
