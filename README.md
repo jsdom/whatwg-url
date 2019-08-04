@@ -89,3 +89,10 @@ To build and run the live viewer:
     npm run build-live-viewer
 
 Serve the contents of the `live-viewer` directory using any web server.
+
+## Supporting whatwg-url
+
+The jsdom project (including whatwg-url) is a community-driven project maintained by a team of [volunteers](https://github.com/orgs/jsdom/people). You could support us by:
+
+- [Getting professional support for whatwg-url](https://tidelift.com/subscription/pkg/npm-whatwg-url?utm_source=npm-whatwg-url&utm_medium=referral&utm_campaign=readme) as part of a Tidelift subscription. Tidelift helps making open source sustainable for us while giving teams assurances for maintenance, licensing, and security.
+- Contributing directly to the project.
