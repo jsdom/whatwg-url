@@ -4,9 +4,14 @@ if (process.env.NO_UPDATE) {
   process.exit(0);
 }
 
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
+const util = require("util");
+const stream = require("stream");
+
 const got = require("got");
+
+const pipeline = util.promisify(stream.pipeline);
 
 process.on("unhandledRejection", err => {
   throw err;
@@ -40,6 +45,8 @@ for (const file of [
   "urlsearchparams-sort.any.js",
   "urlsearchparams-stringifier.any.js"
 ]) {
-  got(`${urlPrefix}${file}`, { stream: true })
-    .pipe(fs.createWriteStream(path.resolve(targetDir, file)));
+  pipeline(
+    got.stream(`${urlPrefix}${file}`),
+    fs.createWriteStream(path.resolve(targetDir, file))
+  );
 }

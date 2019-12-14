@@ -1,7 +1,6 @@
 # node specific
 node_modules/
 npm-debug.log
-package-lock.json
 
 # deploy keys
 deploy_key

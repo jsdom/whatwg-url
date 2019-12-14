@@ -12,16 +12,16 @@
   "dependencies": {
     "lodash.sortby": "^4.7.0",
     "tr46": "^1.0.1",
-    "webidl-conversions": "^4.0.2"
+    "webidl-conversions": "^5.0.0"
   },
   "devDependencies": {
-    "browserify": "^16.2.2",
-    "domexception": "^1.0.1",
-    "eslint": "^5.4.0",
-    "got": "^9.2.2",
-    "jest": "^23.5.0",
-    "recast": "^0.15.3",
-    "webidl2js": "^9.0.1"
+    "browserify": "^16.5.0",
+    "domexception": "^2.0.0",
+    "eslint": "^6.7.2",
+    "got": "^10.0.4",
+    "jest": "^24.9.0",
+    "recast": "^0.18.5",
+    "webidl2js": "^11.0.0"
   },
   "scripts": {
     "build": "node scripts/transform.js && node scripts/convert-idl.js",

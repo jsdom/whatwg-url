@@ -1109,7 +1109,7 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
     }
 
     if (!isNaN(c)) {
-      this.url.path[0] = this.url.path[0] + percentEncodeChar(c, isC0ControlPercentEncode);
+      this.url.path[0] += percentEncodeChar(c, isC0ControlPercentEncode);
     }
   }
 
