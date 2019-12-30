@@ -1,7 +1,6 @@
 "use strict";
 
-const URL = require("./lib/URL");
-const URLSearchParams = require("./lib/URLSearchParams");
+const { URL, URLSearchParams } = require("./webidl2js-wrapper");
 const urlStateMachine = require("./lib/url-state-machine");
 const urlEncoded = require("./lib/urlencoded");
 
