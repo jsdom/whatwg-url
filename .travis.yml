@@ -4,15 +4,13 @@ branches:
 
 language: node_js
 node_js:
-  - "10"
+  - 10
+  - 12
   - stable
 
-install:
-  - yarn --frozen-lockfile
-
 script:
-  - yarn lint
-  - yarn test
+  - npm run lint
+  - npm test
 
 before_deploy:
 - bash scripts/deploy-live-viewer.sh
