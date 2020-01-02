@@ -77,20 +77,20 @@ This module exports the `URL` and `URLSearchParams` [interface wrappers API](htt
 
 First, install [Node.js](https://nodejs.org/). Then, fetch the dependencies of whatwg-url, by running from this directory:
 
-    yarn
+    npm
 
 To run tests:
 
-    yarn test
+    npm test
 
 To generate a coverage report:
 
-    yarn coverage
+    npm run coverage
 
 To build and run the live viewer:
 
-    yarn build
-    yarn build-live-viewer
+    npm run build
+    npm run build-live-viewer
 
 Serve the contents of the `live-viewer` directory using any web server.
 
