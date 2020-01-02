@@ -26,7 +26,7 @@
     "webidl2js": "^12.0.0"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "scripts": {
     "build": "node scripts/transform.js && node scripts/convert-idl.js",
