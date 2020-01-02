@@ -32,7 +32,7 @@
     "build": "node scripts/transform.js && node scripts/convert-idl.js",
     "coverage": "jest --coverage",
     "lint": "eslint .",
-    "prepublish": "node scripts/transform.js && node scripts/convert-idl.js",
+    "prepare": "node scripts/transform.js && node scripts/convert-idl.js",
     "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js && node scripts/convert-idl.js",
     "build-live-viewer": "browserify index.js --standalone whatwgURL > live-viewer/whatwg-url.js",
     "test": "jest"
