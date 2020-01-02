@@ -1,14 +1,14 @@
-sudo: false
-
 branches:
   only:
   - master
 
 language: node_js
-node_js: stable
+node_js:
+  - "8"
+  - stable
 
 install:
-  - yarn
+  - yarn --frozen-lockfile
 
 script:
   - yarn lint
