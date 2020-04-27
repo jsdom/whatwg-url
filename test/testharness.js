@@ -27,7 +27,8 @@ module.exports = {
     assert.deepStrictEqual([...actual], [...expected]);
   },
 
-  assert_throws(code, func) {
+  assert_throws_js(errorConstructor, func) {
+    // Don't bother testing the errorConstructor since that brings in tricky realm issues.
     assert.throws(func);
   },
 
