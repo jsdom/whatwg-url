@@ -77,7 +77,7 @@ This module exports the `URL` and `URLSearchParams` [interface wrappers API](htt
 
 First, install [Node.js](https://nodejs.org/). Then, fetch the dependencies of whatwg-url, by running from this directory:
 
-    npm
+    npm install
 
 To run tests:
 

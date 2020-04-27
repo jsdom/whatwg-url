@@ -1154,10 +1154,7 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
 };
 
 URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
-  if (isNaN(c)) { // do nothing
-  } else if (c === 0x0) {
-    this.parseError = true;
-  } else {
+  if (!isNaN(c)) {
     // TODO: If c is not a URL code point and not "%", parse error.
     if (c === p("%") &&
       (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
