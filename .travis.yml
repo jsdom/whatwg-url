@@ -13,15 +13,14 @@ script:
   - npm test
 
 before_deploy:
-- bash scripts/deploy-live-viewer.sh
-- openssl aes-256-cbc -K $encrypted_3767330e5762_key -iv $encrypted_3767330e5762_iv -in deploy_key.enc -out deploy_key -d
+  - bash scripts/deploy-live-viewer.sh
+  - openssl aes-256-cbc -K $encrypted_3767330e5762_key -iv $encrypted_3767330e5762_iv -in deploy_key.enc -out deploy_key -d
 
 deploy:
   provider: pages
   local_dir: out
   deploy_key: deploy_key
-  edge:
-    branch: master
+  edge: true
 
 notifications:
   email:
