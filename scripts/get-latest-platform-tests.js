@@ -23,15 +23,21 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "efec8204e84d434d80407bb7cf8df37d33cabaa1";
+const commitHash = "59e50d35ef02a8992dce8980784c14010ebf7c98";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
+
+fs.rmdirSync(targetDir, { recursive: true });
+fs.mkdirSync(targetDir, { recursive: true });
+fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
 
 for (const file of [
   "resources/setters_tests.json",
   "resources/toascii.json",
   "resources/urltestdata.json",
+  "url-searchparams.any.js",
+  "url-setters-stripping.any.js",
   "url-tojson.any.js",
   "urlencoded-parser.any.js",
   "urlsearchparams-append.any.js",
