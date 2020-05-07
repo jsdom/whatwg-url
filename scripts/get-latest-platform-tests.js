@@ -23,7 +23,7 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "59e50d35ef02a8992dce8980784c14010ebf7c98";
+const commitHash = "c390f441840c65b55f014a34ef0459853709286b";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
