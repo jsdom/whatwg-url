@@ -465,7 +465,7 @@ function domainToASCII(domain, beStrict = false) {
     useSTD3ASCIIRules: beStrict,
     verifyDNSLength: beStrict
   });
-  if (result === null) {
+  if (result === null || result === "") {
     return failure;
   }
   return result;
