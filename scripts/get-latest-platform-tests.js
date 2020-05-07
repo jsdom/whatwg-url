@@ -28,7 +28,15 @@ const commitHash = "59e50d35ef02a8992dce8980784c14010ebf7c98";
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
-fs.rmdirSync(targetDir, { recursive: true });
+try {
+  fs.rmdirSync(targetDir, { recursive: true });
+} catch (e) {
+  // Swallow ENOENT errors. They occur in Node.js v10 on CI because it does not support { recursive: true }.
+  if (e.code !== "ENOENT") {
+    throw e;
+  }
+}
+
 fs.mkdirSync(targetDir, { recursive: true });
 fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
 
