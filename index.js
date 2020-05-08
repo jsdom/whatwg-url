@@ -5,8 +5,8 @@ const urlStateMachine = require("./dist/url-state-machine");
 const urlEncoded = require("./dist/urlencoded");
 
 const sharedGlobalObject = {};
-URL.install(sharedGlobalObject);
-URLSearchParams.install(sharedGlobalObject);
+URL.install(sharedGlobalObject, ["Window"]);
+URLSearchParams.install(sharedGlobalObject, ["Window"]);
 
 exports.URL = sharedGlobalObject.URL;
 exports.URLSearchParams = sharedGlobalObject.URLSearchParams;
