@@ -38,6 +38,11 @@ class FauxXMLHttpRequest {
 
   send() {}
 
+  get onload() {
+    assert(false, "This should not be called");
+    return null;
+  }
+
   set onload(cb) {
     assert(this.responseType === "json");
     const buf = fs.readFileSync(path.resolve(__dirname, `web-platform-tests/${this._path}`), "utf8");
