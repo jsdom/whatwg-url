@@ -337,8 +337,7 @@ function parseIPv6(input) {
 
 function serializeIPv6(address) {
   let output = "";
-  const seqResult = findLongestZeroSequence(address);
-  const compress = seqResult.idx;
+  const compress = findLongestZeroSequence(address);
   let ignore0 = false;
 
   for (let pieceIndex = 0; pieceIndex <= 7; ++pieceIndex) {
@@ -435,13 +434,9 @@ function findLongestZeroSequence(arr) {
   // if trailing zeros
   if (currLen > maxLen) {
     maxIdx = currStart;
-    maxLen = currLen;
   }
 
-  return {
-    idx: maxIdx,
-    len: maxLen
-  };
+  return maxIdx;
 }
 
 function serializeHost(host) {
