@@ -433,7 +433,7 @@ function findLongestZeroSequence(arr) {
 
   // if trailing zeros
   if (currLen > maxLen) {
-    maxIdx = currStart;
+    return currStart;
   }
 
   return maxIdx;
