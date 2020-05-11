@@ -706,7 +706,7 @@ URLStateMachine.prototype["parse relative"] = function parseRelative(c) {
       this.url.query = null;
       this.url.path.pop();
       this.state = "path";
-       --this.pointer;
+      --this.pointer;
     }
   }
 
