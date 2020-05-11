@@ -896,27 +896,22 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
     }
     this.state = "file slash";
   } else if (this.base !== null && this.base.scheme === "file") {
-    if (isNaN(c)) {
-      this.url.host = this.base.host;
-      this.url.path = this.base.path.slice();
-      this.url.query = this.base.query;
-    } else if (c === p("?")) {
-      this.url.host = this.base.host;
-      this.url.path = this.base.path.slice();
+    this.url.host = this.base.host;
+    this.url.path = this.base.path.slice();
+    this.url.query = this.base.query;
+    if (c === p("?")) {
       this.url.query = "";
       this.state = "query";
     } else if (c === p("#")) {
-      this.url.host = this.base.host;
-      this.url.path = this.base.path.slice();
-      this.url.query = this.base.query;
       this.url.fragment = "";
       this.state = "fragment";
-    } else {
+    } else if (!isNaN(c)) {
+      this.url.query = null;
       if (!startsWithWindowsDriveLetter(this.input, this.pointer)) {
-        this.url.host = this.base.host;
-        this.url.path = this.base.path.slice();
         shortenPath(this.url);
       } else {
+        this.url.host = null;
+        this.url.path = [];
         this.parseError = true;
       }
 
