@@ -90,20 +90,29 @@ function isC0ControlPercentEncode(c) {
   return c <= 0x1F || c > 0x7E;
 }
 
-const extraUserinfoPercentEncodeSet =
-  new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
-function isUserinfoPercentEncode(c) {
-  return isPathPercentEncode(c) || extraUserinfoPercentEncodeSet.has(c);
-}
-
 const extraFragmentPercentEncodeSet = new Set([p(" "), p("\""), p("<"), p(">"), p("`")]);
 function isFragmentPercentEncode(c) {
   return isC0ControlPercentEncode(c) || extraFragmentPercentEncodeSet.has(c);
 }
 
-const extraPathPercentEncodeSet = new Set([p("#"), p("?"), p("{"), p("}")]);
+const extraQueryPercentEncodeSet = new Set([p(" "), p("\""), p("#"), p("<"), p(">")]);
+function isQueryPercentEncode(c) {
+  return isC0ControlPercentEncode(c) || extraQueryPercentEncodeSet.has(c);
+}
+
+function isSpecialQueryPercentEncode(c) {
+  return isQueryPercentEncode(c) || c === p("'");
+}
+
+const extraPathPercentEncodeSet = new Set([p("?"), p("`"), p("{"), p("}")]);
 function isPathPercentEncode(c) {
-  return isFragmentPercentEncode(c) || extraPathPercentEncodeSet.has(c);
+  return isQueryPercentEncode(c) || extraPathPercentEncodeSet.has(c);
+}
+
+const extraUserinfoPercentEncodeSet =
+  new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
+function isUserinfoPercentEncode(c) {
+  return isPathPercentEncode(c) || extraUserinfoPercentEncodeSet.has(c);
 }
 
 function percentEncodeChar(c, encodeSetPredicate) {
@@ -1098,37 +1107,22 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
 };
 
 URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
-  if (isNaN(c) || (!this.stateOverride && c === p("#"))) {
-    if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
-      this.encodingOverride = "utf-8";
-    }
+  if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
+    this.encodingOverride = "utf-8";
+  }
 
-    const buffer = Buffer.from(this.buffer); // TODO: Use encoding override instead
-    for (let i = 0; i < buffer.length; ++i) {
-      if (buffer[i] < 0x21 ||
-          buffer[i] > 0x7E ||
-          buffer[i] === 0x22 || buffer[i] === 0x23 || buffer[i] === 0x3C || buffer[i] === 0x3E ||
-          (buffer[i] === 0x27 && isSpecial(this.url))) {
-        this.url.query += percentEncode(buffer[i]);
-      } else {
-        this.url.query += String.fromCodePoint(buffer[i]);
-      }
-    }
-
-    this.buffer = "";
-    if (c === p("#")) {
-      this.url.fragment = "";
-      this.state = "fragment";
-    }
-  } else {
+  if (!this.stateOverride && c === p("#")) {
+    this.url.fragment = "";
+    this.state = "fragment";
+  } else if (!isNaN(c)) {
     // TODO: If c is not a URL code point and not "%", parse error.
     if (c === p("%") &&
       (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
         !infra.isASCIIHex(this.input[this.pointer + 2]))) {
       this.parseError = true;
     }
-
-    this.buffer += cStr;
+    // TODO: Use encoding override instead
+    this.url.query += percentEncodeChar(c, isSpecial(this.url) ? isSpecialQueryPercentEncode : isQueryPercentEncode);
   }
 
   return true;
