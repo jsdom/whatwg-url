@@ -1106,7 +1106,7 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
   return true;
 };
 
-URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
+URLStateMachine.prototype["parse query"] = function parseQuery(c) {
   if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
     this.encodingOverride = "utf-8";
   }
