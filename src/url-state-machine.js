@@ -910,9 +910,9 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
       if (!startsWithWindowsDriveLetter(this.input, this.pointer)) {
         shortenPath(this.url);
       } else {
+        this.parseError = true;
         this.url.host = null;
         this.url.path = [];
-        this.parseError = true;
       }
 
       this.state = "path";
