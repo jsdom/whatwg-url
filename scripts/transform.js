@@ -3,6 +3,33 @@
 const fs = require("fs");
 const path = require("path");
 const recast = require("recast");
+const glob = require("glob");
+const WebIDL2JS = require("webidl2js");
+const clearDir = require("./clear-dir");
+
+const srcDir = path.resolve(__dirname, "../src");
+const outputDir = path.resolve(__dirname, "../dist");
+
+clearDir(outputDir);
+
+for (const file of glob.sync(srcDir + "/*.js")) {
+  const code = fs.readFileSync(file, { encoding: "utf8" });
+  const ast = recast.parse(code);
+  replaceP(ast.program.body);
+  const output = recast.print(ast, { lineTerminator: "\n" }).code;
+
+  const outputFile = path.resolve(outputDir, path.relative(srcDir, file));
+  fs.writeFileSync(outputFile, output);
+}
+
+const transformer = new WebIDL2JS({ implSuffix: "-impl" });
+
+transformer.addSource(srcDir, outputDir);
+transformer.generate(outputDir)
+  .catch(err => {
+    console.error(err.stack);
+    process.exit(1);
+  });
 
 function replaceP(body) {
   recast.types.visit(body, {
@@ -25,12 +52,4 @@ function replaceP(body) {
       this.traverse(p);
     }
   });
-}
-
-for (const file of ["urlencoded.js", "url-state-machine.js"]) {
-  const code = fs.readFileSync(path.resolve(__dirname, "../src", file), { encoding: "utf8" });
-  const ast = recast.parse(code);
-  replaceP(ast.program.body);
-  const output = recast.print(ast, { lineTerminator: "\n" }).code;
-  fs.writeFileSync(path.resolve(__dirname, "../lib", file), output);
 }
