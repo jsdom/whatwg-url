@@ -89,7 +89,7 @@ To generate a coverage report:
 
 To build and run the live viewer:
 
-    npm run build
+    npm run prepare
     npm run build-live-viewer
 
 Serve the contents of the `live-viewer` directory using any web server.

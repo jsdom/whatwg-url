@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const util = require("util");
 const stream = require("stream");
+const clearDir = require("./clear-dir");
 
 const got = require("got");
 
@@ -28,16 +29,7 @@ const commitHash = "9ffe8f26432649d02eb81add2816dd5394f57a8c";
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
-try {
-  fs.rmdirSync(targetDir, { recursive: true });
-} catch (e) {
-  // Swallow ENOENT errors. They occur in Node.js v10 on CI because it does not support { recursive: true }.
-  if (e.code !== "ENOENT") {
-    throw e;
-  }
-}
-
-fs.mkdirSync(targetDir, { recursive: true });
+clearDir(targetDir);
 fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
 
 for (const file of [

@@ -6,7 +6,7 @@
   "files": [
     "index.js",
     "webidl2js-wrapper.js",
-    "lib/"
+    "dist/"
   ],
   "author": "Sebastian Mayr <github@smayr.name>",
   "license": "MIT",
@@ -20,6 +20,7 @@
     "browserify": "^16.5.0",
     "domexception": "^2.0.1",
     "eslint": "^6.8.0",
+    "glob": "^7.1.6",
     "got": "^10.6.0",
     "jest": "^25.1.0",
     "recast": "^0.18.7",
@@ -29,11 +30,10 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "node scripts/transform.js && node scripts/convert-idl.js",
     "coverage": "jest --coverage",
     "lint": "eslint .",
-    "prepare": "node scripts/transform.js && node scripts/convert-idl.js",
-    "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js && node scripts/convert-idl.js",
+    "prepare": "node scripts/transform.js",
+    "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js",
     "build-live-viewer": "browserify index.js --standalone whatwgURL > live-viewer/whatwg-url.js",
     "test": "jest"
   },

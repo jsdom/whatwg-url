@@ -1,8 +1,8 @@
 "use strict";
 
 const { URL, URLSearchParams } = require("./webidl2js-wrapper");
-const urlStateMachine = require("./lib/url-state-machine");
-const urlEncoded = require("./lib/urlencoded");
+const urlStateMachine = require("./dist/url-state-machine");
+const urlEncoded = require("./dist/urlencoded");
 
 const sharedGlobalObject = {};
 URL.install(sharedGlobalObject);

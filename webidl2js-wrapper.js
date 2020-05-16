@@ -1,7 +1,7 @@
 "use strict";
 
-const URL = require("./lib/URL");
-const URLSearchParams = require("./lib/URLSearchParams");
+const URL = require("./dist/URL");
+const URLSearchParams = require("./dist/URLSearchParams");
 
 exports.URL = URL;
 exports.URLSearchParams = URLSearchParams;
