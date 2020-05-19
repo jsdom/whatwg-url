@@ -3,7 +3,10 @@ const punycode = require("punycode");
 const tr46 = require("tr46");
 
 const infra = require("./infra");
-const { percentEncode, percentDecode } = require("./urlencoded");
+const { utf8DecodeWithoutBOM } = require("./encoding");
+const { percentDecodeString, utf8PercentEncodeCodePoint, utf8PercentEncodeString, isC0ControlPercentEncode,
+  isFragmentPercentEncode, isQueryPercentEncode, isSpecialQueryPercentEncode, isPathPercentEncode,
+  isUserinfoPercentEncode } = require("./percent-encoding");
 
 function p(char) {
   return char.codePointAt(0);
@@ -21,7 +24,7 @@ const specialSchemes = {
 const failure = Symbol("failure");
 
 function countSymbols(str) {
-  return punycode.ucs2.decode(str).length;
+  return [...str].length;
 }
 
 function at(input, idx) {
@@ -72,48 +75,6 @@ function isNotSpecial(url) {
 
 function defaultPort(scheme) {
   return specialSchemes[scheme];
-}
-
-function utf8PercentEncode(c) {
-  const buf = Buffer.from(c);
-
-  let str = "";
-
-  for (let i = 0; i < buf.length; ++i) {
-    str += percentEncode(buf[i]);
-  }
-
-  return str;
-}
-
-function isC0ControlPercentEncode(c) {
-  return c <= 0x1F || c > 0x7E;
-}
-
-const extraUserinfoPercentEncodeSet =
-  new Set([p("/"), p(":"), p(";"), p("="), p("@"), p("["), p("\\"), p("]"), p("^"), p("|")]);
-function isUserinfoPercentEncode(c) {
-  return isPathPercentEncode(c) || extraUserinfoPercentEncodeSet.has(c);
-}
-
-const extraFragmentPercentEncodeSet = new Set([p(" "), p("\""), p("<"), p(">"), p("`")]);
-function isFragmentPercentEncode(c) {
-  return isC0ControlPercentEncode(c) || extraFragmentPercentEncodeSet.has(c);
-}
-
-const extraPathPercentEncodeSet = new Set([p("#"), p("?"), p("{"), p("}")]);
-function isPathPercentEncode(c) {
-  return isFragmentPercentEncode(c) || extraPathPercentEncodeSet.has(c);
-}
-
-function percentEncodeChar(c, encodeSetPredicate) {
-  const cStr = String.fromCodePoint(c);
-
-  if (encodeSetPredicate(c)) {
-    return utf8PercentEncode(cStr);
-  }
-
-  return cStr;
 }
 
 function parseIPv4Number(input) {
@@ -377,7 +338,7 @@ function parseHost(input, isNotSpecialArg = false) {
     return parseOpaqueHost(input);
   }
 
-  const domain = percentDecode(Buffer.from(input)).toString();
+  const domain = utf8DecodeWithoutBOM(percentDecodeString(input));
   const asciiDomain = domainToASCII(domain);
   if (asciiDomain === failure) {
     return failure;
@@ -400,12 +361,7 @@ function parseOpaqueHost(input) {
     return failure;
   }
 
-  let output = "";
-  const decoded = punycode.ucs2.decode(input);
-  for (let i = 0; i < decoded.length; ++i) {
-    output += percentEncodeChar(decoded[i], isC0ControlPercentEncode);
-  }
-  return output;
+  return utf8PercentEncodeString(input, isC0ControlPercentEncode);
 }
 
 function findLongestZeroSequence(arr) {
@@ -769,7 +725,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
         this.passwordTokenSeenFlag = true;
         continue;
       }
-      const encodedCodePoints = percentEncodeChar(codePoint, isUserinfoPercentEncode);
+      const encodedCodePoints = utf8PercentEncodeCodePoint(codePoint, isUserinfoPercentEncode);
       if (this.passwordTokenSeenFlag) {
         this.url.password += encodedCodePoints;
       } else {
@@ -1059,7 +1015,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.parseError = true;
     }
 
-    this.buffer += percentEncodeChar(c, isPathPercentEncode);
+    this.buffer += utf8PercentEncodeCodePoint(c, isPathPercentEncode);
   }
 
   return true;
@@ -1085,45 +1041,33 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
     }
 
     if (!isNaN(c)) {
-      this.url.path[0] += percentEncodeChar(c, isC0ControlPercentEncode);
+      this.url.path[0] += utf8PercentEncodeCodePoint(c, isC0ControlPercentEncode);
     }
   }
 
   return true;
 };
 
-URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
-  if (isNaN(c) || (!this.stateOverride && c === p("#"))) {
-    if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
-      this.encodingOverride = "utf-8";
-    }
+URLStateMachine.prototype["parse query"] = function parseQuery(c) {
+  if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
+    this.encodingOverride = "utf-8";
+  }
 
-    const buffer = Buffer.from(this.buffer); // TODO: Use encoding override instead
-    for (let i = 0; i < buffer.length; ++i) {
-      if (buffer[i] < 0x21 ||
-          buffer[i] > 0x7E ||
-          buffer[i] === 0x22 || buffer[i] === 0x23 || buffer[i] === 0x3C || buffer[i] === 0x3E ||
-          (buffer[i] === 0x27 && isSpecial(this.url))) {
-        this.url.query += percentEncode(buffer[i]);
-      } else {
-        this.url.query += String.fromCodePoint(buffer[i]);
-      }
-    }
-
-    this.buffer = "";
-    if (c === p("#")) {
-      this.url.fragment = "";
-      this.state = "fragment";
-    }
-  } else {
+  if (!this.stateOverride & c === p("#")) {
+    this.url.fragment = "";
+    this.state = "fragment";
+  } else if (!isNaN(c)) {
     // TODO: If c is not a URL code point and not "%", parse error.
+
     if (c === p("%") &&
       (!infra.isASCIIHex(this.input[this.pointer + 1]) ||
         !infra.isASCIIHex(this.input[this.pointer + 2]))) {
       this.parseError = true;
     }
 
-    this.buffer += cStr;
+    const queryPercentEncodePredicate = isSpecial(this.url) ? isSpecialQueryPercentEncode : isQueryPercentEncode;
+    // TODO: use "percent-encode after encoding" passing in this.encodingOverride
+    this.url.query += utf8PercentEncodeCodePoint(c, queryPercentEncodePredicate);
   }
 
   return true;
@@ -1138,7 +1082,7 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
       this.parseError = true;
     }
 
-    this.url.fragment += percentEncodeChar(c, isFragmentPercentEncode);
+    this.url.fragment += utf8PercentEncodeCodePoint(c, isFragmentPercentEncode);
   }
 
   return true;
@@ -1247,19 +1191,11 @@ module.exports.basicURLParse = function (input, options) {
 };
 
 module.exports.setTheUsername = function (url, username) {
-  url.username = "";
-  const decoded = punycode.ucs2.decode(username);
-  for (let i = 0; i < decoded.length; ++i) {
-    url.username += percentEncodeChar(decoded[i], isUserinfoPercentEncode);
-  }
+  url.username = utf8PercentEncodeString(username, isUserinfoPercentEncode);
 };
 
 module.exports.setThePassword = function (url, password) {
-  url.password = "";
-  const decoded = punycode.ucs2.decode(password);
-  for (let i = 0; i < decoded.length; ++i) {
-    url.password += percentEncodeChar(decoded[i], isUserinfoPercentEncode);
-  }
+  url.password = utf8PercentEncodeString(password, isUserinfoPercentEncode);
 };
 
 module.exports.serializeHost = serializeHost;

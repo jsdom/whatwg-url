@@ -1,5 +1,7 @@
 "use strict";
 
+// Note that we take code points as JS numbers, not JS strings.
+
 function isASCIIDigit(c) {
   return c >= 0x30 && c <= 0x39;
 }

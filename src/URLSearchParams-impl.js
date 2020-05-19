@@ -26,7 +26,7 @@ exports.implementation = class URLSearchParamsImpl {
         this._list.push([name, value]);
       }
     } else {
-      this._list = urlencoded.parseUrlencoded(init);
+      this._list = urlencoded.parseUrlencodedString(init);
     }
   }
 
