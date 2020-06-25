@@ -46,7 +46,7 @@ exports.implementation = class URLImpl {
     this._query._list.splice(0);
     const { query } = parsedURL;
     if (query !== null) {
-      this._query._list = urlencoded.parseUrlencoded(query);
+      this._query._list = urlencoded.parseUrlencodedString(query);
     }
   }
 
@@ -185,7 +185,7 @@ exports.implementation = class URLImpl {
     const input = v[0] === "?" ? v.substring(1) : v;
     url.query = "";
     usm.basicURLParse(input, { url, stateOverride: "query" });
-    this._query._list = urlencoded.parseUrlencoded(input);
+    this._query._list = urlencoded.parseUrlencodedString(input);
   }
 
   get searchParams() {
