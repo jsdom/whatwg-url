@@ -6,7 +6,7 @@ function p(char) {
   return char.codePointAt(0);
 }
 
-// https://whatpr.org/url/518.html#concept-urlencoded-parser
+// https://url.spec.whatwg.org/#concept-urlencoded-parser
 function parseUrlencoded(input) {
   const sequences = strictlySplitByteSequence(input, p("&"));
   const output = [];
@@ -38,12 +38,12 @@ function parseUrlencoded(input) {
   return output;
 }
 
-// https://whatpr.org/url/518.html#concept-urlencoded-string-parser
+// https://url.spec.whatwg.org/#concept-urlencoded-string-parser
 function parseUrlencodedString(input) {
   return parseUrlencoded(utf8Encode(input));
 }
 
-// https://whatpr.org/url/518.html#concept-urlencoded-serializer
+// https://url.spec.whatwg.org/#concept-urlencoded-serializer
 function serializeUrlencoded(tuples, encodingOverride = undefined) {
   let encoding = "utf-8";
   if (encodingOverride !== undefined) {
