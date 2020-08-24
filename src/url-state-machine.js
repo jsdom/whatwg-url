@@ -1113,8 +1113,11 @@ function serializeURL(url, excludeFragment) {
   if (url.cannotBeABaseURL) {
     output += url.path[0];
   } else {
-    for (const string of url.path) {
-      output += "/" + string;
+    if (url.host === null && url.path.length > 1 && url.path[0] === "") {
+      output += "/.";
+    }
+    for (const segment of url.path) {
+      output += "/" + segment;
     }
   }
 
