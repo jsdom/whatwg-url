@@ -2,7 +2,7 @@
 
 const { URL, URLSearchParams } = require("./webidl2js-wrapper");
 const urlStateMachine = require("./dist/url-state-machine");
-const urlEncoded = require("./dist/urlencoded");
+const percentEncoding = require("./dist/percent-encoding");
 
 const sharedGlobalObject = {};
 URL.install(sharedGlobalObject, ["Window"]);
@@ -21,4 +21,4 @@ exports.setTheUsername = urlStateMachine.setTheUsername;
 exports.setThePassword = urlStateMachine.setThePassword;
 exports.cannotHaveAUsernamePasswordPort = urlStateMachine.cannotHaveAUsernamePasswordPort;
 
-exports.percentDecode = urlEncoded.percentDecode;
+exports.percentDecode = percentEncoding.percentDecodeBytes;
