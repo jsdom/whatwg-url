@@ -2,6 +2,13 @@
 <meta charset="utf-8">
 <title>Live URL Viewer</title>
 <link rel="stylesheet" href="style.css">
+
+<script>
+// whatwg-url.js depends on SharedArrayBuffer being global, but we can't set COOP+COEP headers on
+// GitHub pages.
+window.SharedArrayBuffer =
+  new WebAssembly.Memory({ shared:true, initial:1, maximum:1 }).buffer.constructor;
+</script>
 <script src="whatwg-url.js"></script>
 
 <h1>Live URL Viewer</h1>
