@@ -24,9 +24,12 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/w3c/web-platform-tests/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "551c9d604fb8b97d3f8c65793bb047d15baddbc2";
+// const commitHash = "551c9d604fb8b97d3f8c65793bb047d15baddbc2";
+// const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 
-const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
+const commitHash = "094fcd4dd2b881a7f751f9c1f55534cbe08b151f";
+const urlPrefix = `https://raw.githubusercontent.com/alwinb/wpt/${commitHash}/url/`;
+
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
 clearDir(targetDir);
