@@ -891,7 +891,7 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
     if (this.base !== null && this.base.scheme === "file") {
       if (!startsWithWindowsDriveLetter(this.input, this.pointer) &&
           isNormalizedWindowsDriveLetterString(this.base.path[0])) {
-        this.url.path.push (this.base.path[0]);
+        this.url.path.push(this.base.path[0]);
       }
       this.url.host = this.base.host;
     }
