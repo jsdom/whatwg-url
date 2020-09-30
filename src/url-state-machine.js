@@ -867,7 +867,6 @@ URLStateMachine.prototype["parse file"] = function parseFile(c) {
         shortenPath(this.url);
       } else {
         this.parseError = true;
-        this.url.host = null;
         this.url.path = [];
       }
 
@@ -889,13 +888,12 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
     }
     this.state = "file host";
   } else {
-    if (this.base !== null && this.base.scheme === "file" &&
-        !startsWithWindowsDriveLetter(this.input, this.pointer)) {
-      if (isNormalizedWindowsDriveLetterString(this.base.path[0])) {
+    if (this.base !== null && this.base.scheme === "file") {
+      if (!startsWithWindowsDriveLetter(this.input, this.pointer) &&
+          isNormalizedWindowsDriveLetterString(this.base.path[0])) {
         this.url.path.push(this.base.path[0]);
-      } else {
-        this.url.host = this.base.host;
       }
+      this.url.host = this.base.host;
     }
     this.state = "path";
     --this.pointer;
@@ -983,21 +981,11 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.url.path.push("");
     } else if (!isSingleDot(this.buffer)) {
       if (this.url.scheme === "file" && this.url.path.length === 0 && isWindowsDriveLetterString(this.buffer)) {
-        if (this.url.host !== "" && this.url.host !== null) {
-          this.parseError = true;
-          this.url.host = "";
-        }
         this.buffer = this.buffer[0] + ":";
       }
       this.url.path.push(this.buffer);
     }
     this.buffer = "";
-    if (this.url.scheme === "file" && (c === undefined || c === p("?") || c === p("#"))) {
-      while (this.url.path.length > 1 && this.url.path[0] === "") {
-        this.parseError = true;
-        this.url.path.shift();
-      }
-    }
     if (c === p("?")) {
       this.url.query = "";
       this.state = "query";
