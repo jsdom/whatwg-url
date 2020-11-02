@@ -1037,14 +1037,21 @@ URLStateMachine.prototype["parse cannot-be-a-base-URL path"] = function parseCan
   return true;
 };
 
-URLStateMachine.prototype["parse query"] = function parseQuery(c) {
+URLStateMachine.prototype["parse query"] = function parseQuery(c, cStr) {
   if (!isSpecial(this.url) || this.url.scheme === "ws" || this.url.scheme === "wss") {
     this.encodingOverride = "utf-8";
   }
 
-  if (!this.stateOverride & c === p("#")) {
-    this.url.fragment = "";
-    this.state = "fragment";
+  if ((!this.stateOverride && c === p("#")) || isNaN(c)) {
+    const queryPercentEncodePredicate = isSpecial(this.url) ? isSpecialQueryPercentEncode : isQueryPercentEncode;
+    this.url.query += utf8PercentEncodeString(this.buffer, queryPercentEncodePredicate);
+
+    this.buffer = "";
+
+    if (c === p("#")) {
+      this.url.fragment = "";
+      this.state = "fragment";
+    }
   } else if (!isNaN(c)) {
     // TODO: If c is not a URL code point and not "%", parse error.
 
@@ -1054,9 +1061,7 @@ URLStateMachine.prototype["parse query"] = function parseQuery(c) {
       this.parseError = true;
     }
 
-    const queryPercentEncodePredicate = isSpecial(this.url) ? isSpecialQueryPercentEncode : isQueryPercentEncode;
-    // TODO: use "percent-encode after encoding" passing in this.encodingOverride
-    this.url.query += utf8PercentEncodeCodePoint(c, queryPercentEncodePredicate);
+    this.buffer += cStr;
   }
 
   return true;
