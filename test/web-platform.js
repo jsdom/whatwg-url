@@ -3,6 +3,7 @@ const assert = require("assert");
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { utf8PercentEncodeString, isSpecialQueryPercentEncode } = require("../dist/percent-encoding.js");
 const { URL, URLSearchParams } = require("..");
 const DOMException = require("domexception");
 const testharness = require("./testharness");
@@ -10,6 +11,7 @@ const parsingTestCases = require("./web-platform-tests/resources/urltestdata.jso
 const additionalParsingTestCases = require("./to-upstream.json");
 const setterTestData = require("./web-platform-tests/resources/setters_tests.json");
 const toASCIITestCases = require("./web-platform-tests/resources/toascii.json");
+const percentEncodingTestCases = require("./web-platform-tests/resources/percent-encoding.json");
 
 const wptDir = path.join(__dirname, "web-platform-tests");
 
@@ -143,6 +145,22 @@ function testToASCII(testCase) {
   };
 }
 
+function testPercentEncoding(testCase) {
+  return () => {
+    // whatwg-url only supports UTF-8 percent encoding for now.
+    const { input } = testCase;
+    const output = testCase.output["utf-8"];
+
+    // Unit test
+    assert.equal(utf8PercentEncodeString(input, isSpecialQueryPercentEncode, false), output);
+
+    // Integration test
+    const url = new URL(`https://doesnotmatter.invalid/?${input}#${input}`);
+    assert.equal(url.search, `?${output}`, "search");
+    assert.equal(url.hash, `#${output}`, "hash");
+  };
+}
+
 describe("Web platform tests", () => {
   describe("parsing", () => {
     for (const expected of parsingTestCases) {
@@ -211,6 +229,22 @@ describe("Web platform tests", () => {
       }
 
       test(description, testToASCII(testCase));
+    }
+  });
+
+  describe("percent-encoding", () => {
+    for (const testCase of percentEncodingTestCases) {
+      if (typeof testCase === "string") {
+        // It's a "comment"; skip it.
+        continue;
+      }
+
+      let description = testCase.input;
+      if (testCase.comment) {
+        description += ` (${testCase.comment})`;
+      }
+
+      test(description, testPercentEncoding(testCase));
     }
   });
 });
