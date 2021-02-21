@@ -961,6 +961,8 @@ URLStateMachine.prototype["parse path start"] = function parsePathStart(c) {
     if (c !== p("/")) {
       --this.pointer;
     }
+  } else if (this.stateOverride && this.url.host == null) {
+    this.url.path.push("");
   }
 
   return true;
