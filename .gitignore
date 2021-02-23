@@ -2,10 +2,6 @@
 node_modules/
 npm-debug.log
 
-# deploy keys
-deploy_key
-deploy_key.pub
-
 # project specific
 coverage/
 test/web-platform-tests/
