@@ -17,13 +17,13 @@
     "webidl-conversions": "^6.1.0"
   },
   "devDependencies": {
-    "browserify": "^16.5.2",
+    "browserify": "^17.0.0",
     "domexception": "^2.0.1",
-    "eslint": "^7.7.0",
+    "eslint": "^7.20.0",
     "glob": "^7.1.6",
-    "got": "^11.5.2",
-    "jest": "^26.4.2",
-    "recast": "^0.20.2",
+    "got": "^11.8.1",
+    "jest": "^26.6.3",
+    "recast": "^0.20.4",
     "webidl2js": "^16.2.0"
   },
   "engines": {
