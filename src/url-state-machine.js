@@ -760,6 +760,10 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
       return failure;
     }
 
+    if (this.stateOverride === "hostname") {
+      return false;
+    }
+
     const host = parseHost(this.buffer, isNotSpecial(this.url));
     if (host === failure) {
       return failure;
@@ -768,9 +772,6 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
     this.url.host = host;
     this.buffer = "";
     this.state = "port";
-    if (this.stateOverride === "hostname") {
-      return false;
-    }
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (isSpecial(this.url) && c === p("\\"))) {
     --this.pointer;
