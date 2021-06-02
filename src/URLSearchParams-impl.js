@@ -1,5 +1,5 @@
 "use strict";
-const stableSortBy = require("lodash/sortBy");
+const stableSortBy = require("lodash.sortby");
 const urlencoded = require("./urlencoded");
 
 exports.implementation = class URLSearchParamsImpl {
