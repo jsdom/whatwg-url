@@ -326,6 +326,9 @@ function serializeIPv6(address) {
 }
 
 function parseHost(input, isNotSpecialArg = false) {
+  if (input === "") {
+    return "";
+  }
   if (input[0] === "[") {
     if (input[input.length - 1] !== "]") {
       return failure;
@@ -713,6 +716,9 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
     this.parseError = true;
     if (this.atFlag) {
       this.buffer = "%40" + this.buffer;
+    } else if (this.url.scheme === "file") {
+      this.parseError = true;
+      return failure;
     }
     this.atFlag = true;
 
@@ -751,11 +757,8 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
 
 URLStateMachine.prototype["parse hostname"] =
 URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
-  if (this.stateOverride && this.url.scheme === "file") {
-    --this.pointer;
-    this.state = "file host";
-  } else if (c === p(":") && !this.arrFlag) {
-    if (this.buffer === "") {
+  if (c === p(":") && !this.arrFlag) {
+    if (this.url.scheme === "file") {
       this.parseError = true;
       return failure;
     }
@@ -765,7 +768,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
     }
 
     const host = parseHost(this.buffer, isNotSpecial(this.url));
-    if (host === failure) {
+    if (host === failure || host === "") {
       return failure;
     }
 
@@ -775,7 +778,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
   } else if (isNaN(c) || c === p("/") || c === p("?") || c === p("#") ||
              (isSpecial(this.url) && c === p("\\"))) {
     --this.pointer;
-    if (isSpecial(this.url) && this.buffer === "") {
+    if (isSpecial(this.url) && this.buffer === "" && this.url.scheme !== "file") {
       this.parseError = true;
       return failure;
     } else if (this.stateOverride && this.buffer === "" &&
@@ -789,7 +792,7 @@ URLStateMachine.prototype["parse host"] = function parseHostName(c, cStr) {
       return failure;
     }
 
-    this.url.host = host;
+    this.url.host = this.url.scheme === "file" && host === "localhost" ? "" : host;
     this.buffer = "";
     this.state = "path start";
     if (this.stateOverride) {
@@ -888,7 +891,11 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
     if (c === p("\\")) {
       this.parseError = true;
     }
-    this.state = "file host";
+    if (startsWithWindowsDriveLetter(this.input, this.pointer + 1)) {
+      this.state = "path";
+    } else {
+      this.state = "authority";
+    }
   } else {
     if (this.base !== null && this.base.scheme === "file") {
       if (!startsWithWindowsDriveLetter(this.input, this.pointer) &&
@@ -899,42 +906,6 @@ URLStateMachine.prototype["parse file slash"] = function parseFileSlash(c) {
     }
     this.state = "path";
     --this.pointer;
-  }
-
-  return true;
-};
-
-URLStateMachine.prototype["parse file host"] = function parseFileHost(c, cStr) {
-  if (isNaN(c) || c === p("/") || c === p("\\") || c === p("?") || c === p("#")) {
-    --this.pointer;
-    if (!this.stateOverride && isWindowsDriveLetterString(this.buffer)) {
-      this.parseError = true;
-      this.state = "path";
-    } else if (this.buffer === "") {
-      this.url.host = "";
-      if (this.stateOverride) {
-        return false;
-      }
-      this.state = "path start";
-    } else {
-      let host = parseHost(this.buffer, isNotSpecial(this.url));
-      if (host === failure) {
-        return failure;
-      }
-      if (host === "localhost") {
-        host = "";
-      }
-      this.url.host = host;
-
-      if (this.stateOverride) {
-        return false;
-      }
-
-      this.buffer = "";
-      this.state = "path start";
-    }
-  } else {
-    this.buffer += cStr;
   }
 
   return true;
