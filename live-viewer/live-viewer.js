@@ -15,9 +15,15 @@
   browserIframeDocument.body.appendChild(browserAnchor);
 
   const components = [
-    "href", "protocol", "username",
-    "password", "port", "hostname",
-    "pathname", "search", "hash"
+    "href",
+    "protocol",
+    "username",
+    "password",
+    "port",
+    "hostname",
+    "pathname",
+    "search",
+    "hash"
   ];
 
   urlInput.addEventListener("input", update);
@@ -110,7 +116,7 @@
   }
 
   function setFromFragment() {
-    const pieces = /#url=([^&]+)&base=(.*)/.exec(location.hash);
+    const pieces = /#url=([^&]+)&base=(.*)/u.exec(location.hash);
     if (!pieces) {
       return;
     }

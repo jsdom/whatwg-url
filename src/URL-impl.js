@@ -55,11 +55,11 @@ exports.implementation = class URLImpl {
   }
 
   get protocol() {
-    return this._url.scheme + ":";
+    return `${this._url.scheme}:`;
   }
 
   set protocol(v) {
-    usm.basicURLParse(v + ":", { url: this._url, stateOverride: "scheme start" });
+    usm.basicURLParse(`${v}:`, { url: this._url, stateOverride: "scheme start" });
   }
 
   get username() {
@@ -97,7 +97,7 @@ exports.implementation = class URLImpl {
       return usm.serializeHost(url.host);
     }
 
-    return usm.serializeHost(url.host) + ":" + usm.serializeInteger(url.port);
+    return `${usm.serializeHost(url.host)}:${usm.serializeInteger(url.port)}`;
   }
 
   set host(v) {
@@ -153,7 +153,7 @@ exports.implementation = class URLImpl {
       return "";
     }
 
-    return "/" + this._url.path.join("/");
+    return `/${this._url.path.join("/")}`;
   }
 
   set pathname(v) {
@@ -170,7 +170,7 @@ exports.implementation = class URLImpl {
       return "";
     }
 
-    return "?" + this._url.query;
+    return `?${this._url.query}`;
   }
 
   set search(v) {
@@ -197,7 +197,7 @@ exports.implementation = class URLImpl {
       return "";
     }
 
-    return "#" + this._url.fragment;
+    return `#${this._url.fragment}`;
   }
 
   set hash(v) {

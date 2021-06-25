@@ -10,10 +10,10 @@ function p(char) {
 function percentEncode(c) {
   let hex = c.toString(16).toUpperCase();
   if (hex.length === 1) {
-    hex = "0" + hex;
+    hex = `0${hex}`;
   }
 
-  return "%" + hex;
+  return `%${hex}`;
 }
 
 // https://url.spec.whatwg.org/#percent-decode
