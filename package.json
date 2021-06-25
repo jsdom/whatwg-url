@@ -12,7 +12,6 @@
   "license": "MIT",
   "repository": "jsdom/whatwg-url",
   "dependencies": {
-    "lodash": "^4.7.0",
     "tr46": "^2.1.0",
     "webidl-conversions": "^6.1.0"
   },
@@ -28,7 +27,7 @@
     "webidl2js": "^16.2.0"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "scripts": {
     "coverage": "jest --coverage",

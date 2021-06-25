@@ -1,5 +1,4 @@
 "use strict";
-const stableSortBy = require("lodash/sortBy");
 const urlencoded = require("./urlencoded");
 
 exports.implementation = class URLSearchParamsImpl {
@@ -108,7 +107,16 @@ exports.implementation = class URLSearchParamsImpl {
   }
 
   sort() {
-    this._list = stableSortBy(this._list, [0]);
+    this._list.sort((a, b) => {
+      if (a[0] < b[0]) {
+        return -1;
+      }
+      if (a[0] > b[0]) {
+        return 1;
+      }
+      return 0;
+    });
+
     this._updateSteps();
   }
 

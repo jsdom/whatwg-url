@@ -8,7 +8,6 @@ const fs = require("fs");
 const path = require("path");
 const util = require("util");
 const stream = require("stream");
-const clearDir = require("./clear-dir");
 
 const got = require("got");
 
@@ -29,7 +28,7 @@ const commitHash = "706f8d143464de7d923dab391f3eab2469f042ae";
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
 
-clearDir(targetDir);
+(fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true });
 fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
 
 for (const file of [
