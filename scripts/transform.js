@@ -5,12 +5,12 @@ const path = require("path");
 const recast = require("recast");
 const glob = require("glob");
 const WebIDL2JS = require("webidl2js");
-const clearDir = require("./clear-dir");
 
 const srcDir = path.resolve(__dirname, "../src");
 const outputDir = path.resolve(__dirname, "../dist");
 
-clearDir(outputDir);
+(fs.rmSync || fs.rmdirSync)(outputDir, { recursive: true, force: true });
+fs.mkdirSync(outputDir, { recursive: true });
 
 for (const file of glob.sync(`${srcDir}/*.js`)) {
   const code = fs.readFileSync(file, { encoding: "utf8" });
