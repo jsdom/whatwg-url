@@ -15,8 +15,7 @@ function parseUrlencoded(input) {
       continue;
     }
 
-    let name;
-    let value;
+    let name, value;
     const indexOfEqual = bytes.indexOf(p("="));
 
     if (indexOfEqual >= 0) {

@@ -258,7 +258,7 @@ describe("To-upstream tests", () => {
       }
 
       test(
-        "<" + expected.input + "> against <" + expected.base + ">",
+        `<${expected.input}> against <${expected.base}>`,
         testURL(expected)
       );
     }

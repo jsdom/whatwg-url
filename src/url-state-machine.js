@@ -54,11 +54,11 @@ function isNormalizedWindowsDriveLetterString(string) {
 }
 
 function containsForbiddenHostCodePoint(string) {
-  return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|<|>|\?|@|\[|\\|\]|\^|\|/) !== -1;
+  return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|%|\/|:|<|>|\?|@|\[|\\|\]|\^|\|/u) !== -1;
 }
 
 function containsForbiddenHostCodePointExcludingPercent(string) {
-  return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|\/|:|<|>|\?|@|\[|\\|\]|\^|\|/) !== -1;
+  return string.search(/\u0000|\u0009|\u000A|\u000D|\u0020|#|\/|:|<|>|\?|@|\[|\\|\]|\^|\|/u) !== -1;
 }
 
 function isSpecialScheme(scheme) {
@@ -92,12 +92,12 @@ function parseIPv4Number(input) {
     return 0;
   }
 
-  let regex = /[^0-7]/;
+  let regex = /[^0-7]/u;
   if (R === 10) {
-    regex = /[^0-9]/;
+    regex = /[^0-9]/u;
   }
   if (R === 16) {
-    regex = /[^0-9A-Fa-f]/;
+    regex = /[^0-9A-Fa-f]/u;
   }
 
   if (regex.test(input)) {
@@ -137,7 +137,7 @@ function parseIPv4(input) {
       return failure;
     }
   }
-  if (numbers[numbers.length - 1] >= Math.pow(256, 5 - numbers.length)) {
+  if (numbers[numbers.length - 1] >= 256 ** (5 - numbers.length)) {
     return failure;
   }
 
@@ -145,7 +145,7 @@ function parseIPv4(input) {
   let counter = 0;
 
   for (const n of numbers) {
-    ipv4 += n * Math.pow(256, 3 - counter);
+    ipv4 += n * 256 ** (3 - counter);
     ++counter;
   }
 
@@ -159,7 +159,7 @@ function serializeIPv4(address) {
   for (let i = 1; i <= 4; ++i) {
     output = String(n % 256) + output;
     if (i !== 4) {
-      output = "." + output;
+      output = `.${output}`;
     }
     n = Math.floor(n / 256);
   }
@@ -402,7 +402,7 @@ function serializeHost(host) {
 
   // IPv6 serializer
   if (host instanceof Array) {
-    return "[" + serializeIPv6(host) + "]";
+    return `[${serializeIPv6(host)}]`;
   }
 
   return host;
@@ -423,11 +423,11 @@ function domainToASCII(domain, beStrict = false) {
 }
 
 function trimControlChars(url) {
-  return url.replace(/^[\u0000-\u001F\u0020]+|[\u0000-\u001F\u0020]+$/g, "");
+  return url.replace(/^[\u0000-\u001F\u0020]+|[\u0000-\u001F\u0020]+$/ug, "");
 }
 
 function trimTabAndNewline(url) {
-  return url.replace(/\u0009|\u000A|\u000D/g, "");
+  return url.replace(/\u0009|\u000A|\u000D/ug, "");
 }
 
 function shortenPath(url) {
@@ -451,7 +451,7 @@ function cannotHaveAUsernamePasswordPort(url) {
 }
 
 function isNormalizedWindowsDriveLetter(string) {
-  return /^[A-Za-z]:$/.test(string);
+  return /^[A-Za-z]:$/u.test(string);
 }
 
 function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
@@ -505,7 +505,7 @@ function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
     const cStr = isNaN(c) ? undefined : String.fromCodePoint(c);
 
     // exec state machine
-    const ret = this["parse " + this.state](c, cStr);
+    const ret = this[`parse ${this.state}`](c, cStr);
     if (!ret) {
       break; // terminate algorithm
     } else if (ret === failure) {
@@ -712,7 +712,7 @@ URLStateMachine.prototype["parse authority"] = function parseAuthority(c, cStr) 
   if (c === p("@")) {
     this.parseError = true;
     if (this.atFlag) {
-      this.buffer = "%40" + this.buffer;
+      this.buffer = `%40${this.buffer}`;
     }
     this.atFlag = true;
 
@@ -815,7 +815,7 @@ URLStateMachine.prototype["parse port"] = function parsePort(c, cStr) {
              this.stateOverride) {
     if (this.buffer !== "") {
       const port = parseInt(this.buffer);
-      if (port > Math.pow(2, 16) - 1) {
+      if (port > 2 ** 16 - 1) {
         this.parseError = true;
         return failure;
       }
@@ -985,7 +985,7 @@ URLStateMachine.prototype["parse path"] = function parsePath(c) {
       this.url.path.push("");
     } else if (!isSingleDot(this.buffer)) {
       if (this.url.scheme === "file" && this.url.path.length === 0 && isWindowsDriveLetterString(this.buffer)) {
-        this.buffer = this.buffer[0] + ":";
+        this.buffer = `${this.buffer[0]}:`;
       }
       this.url.path.push(this.buffer);
     }
@@ -1086,14 +1086,14 @@ URLStateMachine.prototype["parse fragment"] = function parseFragment(c) {
 };
 
 function serializeURL(url, excludeFragment) {
-  let output = url.scheme + ":";
+  let output = `${url.scheme}:`;
   if (url.host !== null) {
     output += "//";
 
     if (url.username !== "" || url.password !== "") {
       output += url.username;
       if (url.password !== "") {
-        output += ":" + url.password;
+        output += `:${url.password}`;
       }
       output += "@";
     }
@@ -1101,7 +1101,7 @@ function serializeURL(url, excludeFragment) {
     output += serializeHost(url.host);
 
     if (url.port !== null) {
-      output += ":" + url.port;
+      output += `:${url.port}`;
     }
   }
 
@@ -1112,27 +1112,27 @@ function serializeURL(url, excludeFragment) {
       output += "/.";
     }
     for (const segment of url.path) {
-      output += "/" + segment;
+      output += `/${segment}`;
     }
   }
 
   if (url.query !== null) {
-    output += "?" + url.query;
+    output += `?${url.query}`;
   }
 
   if (!excludeFragment && url.fragment !== null) {
-    output += "#" + url.fragment;
+    output += `#${url.fragment}`;
   }
 
   return output;
 }
 
 function serializeOrigin(tuple) {
-  let result = tuple.scheme + "://";
+  let result = `${tuple.scheme}://`;
   result += serializeHost(tuple.host);
 
   if (tuple.port !== null) {
-    result += ":" + tuple.port;
+    result += `:${tuple.port}`;
   }
 
   return result;

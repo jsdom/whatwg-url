@@ -12,7 +12,7 @@ const outputDir = path.resolve(__dirname, "../dist");
 
 clearDir(outputDir);
 
-for (const file of glob.sync(srcDir + "/*.js")) {
+for (const file of glob.sync(`${srcDir}/*.js`)) {
   const code = fs.readFileSync(file, { encoding: "utf8" });
   const ast = recast.parse(code);
   replaceP(ast.program.body);
