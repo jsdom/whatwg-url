@@ -1,5 +1,4 @@
 "use strict";
-const punycode = require("punycode");
 const tr46 = require("tr46");
 
 const infra = require("./infra");
@@ -173,7 +172,7 @@ function parseIPv6(input) {
   let compress = null;
   let pointer = 0;
 
-  input = punycode.ucs2.decode(input);
+  input = Array.from(input, c => c.codePointAt(0));
 
   if (input[pointer] === p(":")) {
     if (input[pointer + 1] !== p(":")) {
@@ -498,7 +497,7 @@ function URLStateMachine(input, base, encodingOverride, url, stateOverride) {
   this.arrFlag = false;
   this.passwordTokenSeenFlag = false;
 
-  this.input = punycode.ucs2.decode(this.input);
+  this.input = Array.from(this.input, c => c.codePointAt(0));
 
   for (; this.pointer <= this.input.length; ++this.pointer) {
     const c = this.input[this.pointer];
