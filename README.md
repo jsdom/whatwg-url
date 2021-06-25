@@ -29,7 +29,8 @@ The following methods are exported for use by places like jsdom that need to imp
 - [Set the username](https://url.spec.whatwg.org/#set-the-username): `setTheUsername(urlRecord, usernameString)`
 - [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`
 - [Cannot have a username/password/port](https://url.spec.whatwg.org/#cannot-have-a-username-password-port): `cannotHaveAUsernamePasswordPort(urlRecord)`
-- [Percent decode](https://url.spec.whatwg.org/#percent-decode): `percentDecode(buffer)`
+- [Percent decode bytes](https://url.spec.whatwg.org/#percent-decode): `percentDecodeBytes(uint8Array)`
+- [Percent decode a string](https://url.spec.whatwg.org/#percent-decode-string): `percentDecodeString(string)`
 
 The `stateOverride` parameter is one of the following strings:
 

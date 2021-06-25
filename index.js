@@ -21,4 +21,5 @@ exports.setTheUsername = urlStateMachine.setTheUsername;
 exports.setThePassword = urlStateMachine.setThePassword;
 exports.cannotHaveAUsernamePasswordPort = urlStateMachine.cannotHaveAUsernamePasswordPort;
 
-exports.percentDecode = percentEncoding.percentDecodeBytes;
+exports.percentDecodeString = percentEncoding.percentDecodeString;
+exports.percentDecodeBytes = percentEncoding.percentDecodeBytes;

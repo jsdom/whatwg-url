@@ -33,10 +33,7 @@ function percentDecodeBytes(input) {
     }
   }
 
-  // TODO: remove the Buffer.from in the next major version; it's only needed for back-compat, and sticking to standard
-  // typed arrays is nicer and simpler.
-  // See https://github.com/jsdom/data-urls/issues/17 for background.
-  return Buffer.from(output.slice(0, outputIndex));
+  return output.slice(0, outputIndex);
 }
 
 // https://url.spec.whatwg.org/#string-percent-decode
