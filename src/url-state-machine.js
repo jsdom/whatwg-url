@@ -77,6 +77,10 @@ function defaultPort(scheme) {
 }
 
 function parseIPv4Number(input) {
+  if (input === "") {
+    return failure;
+  }
+
   let R = 10;
 
   if (input.length >= 2 && input.charAt(0) === "0" && input.charAt(1).toLowerCase() === "x") {
@@ -115,17 +119,14 @@ function parseIPv4(input) {
   }
 
   if (parts.length > 4) {
-    return input;
+    return failure;
   }
 
   const numbers = [];
   for (const part of parts) {
-    if (part === "") {
-      return input;
-    }
     const n = parseIPv4Number(part);
     if (n === failure) {
-      return input;
+      return failure;
     }
 
     numbers.push(n);
@@ -347,12 +348,32 @@ function parseHost(input, isNotSpecialArg = false) {
     return failure;
   }
 
-  const ipv4Host = parseIPv4(asciiDomain);
-  if (typeof ipv4Host === "number" || ipv4Host === failure) {
-    return ipv4Host;
+  if (endsInANumber(asciiDomain)) {
+    return parseIPv4(asciiDomain);
   }
 
   return asciiDomain;
+}
+
+function endsInANumber(input) {
+  const parts = input.split(".");
+  if (parts[parts.length - 1] === "") {
+    if (parts.length === 1) {
+      return false;
+    }
+    parts.pop();
+  }
+
+  const last = parts[parts.length - 1];
+  if (parseIPv4Number(last) !== failure) {
+    return true;
+  }
+
+  if (/^[0-9]+$/u.test(last)) {
+    return true;
+  }
+
+  return false;
 }
 
 function parseOpaqueHost(input) {
