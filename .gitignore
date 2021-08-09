@@ -5,6 +5,9 @@ npm-debug.log
 # project specific
 coverage/
 test/web-platform-tests/
-dist/
-out/
 live-viewer/whatwg-url.js
+lib/VoidFunction.js
+lib/Function.js
+lib/URL.js
+lib/URLSearchParams.js
+lib/utils.js
