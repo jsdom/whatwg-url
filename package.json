@@ -13,7 +13,7 @@
   "repository": "jsdom/whatwg-url",
   "dependencies": {
     "tr46": "^2.1.0",
-    "webidl-conversions": "^6.1.0"
+    "webidl-conversions": "^7.0.0"
   },
   "devDependencies": {
     "@domenic/eslint-config": "^1.2.0",
