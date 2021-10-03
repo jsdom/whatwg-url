@@ -3,18 +3,6 @@
 <title>Live URL Viewer</title>
 <link rel="stylesheet" href="style.css">
 
-<script>
-// whatwg-url.js depends on SharedArrayBuffer.prototype.byteLength having a getter, but Safari
-// doesn't support SharedArrayBuffer. Since the dependency is just for type-checking code in
-// https://github.com/jsdom/webidl-conversions which isn't actually exercised, we can stub it out.
-if (!window.SharedArrayBuffer) {
-  window.SharedArrayBuffer = {
-    prototype: {
-      get byteLength() { }
-    }
-  };
-}
-</script>
 <script src="whatwg-url.js"></script>
 
 <h1>Live URL Viewer</h1>
