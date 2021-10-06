@@ -4,7 +4,7 @@ const { URL, URLSearchParams } = require("./webidl2js-wrapper");
 const urlStateMachine = require("./lib/url-state-machine");
 const percentEncoding = require("./lib/percent-encoding");
 
-const sharedGlobalObject = {};
+const sharedGlobalObject = { Array, Object, Promise, String, TypeError };
 URL.install(sharedGlobalObject, ["Window"]);
 URLSearchParams.install(sharedGlobalObject, ["Window"]);
 
