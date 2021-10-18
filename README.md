@@ -24,10 +24,12 @@ The following methods are exported for use by places like jsdom that need to imp
 - [Basic URL parser](https://url.spec.whatwg.org/#concept-basic-url-parser): `basicURLParse(input, { baseURL, url, stateOverride })`
 - [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer): `serializeURL(urlRecord, excludeFragment)`
 - [Host serializer](https://url.spec.whatwg.org/#concept-host-serializer): `serializeHost(hostFromURLRecord)`
+- [URL path serializer](https://url.spec.whatwg.org/#url-path-serializer): `serializePath(urlRecord)`
 - [Serialize an integer](https://url.spec.whatwg.org/#serialize-an-integer): `serializeInteger(number)`
 - [Origin](https://url.spec.whatwg.org/#concept-url-origin) [serializer](https://html.spec.whatwg.org/multipage/origin.html#ascii-serialisation-of-an-origin): `serializeURLOrigin(urlRecord)`
 - [Set the username](https://url.spec.whatwg.org/#set-the-username): `setTheUsername(urlRecord, usernameString)`
 - [Set the password](https://url.spec.whatwg.org/#set-the-password): `setThePassword(urlRecord, passwordString)`
+- [Has an opaque path](https://url.spec.whatwg.org/#url-opaque-path): `hasAnOpaquePath(urlRecord)`
 - [Cannot have a username/password/port](https://url.spec.whatwg.org/#cannot-have-a-username-password-port): `cannotHaveAUsernamePasswordPort(urlRecord)`
 - [Percent decode bytes](https://url.spec.whatwg.org/#percent-decode): `percentDecodeBytes(uint8Array)`
 - [Percent decode a string](https://url.spec.whatwg.org/#percent-decode-string): `percentDecodeString(string)`
