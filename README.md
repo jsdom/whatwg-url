@@ -4,7 +4,7 @@ whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spe
 
 ## Specification conformance
 
-whatwg-url is currently up to date with the URL spec up to commit [ab0e820](https://github.com/whatwg/url/commit/ab0e820b0b559610b30c731b7f2c1a8094181680).
+whatwg-url is currently up to date with the URL spec up to commit [43c2713](https://github.com/whatwg/url/commit/43c27137a0bc82c4b800fe74be893255fbeb35f4).
 
 For `file:` URLs, whose [origin is left unspecified](https://url.spec.whatwg.org/#concept-url-origin), whatwg-url chooses to use a new opaque origin (which serializes to `"null"`).
 
@@ -54,7 +54,7 @@ The `stateOverride` parameter is one of the following strings:
 - [`"file host"`](https://url.spec.whatwg.org/#file-host-state)
 - [`"path start"`](https://url.spec.whatwg.org/#path-start-state)
 - [`"path"`](https://url.spec.whatwg.org/#path-state)
-- [`"cannot-be-a-base-URL path"`](https://url.spec.whatwg.org/#cannot-be-a-base-url-path-state)
+- [`"opaque path"`](https://url.spec.whatwg.org/#cannot-be-a-base-url-path-state)
 - [`"query"`](https://url.spec.whatwg.org/#query-state)
 - [`"fragment"`](https://url.spec.whatwg.org/#fragment-state)
 
