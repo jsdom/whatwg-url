@@ -18,8 +18,8 @@
   "devDependencies": {
     "@domenic/eslint-config": "^1.4.0",
     "benchmark": "^2.1.4",
-    "browserify": "^17.0.0",
     "domexception": "^4.0.0",
+    "esbuild": "^0.13.14",
     "eslint": "^7.32.0",
     "got": "^11.8.2",
     "jest": "^27.2.4",
@@ -33,7 +33,7 @@
     "lint": "eslint .",
     "prepare": "node scripts/transform.js",
     "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js",
-    "build-live-viewer": "browserify index.js --standalone whatwgURL > live-viewer/whatwg-url.js",
+    "build-live-viewer": "esbuild --bundle --global-name=whatwgURL --outfile=live-viewer/whatwg-url.js index.js",
     "test": "jest"
   },
   "jest": {
