@@ -33,7 +33,7 @@
     "lint": "eslint .",
     "prepare": "node scripts/transform.js",
     "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js",
-    "build-live-viewer": "esbuild --bundle --global-name=whatwgURL --outfile=live-viewer/whatwg-url.js index.js",
+    "build-live-viewer": "esbuild --bundle --global-name=whatwgURL --sourcemap --outfile=live-viewer/whatwg-url.js index.js",
     "test": "jest"
   },
   "jest": {
