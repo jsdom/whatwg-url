@@ -116,7 +116,7 @@
   }
 
   function setFromFragment() {
-    const pieces = /#url=([^&]+)&base=(.*)/u.exec(location.hash);
+    const pieces = /#url=([^&]*)&base=(.*)/u.exec(location.hash);
     if (!pieces) {
       return;
     }
