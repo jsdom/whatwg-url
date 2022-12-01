@@ -6,12 +6,7 @@ if (process.env.NO_UPDATE) {
 
 const fs = require("fs");
 const path = require("path");
-const util = require("util");
-const stream = require("stream");
-
-const got = require("got");
-
-const pipeline = util.promisify(stream.pipeline);
+const fetch = require("minipass-fetch");
 
 process.on("unhandledRejection", err => {
   throw err;
@@ -51,8 +46,7 @@ for (const file of [
   "urlsearchparams-sort.any.js",
   "urlsearchparams-stringifier.any.js"
 ]) {
-  pipeline(
-    got.stream(`${urlPrefix}${file}`),
-    fs.createWriteStream(path.resolve(targetDir, file))
-  );
+  fetch(`${urlPrefix}${file}`).then(res => {
+    res.body.pipe(fs.createWriteStream(path.resolve(targetDir, file)));
+  });
 }

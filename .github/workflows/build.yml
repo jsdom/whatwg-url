@@ -14,17 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 12
           - 14
           - 16
-        architecture:
-          - x64
+          - 18
+          - latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        architecture: ${{ matrix.architecture }}
     - run: npm ci
     - run: npm run lint
     - run: npm test
@@ -33,8 +31,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
     - run: npm ci
     - name: Build Live Viewer
       run: bash scripts/deploy-live-viewer.sh
