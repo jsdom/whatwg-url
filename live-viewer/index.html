@@ -22,9 +22,18 @@ between the two parsers in which case the affected URL component will be colored
   <label for="url">URL:</label>
   <input id="url" value="https://example.com/" autofocus>
 
+  <label for="url-escaped">URL with escapes:</label>
+  <input id="url-escaped" value="https://example.com/">
+
   <label for="base">Base URL:</label>
   <input id="base" value="about:blank">
 </form>
+
+<details>
+  <summary>How do I use "URL with escapes?"</summary>
+
+  <p>Most of the time, you don't need to worry about this. But if you want to test characters outside of the U+0021 (!) through U+007E (~) range, which can be harder to input or to visually distinguish, you can use this field. Any strings of the form <samp>\u{<var>number</var>}</samp> will be decoded to their corresponding Unicode code point. So for example, you could test how null characters are processed by the URL parser by using the input <samp>test:\u{0}</samp>.
+</details>
 
 <h2>Browser's URL components</h2>
 
