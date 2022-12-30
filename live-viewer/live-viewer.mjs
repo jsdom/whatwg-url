@@ -1,6 +1,7 @@
 import whatwgURL from "./whatwg-url.mjs";
 
 const urlInput = document.querySelector("#url");
+const urlEscapedInput = document.querySelector("#url-escaped");
 const baseInput = document.querySelector("#base");
 
 const te = new TextEncoder();
@@ -19,8 +20,13 @@ const components = [
   "origin"
 ];
 
+urlInput.addEventListener("input", updateEscaped);
+urlEscapedInput.addEventListener("input", updateUnescaped);
+
 urlInput.addEventListener("input", update);
+urlEscapedInput.addEventListener("input", update);
 baseInput.addEventListener("input", update);
+
 window.addEventListener("hashchange", setFromFragment);
 setFromFragment();
 update();
@@ -52,6 +58,14 @@ function setResult(kind, result, mismatchedComponents) {
       setComponentElMismatch(componentEl, mismatchedComponents.has(component));
     }
   }
+}
+
+function updateEscaped() {
+  urlEscapedInput.value = escape(urlInput.value);
+}
+
+function updateUnescaped() {
+  urlInput.value = unescape(urlEscapedInput.value);
 }
 
 function setComponentElValue(componentEl, value) {
@@ -120,6 +134,7 @@ function setFromFragment() {
     console.warn("base hash parameter was not deserializable.");
   }
 
+  updateEscaped();
   update();
 }
 
@@ -138,4 +153,28 @@ function decodeFromBase64(encoded) {
   const bytes = Uint8Array.from(byteString, char => char.charCodeAt(0));
   const originalString = td.decode(bytes);
   return originalString;
+}
+
+function escape(rawString) {
+  return rawString
+    .replaceAll(
+      "\\u",
+      "\\\\u"
+    )
+    .replaceAll(
+      /[^\u{0021}-\u{007E}]/ug,
+      c => `\\u{${c.codePointAt(0).toString(16).padStart(4, "0")}}`
+    );
+}
+
+function unescape(escapedString) {
+  return escapedString
+    .replaceAll(
+      /(?<!\\)\\u\{([0-9a-fA-F]+)\}/ug,
+      (_, c) => String.fromCodePoint(Number.parseInt(c, 16))
+    )
+    .replaceAll(
+      "\\\\u",
+      "\\u"
+    );
 }
