@@ -1,8 +1,8 @@
 import whatwgURL from "./whatwg-url.mjs";
 
-const urlInput = document.querySelector("#url");
-const urlEscapedInput = document.querySelector("#url-escaped");
-const baseInput = document.querySelector("#base");
+const inputEl = document.querySelector("#input");
+const inputEscapedEl = document.querySelector("#input-escaped");
+const baseEl = document.querySelector("#base");
 
 const te = new TextEncoder();
 const td = new TextDecoder();
@@ -20,12 +20,12 @@ const components = [
   "origin"
 ];
 
-urlInput.addEventListener("input", updateEscaped);
-urlEscapedInput.addEventListener("input", updateUnescaped);
+inputEl.addEventListener("input", updateEscaped);
+inputEscapedEl.addEventListener("input", updateUnescaped);
 
-urlInput.addEventListener("input", update);
-urlEscapedInput.addEventListener("input", update);
-baseInput.addEventListener("input", update);
+inputEl.addEventListener("input", update);
+inputEscapedEl.addEventListener("input", update);
+baseEl.addEventListener("input", update);
 
 window.addEventListener("hashchange", setFromFragment);
 setFromFragment();
@@ -61,11 +61,11 @@ function setResult(kind, result, mismatchedComponents) {
 }
 
 function updateEscaped() {
-  urlEscapedInput.value = escape(urlInput.value);
+  inputEscapedEl.value = escape(inputEl.value);
 }
 
 function updateUnescaped() {
-  urlInput.value = unescape(urlEscapedInput.value);
+  inputEl.value = unescape(inputEscapedEl.value);
 }
 
 function setComponentElValue(componentEl, value) {
@@ -92,7 +92,7 @@ function getMismatchedComponents(result1, result2) {
 
 function getBrowserResult() {
   try {
-    return new URL(urlInput.value, baseInput.value);
+    return new URL(inputEl.value, baseEl.value);
   } catch (e) {
     return e;
   }
@@ -100,17 +100,18 @@ function getBrowserResult() {
 
 function getJsdomResult() {
   try {
-    return new whatwgURL.URL(urlInput.value, baseInput.value);
+    return new whatwgURL.URL(inputEl.value, baseEl.value);
   } catch (e) {
     return e;
   }
 }
 
+// We use "url=" in the fragment for backward-compatibility, even though "input=" would be a bit more correct.
 function updateFragmentForSharing() {
   history.replaceState(
     undefined,
     "",
-    `#url=${encodeToBase64(urlInput.value)}&base=${encodeToBase64(baseInput.value)}`
+    `#url=${encodeToBase64(inputEl.value)}&base=${encodeToBase64(baseEl.value)}`
   );
 }
 
@@ -121,14 +122,14 @@ function setFromFragment() {
   }
   const [, urlEncoded, baseEncoded] = pieces;
   try {
-    urlInput.value = decodeFromBase64(urlEncoded);
+    inputEl.value = decodeFromBase64(urlEncoded);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("url hash parameter was not deserializable.");
   }
 
   try {
-    baseInput.value = decodeFromBase64(baseEncoded);
+    baseEl.value = decodeFromBase64(baseEncoded);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.warn("base hash parameter was not deserializable.");
