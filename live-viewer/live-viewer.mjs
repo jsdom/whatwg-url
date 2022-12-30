@@ -95,7 +95,11 @@ function getJsdomResult() {
 }
 
 function updateFragmentForSharing() {
-  location.hash = `url=${encodeToBase64(urlInput.value)}&base=${encodeToBase64(baseInput.value)}`;
+  history.replaceState(
+    undefined,
+    "",
+    `#url=${encodeToBase64(urlInput.value)}&base=${encodeToBase64(baseInput.value)}`
+  );
 }
 
 function setFromFragment() {
