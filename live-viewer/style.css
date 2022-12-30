@@ -88,7 +88,3 @@ form input {
 .output td.empty-string:not(.fail) {
   color: #CCC;
 }
-
-.output td.non-string {
-  font-style: italic;
-}
