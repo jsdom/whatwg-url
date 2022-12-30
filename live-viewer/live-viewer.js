@@ -54,7 +54,7 @@
       output.hidden = false;
       error.hidden = true;
       for (const component of components) {
-        const componentEl = output.querySelector(`#${component}`).querySelector("td");
+        const componentEl = output.querySelector(`.${component}`).querySelector("td");
         setComponentElValue(componentEl, result[component]);
         setComponentElMismatch(componentEl, mismatchedComponents.has(component));
       }
