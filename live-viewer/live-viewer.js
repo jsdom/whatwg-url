@@ -23,7 +23,8 @@
     "hostname",
     "pathname",
     "search",
-    "hash"
+    "hash",
+    "origin"
   ];
 
   urlInput.addEventListener("input", update);
