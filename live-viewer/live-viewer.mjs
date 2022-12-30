@@ -1,4 +1,4 @@
-"use strict";
+import whatwgURL from "./whatwg-url.mjs";
 (() => {
   const urlInput = document.querySelector("#url");
   const baseInput = document.querySelector("#base");
