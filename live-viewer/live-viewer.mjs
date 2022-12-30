@@ -23,6 +23,7 @@ urlInput.addEventListener("input", update);
 baseInput.addEventListener("input", update);
 window.addEventListener("hashchange", setFromFragment);
 setFromFragment();
+update();
 
 function update() {
   const browserResult = getBrowserResult();
