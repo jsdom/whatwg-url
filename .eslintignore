@@ -1,6 +1,6 @@
 coverage/
 test/web-platform-tests/
-live-viewer/whatwg-url.js
+live-viewer/whatwg-url.mjs
 lib/VoidFunction.js
 lib/Function.js
 lib/URL.js
