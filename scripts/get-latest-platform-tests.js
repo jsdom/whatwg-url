@@ -18,7 +18,7 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/web-platform-tests/wpt/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "d9d78543960a04ea8ad8f1aa3c7536b6a9a87d9a";
+const commitHash = "4708e9a52978ed5dc1fdf742a15912f492a406ec";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
@@ -31,6 +31,7 @@ for (const file of [
   "resources/setters_tests.json",
   "resources/toascii.json",
   "resources/urltestdata.json",
+  "resources/IdnaTestV2.json",
   "url-searchparams.any.js",
   "url-setters-stripping.any.js",
   "url-tojson.any.js",
