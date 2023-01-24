@@ -163,17 +163,31 @@ function testPercentEncoding(testCase) {
 }
 
 function testIDNAv2(testCase) {
+  const encodedInput = encodeHostEndingCodePoints(testCase.input);
+
   return () => {
     if (testCase.output === null) {
-      assert.throws(() => new URL(`https://${testCase.input}/x`), TypeError);
+      assert.throws(() => new URL(`https://${encodedInput}/x`), TypeError);
     } else {
-      const url = new URL(`https://${testCase.input}/x`);
+      const url = new URL(`https://${encodedInput}/x`);
       assert.equal(url.host, testCase.output);
       assert.equal(url.hostname, testCase.output);
       assert.equal(url.pathname, "/x");
       assert.equal(url.href, `https://${testCase.output}/x`);
     }
   };
+}
+
+function encodeHostEndingCodePoints(input) {
+  let output = "";
+  for (const codePoint of input) {
+    if ([":", "/", "?", "#", "\\"].includes(codePoint)) {
+      output += encodeURIComponent(codePoint);
+    } else {
+      output += codePoint;
+    }
+  }
+  return output;
 }
 
 describe("Web platform tests", () => {
