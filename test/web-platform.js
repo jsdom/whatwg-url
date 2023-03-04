@@ -284,6 +284,11 @@ describe("Web platform tests", () => {
         continue;
       }
 
+      if (testCase.input === "") {
+        // Cannot test empty string input through new URL().
+        continue;
+      }
+
       let description = testCase.input;
       if (testCase.comment) {
         description += ` (${testCase.comment})`;
