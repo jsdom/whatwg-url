@@ -12,6 +12,7 @@ const additionalParsingTestCases = require("./to-upstream.json");
 const setterTestData = require("./web-platform-tests/resources/setters_tests.json");
 const toASCIITestCases = require("./web-platform-tests/resources/toascii.json");
 const percentEncodingTestCases = require("./web-platform-tests/resources/percent-encoding.json");
+const idnaV2TestCases = require("./web-platform-tests/resources/IdnaTestV2.json");
 
 const wptDir = path.join(__dirname, "web-platform-tests");
 
@@ -161,6 +162,34 @@ function testPercentEncoding(testCase) {
   };
 }
 
+function testIDNAv2(testCase) {
+  const encodedInput = encodeHostEndingCodePoints(testCase.input);
+
+  return () => {
+    if (testCase.output === null) {
+      assert.throws(() => new URL(`https://${encodedInput}/x`), TypeError);
+    } else {
+      const url = new URL(`https://${encodedInput}/x`);
+      assert.equal(url.host, testCase.output);
+      assert.equal(url.hostname, testCase.output);
+      assert.equal(url.pathname, "/x");
+      assert.equal(url.href, `https://${testCase.output}/x`);
+    }
+  };
+}
+
+function encodeHostEndingCodePoints(input) {
+  let output = "";
+  for (const codePoint of input) {
+    if ([":", "/", "?", "#", "\\"].includes(codePoint)) {
+      output += encodeURIComponent(codePoint);
+    } else {
+      output += codePoint;
+    }
+  }
+  return output;
+}
+
 describe("Web platform tests", () => {
   describe("parsing", () => {
     for (const expected of parsingTestCases) {
@@ -245,6 +274,27 @@ describe("Web platform tests", () => {
       }
 
       test(description, testPercentEncoding(testCase));
+    }
+  });
+
+  describe("IDNAv2", () => {
+    for (const testCase of idnaV2TestCases) {
+      if (typeof testCase === "string") {
+        // It's a "comment"; skip it.
+        continue;
+      }
+
+      if (testCase.input === "") {
+        // Cannot test empty string input through new URL().
+        continue;
+      }
+
+      let description = testCase.input;
+      if (testCase.comment) {
+        description += ` (${testCase.comment})`;
+      }
+
+      test(description, testIDNAv2(testCase));
     }
   });
 });
