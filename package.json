@@ -19,9 +19,9 @@
     "@domenic/eslint-config": "^3.0.0",
     "benchmark": "^2.1.4",
     "domexception": "^4.0.0",
-    "esbuild": "^0.16.12",
-    "eslint": "^8.30.0",
-    "jest": "^29.3.1",
+    "esbuild": "^0.17.11",
+    "eslint": "^8.35.0",
+    "jest": "^29.5.0",
     "minipass-fetch": "^3.0.1",
     "webidl2js": "^17.1.0"
   },
