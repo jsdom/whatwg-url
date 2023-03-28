@@ -39,5 +39,10 @@ module.exports = {
 
   assert_unreached() {
     assert(false);
+  },
+
+  subsetTestByKey(key, testRunnerFunc, func, name) {
+    // Don't do any keying stuff.
+    testRunnerFunc(func, name);
   }
 };
