@@ -69,7 +69,7 @@ exports.resourceDependentTests = [
 // - toascii.window.js
 
 if (require.main === module) {
-  (fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true, maxRetries: 5 });
+  fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 5 });
   fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
 
   for (const file of [...resources, ...exports.directlyRunnableTests, ...exports.resourceDependentTests]) {
