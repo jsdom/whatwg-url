@@ -36,6 +36,7 @@ const resources = [
 exports.directlyRunnableTests = [
   "url-searchparams.any.js",
   "url-setters-stripping.any.js",
+  "url-statics-canparse.any.js",
   "url-tojson.any.js",
   "urlencoded-parser.any.js",
   "urlsearchparams-append.any.js",
