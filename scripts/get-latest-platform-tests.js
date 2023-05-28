@@ -18,7 +18,7 @@ process.on("unhandledRejection", err => {
 // 1. Go to https://github.com/web-platform-tests/wpt/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "c4726447f3bad1c71244fb99c98738ff0354a034";
+const commitHash = "f415bd4b89e69e270d98a0caaac7f36fde99408d";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
@@ -69,7 +69,7 @@ exports.resourceDependentTests = [
 // - toascii.window.js
 
 if (require.main === module) {
-  (fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true });
+  (fs.rmSync || fs.rmdirSync)(targetDir, { recursive: true, force: true, maxRetries: 5 });
   fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
 
   for (const file of [...resources, ...exports.directlyRunnableTests, ...exports.resourceDependentTests]) {
