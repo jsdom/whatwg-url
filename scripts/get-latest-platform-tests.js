@@ -46,6 +46,7 @@ exports.directlyRunnableTests = [
   "urlsearchparams-get.any.js",
   "urlsearchparams-has.any.js",
   "urlsearchparams-set.any.js",
+  "urlsearchparams-size.any.js",
   "urlsearchparams-sort.any.js",
   "urlsearchparams-stringifier.any.js"
 ];
