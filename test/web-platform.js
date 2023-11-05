@@ -1,4 +1,5 @@
 "use strict";
+const { describe, before, test } = require("node:test");
 const path = require("path");
 const fs = require("fs");
 const vm = require("vm");
@@ -23,7 +24,7 @@ describe("Directly-runnable web platform tests", () => {
 });
 
 describe("Data file-based web platform tests", () => {
-  beforeAll(() => {
+  before(() => {
     assert.deepStrictEqual(
       resourceDependentTests,
       [
