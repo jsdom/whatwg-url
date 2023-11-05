@@ -4,13 +4,8 @@ if (process.env.NO_UPDATE) {
   process.exit(0);
 }
 
-const fs = require("fs");
+const fs = require("fs/promises");
 const path = require("path");
-const fetch = require("minipass-fetch");
-
-process.on("unhandledRejection", err => {
-  throw err;
-});
 
 // Pin to specific version, reflecting the spec version in the readme.
 //
@@ -69,12 +64,25 @@ exports.resourceDependentTests = [
 // - toascii.window.js
 
 if (require.main === module) {
-  fs.rmSync(targetDir, { recursive: true, force: true, maxRetries: 5 });
-  fs.mkdirSync(path.resolve(targetDir, "resources"), { recursive: true });
+  main().catch(e => {
+    console.error(e);
+    process.exit(1);
+  });
+}
 
-  for (const file of [...resources, ...exports.directlyRunnableTests, ...exports.resourceDependentTests]) {
-    fetch(`${urlPrefix}${file}`).then(res => {
-      res.body.pipe(fs.createWriteStream(path.resolve(targetDir, file)));
-    });
-  }
+async function main() {
+  await fs.rm(targetDir, { recursive: true, force: true, maxRetries: 5 });
+  await fs.mkdir(path.resolve(targetDir, "resources"), { recursive: true });
+
+  await Promise.all(
+    [
+      ...resources,
+      ...exports.directlyRunnableTests,
+      ...exports.resourceDependentTests
+    ]
+      .map(async file => {
+        const res = await fetch(`${urlPrefix}${file}`);
+        await fs.writeFile(path.resolve(targetDir, file), res.body);
+      })
+  );
 }
