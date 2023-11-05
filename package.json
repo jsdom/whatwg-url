@@ -1,6 +1,6 @@
 {
   "name": "whatwg-url",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "description": "An implementation of the WHATWG URL Standard's URL API and parsing machinery",
   "main": "index.js",
   "files": [
@@ -36,7 +36,10 @@
     "test": "node --test test/*.js"
   },
   "c8": {
-    "reporter": ["text", "html"],
+    "reporter": [
+      "text",
+      "html"
+    ],
     "exclude": [
       "lib/Function.js",
       "lib/URL.js",
