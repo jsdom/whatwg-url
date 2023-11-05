@@ -26,7 +26,7 @@
     "webidl2js": "^17.1.0"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "scripts": {
     "coverage": "jest --coverage",
