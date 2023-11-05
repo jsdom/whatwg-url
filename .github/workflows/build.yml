@@ -1,11 +1,9 @@
 name: Build
 on:
   pull_request:
-    branches:
-    - main
+    branches: [main]
   push:
-    branches:
-    - main
+    branches: [main]
 jobs:
   build:
     name: Lint and tests
@@ -25,19 +23,3 @@ jobs:
     - run: npm ci
     - run: npm run lint
     - run: npm test
-  deploy:
-    name: Live viewer
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-    - run: npm ci
-    - name: Build Live Viewer
-      run: bash scripts/deploy-live-viewer.sh
-    - name: Push to gh-pages
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main'  }}
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./out

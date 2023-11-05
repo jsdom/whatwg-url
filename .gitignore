@@ -12,3 +12,4 @@ lib/Function.js
 lib/URL.js
 lib/URLSearchParams.js
 lib/utils.js
+_site/
