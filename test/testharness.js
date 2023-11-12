@@ -34,8 +34,8 @@ module.exports = {
   },
 
   assert_throws_js(errorConstructor, func) {
-    // Don't bother testing the errorConstructor since that brings in tricky realm issues.
-    assert.throws(func);
+    // Don't pass errorConstructor itself since that brings in tricky realm issues.
+    assert.throws(func, errorConstructor.name);
   },
 
   assert_unreached() {

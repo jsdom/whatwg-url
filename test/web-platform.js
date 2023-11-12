@@ -4,7 +4,6 @@ const path = require("path");
 const fs = require("fs");
 const vm = require("vm");
 const assert = require("assert");
-const DOMException = require("domexception");
 const { directlyRunnableTests, resourceDependentTests } = require("../scripts/get-latest-platform-tests.js");
 const testharness = require("./testharness.js");
 
