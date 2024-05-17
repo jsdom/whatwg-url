@@ -32,7 +32,7 @@ The following methods are exported for use by places like jsdom that need to imp
 - [Has an opaque path](https://url.spec.whatwg.org/#url-opaque-path): `hasAnOpaquePath(urlRecord)`
 - [Cannot have a username/password/port](https://url.spec.whatwg.org/#cannot-have-a-username-password-port): `cannotHaveAUsernamePasswordPort(urlRecord)`
 - [Percent decode bytes](https://url.spec.whatwg.org/#percent-decode): `percentDecodeBytes(uint8Array)`
-- [Percent decode a string](https://url.spec.whatwg.org/#percent-decode-string): `percentDecodeString(string)`
+- [Percent decode a string](https://url.spec.whatwg.org/#string-percent-decode): `percentDecodeString(string)`
 
 The `stateOverride` parameter is one of the following strings:
 
