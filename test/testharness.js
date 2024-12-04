@@ -29,6 +29,10 @@ module.exports = {
     assert.strictEqual(actual, expected);
   },
 
+  assert_not_equals(actual, expected) {
+    assert.notStrictEqual(actual, expected);
+  },
+
   assert_array_equals(actual, expected) {
     assert.deepStrictEqual([...actual], [...expected]);
   },
