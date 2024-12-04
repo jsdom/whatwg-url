@@ -12,6 +12,7 @@ const { URL, URLSearchParams } = require("..");
 
 const idnaTestV2Data = require("./web-platform-tests/resources/IdnaTestV2.json");
 const urlTestData = require("./web-platform-tests/resources/urltestdata.json");
+const urlTestDataJavaScriptOnly = require("./web-platform-tests/resources/urltestdata-javascript-only.json");
 const settersData = require("./web-platform-tests/resources/setters_tests.json");
 const percentEncodingData = require("./web-platform-tests/resources/percent-encoding.json");
 const toASCIIData = require("./web-platform-tests/resources/toascii.json");
@@ -42,10 +43,12 @@ describe("Data file-based web platform tests", () => {
 
   runWPT("url-constructor.any.js", sandbox => {
     sandbox.runURLTests(urlTestData);
+    sandbox.runURLTests(urlTestDataJavaScriptOnly);
   });
 
   runWPT("url-origin.any.js", sandbox => {
     sandbox.runURLTests(urlTestData);
+    sandbox.runURLTests(urlTestDataJavaScriptOnly);
   });
 
   runWPT("url-setters.any.js", sandbox => {
