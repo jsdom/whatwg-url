@@ -13,7 +13,7 @@ const path = require("path");
 // 1. Go to https://github.com/web-platform-tests/wpt/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "72b915d4b3754f081ef5899bf6a777efe71b2fc5";
+const commitHash = "48178346fe87222856812842fb7af7b01baa1530";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
@@ -32,6 +32,7 @@ exports.directlyRunnableTests = [
   "url-searchparams.any.js",
   "url-setters-stripping.any.js",
   "url-statics-canparse.any.js",
+  "url-statics-parse.any.js",
   "url-tojson.any.js",
   "urlencoded-parser.any.js",
   "urlsearchparams-append.any.js",

@@ -3,6 +3,7 @@
 interface URL {
   constructor(USVString url, optional USVString base);
 
+  [WebIDL2JSCallWithGlobal] static URL? parse(USVString url, optional USVString base);
   static boolean canParse(USVString url, optional USVString base);
 
   stringifier attribute USVString href;
