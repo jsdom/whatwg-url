@@ -1,9 +1,9 @@
 "use strict";
 const { describe, before, test } = require("node:test");
-const path = require("path");
-const fs = require("fs");
-const vm = require("vm");
-const assert = require("assert");
+const path = require("node:path");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const assert = require("node:assert");
 const { directlyRunnableTests, resourceDependentTests } = require("../scripts/get-latest-platform-tests.js");
 const testharness = require("./testharness.js");
 

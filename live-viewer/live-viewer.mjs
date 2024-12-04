@@ -123,14 +123,14 @@ function setFromFragment() {
   const [, urlEncoded, baseEncoded] = pieces;
   try {
     inputEl.value = decodeFromBase64(urlEncoded);
-  } catch (e) {
+  } catch {
     // eslint-disable-next-line no-console
     console.warn("url hash parameter was not deserializable.");
   }
 
   try {
     baseEl.value = decodeFromBase64(baseEncoded);
-  } catch (e) {
+  } catch {
     // eslint-disable-next-line no-console
     console.warn("base hash parameter was not deserializable.");
   }

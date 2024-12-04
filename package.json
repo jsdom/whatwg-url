@@ -16,19 +16,20 @@
     "webidl-conversions": "^7.0.0"
   },
   "devDependencies": {
-    "@domenic/eslint-config": "^3.0.0",
+    "@domenic/eslint-config": "^4.0.1",
     "benchmark": "^2.1.4",
-    "c8": "^8.0.1",
-    "esbuild": "^0.19.5",
-    "eslint": "^8.53.0",
-    "webidl2js": "^17.1.0"
+    "c8": "^10.1.2",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
+    "webidl2js": "^18.0.0"
   },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "coverage": "c8 node --test --experimental-test-coverage test/*.js",
-    "lint": "eslint .",
+    "lint": "eslint",
     "prepare": "node scripts/transform.js",
     "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js",
     "build-live-viewer": "esbuild --bundle --format=esm --sourcemap --outfile=live-viewer/whatwg-url.mjs index.js",

@@ -1,6 +1,6 @@
 "use strict";
 const test = require("node:test");
-const assert = require("assert");
+const assert = require("node:assert");
 const { URL } = require("..");
 
 test("Checking all examples on MDN pass", () => {
