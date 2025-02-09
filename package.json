@@ -33,7 +33,8 @@
     "prepare": "node scripts/transform.js",
     "pretest": "node scripts/get-latest-platform-tests.js && node scripts/transform.js",
     "build-live-viewer": "esbuild --bundle --format=esm --sourcemap --outfile=live-viewer/whatwg-url.mjs index.js",
-    "test": "node --test test/*.js"
+    "test": "node --test test/*.js",
+    "bench": "node scripts/benchmark.js"
   },
   "c8": {
     "reporter": [
