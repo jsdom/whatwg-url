@@ -8,6 +8,7 @@ const testInputs = testData.filter(c => typeof c === "object").map(c => c.input)
 runBenchmark("URL constructor with WPT data", () => {
   for (const input of testInputs) {
     try {
+      // eslint-disable-next-line no-new
       new URL(input);
     } catch {
       // intentionally empty
@@ -17,7 +18,8 @@ runBenchmark("URL constructor with WPT data", () => {
 
 runBenchmark("long input not starting or ending with control characters (GH-286)", () => {
   try {
-    new URL("!!" + "\u0000".repeat(100000) + "A\rA");
+    // eslint-disable-next-line no-new
+    new URL(`!!${"\u0000".repeat(100000)}A\rA`);
   } catch {
     // intentionally empty
   }

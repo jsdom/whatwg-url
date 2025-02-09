@@ -4,6 +4,7 @@ export default [
   {
     ignores: [
       "coverage/",
+      "_site/",
       "test/web-platform-tests/",
       "live-viewer/whatwg-url.mjs",
       "lib/VoidFunction.js",
