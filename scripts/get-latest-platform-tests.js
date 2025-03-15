@@ -13,7 +13,7 @@ const path = require("path");
 // 1. Go to https://github.com/web-platform-tests/wpt/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "a9fe2e77b64b0ce9aefb2ed4331c52bfa44fced4";
+const commitHash = "7c9c41aedbcd49bf96fb9e35a133293b3977b83d";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
@@ -25,7 +25,8 @@ const resources = [
   "resources/toascii.json",
   "resources/urltestdata.json",
   "resources/urltestdata-javascript-only.json",
-  "resources/IdnaTestV2.json"
+  "resources/IdnaTestV2.json",
+  "resources/IdnaTestV2-removed.json"
 ];
 
 // These tests we can download and run directly in /test/web-platform.js.
@@ -54,6 +55,7 @@ exports.directlyRunnableTests = [
 // can distinguish.
 exports.resourceDependentTests = [
   "IdnaTestV2.window.js",
+  "IdnaTestV2-removed.window.js",
   "url-constructor.any.js",
   "url-origin.any.js",
   "url-setters.any.js"

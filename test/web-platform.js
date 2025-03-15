@@ -11,6 +11,7 @@ const { utf8PercentEncodeString, isSpecialQueryPercentEncode } = require("../lib
 const { URL, URLSearchParams } = require("..");
 
 const idnaTestV2Data = require("./web-platform-tests/resources/IdnaTestV2.json");
+const idnaTestV2RemovedData = require("./web-platform-tests/resources/IdnaTestV2-removed.json");
 const urlTestData = require("./web-platform-tests/resources/urltestdata.json");
 const urlTestDataJavaScriptOnly = require("./web-platform-tests/resources/urltestdata-javascript-only.json");
 const settersData = require("./web-platform-tests/resources/setters_tests.json");
@@ -29,6 +30,7 @@ describe("Data file-based web platform tests", () => {
       resourceDependentTests,
       [
         "IdnaTestV2.window.js",
+        "IdnaTestV2-removed.window.js",
         "url-constructor.any.js",
         "url-origin.any.js",
         "url-setters.any.js"
@@ -39,6 +41,10 @@ describe("Data file-based web platform tests", () => {
 
   runWPT("IdnaTestV2.window.js", sandbox => {
     sandbox.runTests(idnaTestV2Data);
+  });
+
+  runWPT("IdnaTestV2-removed.window.js", sandbox => {
+    sandbox.runTests(idnaTestV2RemovedData);
   });
 
   runWPT("url-constructor.any.js", sandbox => {
