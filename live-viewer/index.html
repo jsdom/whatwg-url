@@ -2,21 +2,24 @@
 <meta charset="utf-8">
 <title>Live URL Viewer</title>
 <link rel="stylesheet" href="style.css">
+<script>
+"use strict";
+// Stub out SharedArrayBuffer so that the whatwg-url module can load in browsers despite lack of cross-origin isolation.
+globalThis.SharedArrayBuffer = class {
+  get byteLength() { return 0; }
+  get growable() { return false; }
+};
+</script>
 <script type="module" src="live-viewer.mjs"></script>
 
 <h1>Live URL Viewer</h1>
 
-<p>The output below will display a URL's parsed components from the browser versus those given by
-<a href="https://github.com/jsdom/whatwg-url">jsdom/whatwg-url</a>.
+<p>The output below will display a URL's parsed components from the browser versus those given by <a href="https://github.com/jsdom/whatwg-url">jsdom/whatwg-url</a>.
 
-<p>jsdom/whatwg-url closely follows the <a href="http://url.spec.whatwg.org/">URL Standard</a> and
-the associated
-<a href="https://github.com/w3c/web-platform-tests/tree/master/url">web-platform-tests</a>, so this
+<p>jsdom/whatwg-url closely follows the <a href="http://url.spec.whatwg.org/">URL Standard</a> and the associated <a href="https://github.com/w3c/web-platform-tests/tree/master/url">web-platform-tests</a>, so this
 serves as a good comparison versus the standard itself.
 
-<p>The output will be colored <span class="pass">dark green</span> unless a difference occurs
-between the two parsers in which case the affected URL component will be colored
-<span class="fail">red</span>.
+<p>The output will be colored <span class="pass">dark green</span> unless a difference occurs between the two parsers in which case the affected URL component will be colored <span class="fail">red</span>.
 
 <form>
   <label for="input">Input:</label>
