@@ -13,7 +13,7 @@ const path = require("path");
 // 1. Go to https://github.com/web-platform-tests/wpt/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "40fc257a28faf7c378f59185235685ea8684e8f4";
+const commitHash = "d0bdd2662590a436305355c1bf84754d756689b4";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
