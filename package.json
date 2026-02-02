@@ -15,6 +15,7 @@
     "url": "git+https://github.com/jsdom/whatwg-url.git"
   },
   "dependencies": {
+    "@exodus/bytes": "^1.11.0",
     "tr46": "^6.0.0",
     "webidl-conversions": "^8.0.0"
   },

@@ -7,7 +7,7 @@ const assert = require("node:assert");
 const { directlyRunnableTests, resourceDependentTests } = require("../scripts/get-latest-platform-tests.js");
 const testharness = require("./testharness.js");
 
-const { utf8PercentEncodeString, isSpecialQueryPercentEncode } = require("../lib/percent-encoding.js");
+const { basicURLParse } = require("..");
 const { URL, URLSearchParams } = require("..");
 
 const idnaTestV2Data = require("./web-platform-tests/resources/IdnaTestV2.json");
@@ -92,24 +92,28 @@ describe("Manually recreated web platform tests", () => {
   // Last sync:
   // https://github.com/web-platform-tests/wpt/blob/6d461b4ddb2f1b8d226ca6ae92e14bbd464731a5/url/percent-encoding.window.js
   describe("percent-encoding.window.js", () => {
-    for (const data of percentEncodingData) {
-      if (typeof data === "string") {
+    for (const testUnit of percentEncodingData) {
+      // Ignore comments
+      if (typeof testUnit === "string") {
         continue;
       }
 
-      // whatwg-url only supports UTF-8 percent encoding for now.
-      const { input } = data;
-      const output = data.output["utf-8"];
+      for (const encoding of Object.keys(testUnit.output)) {
+        test(`Input ${testUnit.input} with encoding ${encoding}`, () => {
+          // Simulate the WPT test which creates a document with a given encoding and then parses
+          // a URL with that document's encoding. We use basicURLParse with the encoding option.
+          const url = basicURLParse(
+            `https://doesnotmatter.invalid/?${testUnit.input}#${testUnit.input}`,
+            { encoding }
+          );
 
-      test(`Input ${input} with encoding utf-8`, () => {
-        // Unit test
-        assert.equal(utf8PercentEncodeString(input, isSpecialQueryPercentEncode, false), output);
+          // Test that the fragment is always UTF-8 encoded
+          assert.equal(url.fragment, testUnit.output["utf-8"], "fragment");
 
-        // Integration test
-        const url = new URL(`https://doesnotmatter.invalid/?${input}#${input}`);
-        assert.equal(url.search, `?${output}`, "search");
-        assert.equal(url.hash, `#${output}`, "hash");
-      });
+          // Test that the query uses the specified encoding
+          assert.equal(url.query, testUnit.output[encoding], "query");
+        });
+      }
     }
   });
 
