@@ -29,7 +29,7 @@
     "webidl2js": "^19.1.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
   },
   "scripts": {
     "coverage": "c8 node --test --experimental-test-coverage test/*.js",
