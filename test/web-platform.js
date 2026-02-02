@@ -99,11 +99,6 @@ describe("Manually recreated web platform tests", () => {
       }
 
       for (const encoding of Object.keys(testUnit.output)) {
-        // iso-2022-jp encoding is not supported by @exodus/bytes
-        if (encoding === "iso-2022-jp") {
-          continue;
-        }
-
         test(`Input ${testUnit.input} with encoding ${encoding}`, () => {
           // Simulate the WPT test which creates a document with a given encoding and then parses
           // a URL with that document's encoding. We use basicURLParse with the encoding option.
