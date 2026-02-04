@@ -1,4 +1,7 @@
 import whatwgURL from "./whatwg-url.mjs";
+// exposes the constructor to the browser console.
+// can be helpful for debugging to see the inner struct field values
+window.whatwgURL = whatwgURL;
 
 const inputEl = document.querySelector("#input");
 const inputEscapedEl = document.querySelector("#input-escaped");
