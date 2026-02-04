@@ -96,3 +96,10 @@ summary {
 samp {
   font-family: monospace;
 }
+
+aside {
+  border-left: .25rem solid gray;
+}
+aside p {
+  margin-left: .5rem;
+}
