@@ -29,8 +29,8 @@ describe("Data file-based web platform tests", () => {
     assert.deepStrictEqual(
       resourceDependentTests,
       [
-        "IdnaTestV2.window.js",
-        "IdnaTestV2-removed.window.js",
+        "IdnaTestV2.any.js",
+        "IdnaTestV2-removed.any.js",
         "url-constructor.any.js",
         "url-origin.any.js",
         "url-setters.any.js"
@@ -39,11 +39,11 @@ describe("Data file-based web platform tests", () => {
     );
   });
 
-  runWPT("IdnaTestV2.window.js", sandbox => {
+  runWPT("IdnaTestV2.any.js", sandbox => {
     sandbox.runTests(idnaTestV2Data);
   });
 
-  runWPT("IdnaTestV2-removed.window.js", sandbox => {
+  runWPT("IdnaTestV2-removed.any.js", sandbox => {
     sandbox.runTests(idnaTestV2RemovedData);
   });
 
