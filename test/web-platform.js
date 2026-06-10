@@ -64,9 +64,10 @@ describe("Data file-based web platform tests", () => {
 
 describe("Manually recreated web platform tests", () => {
   // Last sync:
-  // https://github.com/web-platform-tests/wpt/blob/6d461b4ddb2f1b8d226ca6ae92e14bbd464731a5/url/failure.html
+  // https://github.com/web-platform-tests/wpt/blob/06c4589623bf8f8c92fda5afabe44059a01465dc/url/failure.html
   describe("failure.html", () => {
-    for (const data of urlTestData) {
+    for (const data of [...urlTestData, ...urlTestDataJavaScriptOnly]) {
+      // Skip comments, inputs we expect to pass, and relative URLs.
       if (typeof data === "string" || !data.failure || data.base !== null) {
         continue;
       }
@@ -90,7 +91,7 @@ describe("Manually recreated web platform tests", () => {
   });
 
   // Last sync:
-  // https://github.com/web-platform-tests/wpt/blob/6d461b4ddb2f1b8d226ca6ae92e14bbd464731a5/url/percent-encoding.window.js
+  // https://github.com/web-platform-tests/wpt/blob/06c4589623bf8f8c92fda5afabe44059a01465dc/url/percent-encoding.window.js
   describe("percent-encoding.window.js", () => {
     for (const testUnit of percentEncodingData) {
       // Ignore comments
@@ -118,7 +119,7 @@ describe("Manually recreated web platform tests", () => {
   });
 
   // Last sync:
-  // https://github.com/web-platform-tests/wpt/blob/6d461b4ddb2f1b8d226ca6ae92e14bbd464731a5/url/toascii.window.js
+  // https://github.com/web-platform-tests/wpt/blob/06c4589623bf8f8c92fda5afabe44059a01465dc/url/toascii.window.js
   describe("toascii.window.js", () => {
     for (const data of toASCIIData) {
       if (typeof data === "string") {
