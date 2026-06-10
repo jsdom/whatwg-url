@@ -13,7 +13,7 @@ const path = require("path");
 // 1. Go to https://github.com/web-platform-tests/wpt/tree/master/url
 // 2. Press "y" on your keyboard to get a permalink
 // 3. Copy the commit hash
-const commitHash = "06c4589623bf8f8c92fda5afabe44059a01465dc";
+const commitHash = "2a91c2e71952bdceef8b2825ce3a0a0dc73aa588";
 
 const urlPrefix = `https://raw.githubusercontent.com/web-platform-tests/wpt/${commitHash}/url/`;
 const targetDir = path.resolve(__dirname, "..", "test", "web-platform-tests");
@@ -54,8 +54,8 @@ exports.directlyRunnableTests = [
 // files in a case-by-case way. We still download them, but they're in a separately-exported array so that the runner
 // can distinguish.
 exports.resourceDependentTests = [
-  "IdnaTestV2.window.js",
-  "IdnaTestV2-removed.window.js",
+  "IdnaTestV2.any.js",
+  "IdnaTestV2-removed.any.js",
   "url-constructor.any.js",
   "url-origin.any.js",
   "url-setters.any.js"
