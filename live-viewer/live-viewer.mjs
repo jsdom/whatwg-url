@@ -87,22 +87,34 @@ function setComponentElMismatch(componentEl, isMismatched) {
 
 function setValidationErrors(result, hasParseError) {
   const validationErrorsEl = document.querySelector("#jsdom-validation-errors");
+  const urlStringValidityEl = validationErrorsEl.querySelector(".url-string-validity");
+  const urlStringValidityNoteEl = validationErrorsEl.querySelector(".url-string-validity-note");
   const headingEl = validationErrorsEl.querySelector("h3");
   const listEl = validationErrorsEl.querySelector("ol");
   const { validationErrors } = result;
+  const showURLStringValidityNote = result.isValidURLString === false && validationErrors.length === 0;
 
   validationErrorsEl.parentElement.classList.toggle("has-parse-error", hasParseError);
   validationErrorsEl.classList.toggle("has-parse-error", hasParseError);
   validationErrorsEl.classList.toggle("unavailable", result.isUnavailable);
-  validationErrorsEl.classList.toggle("valid", validationErrors.length === 0 && !result.isUnavailable && !hasParseError);
+  validationErrorsEl.classList.toggle(
+    "valid",
+    validationErrors.length === 0 && result.isValidURLString === true && !hasParseError
+  );
+  urlStringValidityEl.classList.toggle("pass", result.isValidURLString === true);
+  urlStringValidityEl.classList.toggle("fail", result.isValidURLString === false);
+  urlStringValidityEl.classList.toggle("unavailable", result.isUnavailable);
+  urlStringValidityNoteEl.hidden = !showURLStringValidityNote;
 
   if (result.isUnavailable) {
+    urlStringValidityEl.textContent = "URL string validity unavailable";
     headingEl.textContent = "Validation unavailable";
     listEl.replaceChildren();
     listEl.hidden = true;
     return;
   }
 
+  urlStringValidityEl.textContent = `URL string: ${result.isValidURLString ? "valid" : "invalid"}`;
   headingEl.textContent = `${validationErrors.length} validation ${validationErrors.length === 1 ? "error" : "errors"}`;
   listEl.replaceChildren();
   listEl.hidden = validationErrors.length === 0;
@@ -146,11 +158,12 @@ function getJsdomValidationResult() {
   const baseURL = whatwgURL.parseURL(baseEl.value);
 
   if (baseURL === null) {
-    return { validationErrors: [], isUnavailable: true };
+    return { validationErrors: [], isValidURLString: null, isUnavailable: true };
   }
 
   return {
     validationErrors: whatwgURL.parseURLWithValidationErrors(inputEl.value, { baseURL }).validationErrors,
+    isValidURLString: whatwgURL.isValidURLString(inputEl.value, { baseURL }),
     isUnavailable: false
   };
 }

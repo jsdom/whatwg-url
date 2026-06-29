@@ -20,6 +20,7 @@ The following methods are exported for use by places like jsdom that need to imp
 
 - [URL parser](https://url.spec.whatwg.org/#concept-url-parser): `parseURL(input, { baseURL, encoding = "UTF-8" })`
 - URL parser with [validation errors](https://url.spec.whatwg.org/#validation-error): `parseURLWithValidationErrors(input, { baseURL, encoding = "UTF-8" })`
+- [Valid URL string](https://url.spec.whatwg.org/#valid-url-string) checker: `isValidURLString(input, { baseURL })`
 - [Basic URL parser](https://url.spec.whatwg.org/#concept-basic-url-parser): `basicURLParse(input, { baseURL, url, stateOverride, encoding = "UTF-8" })`
 - [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer): `serializeURL(urlRecord, excludeFragment)`
 - [Host serializer](https://url.spec.whatwg.org/#concept-host-serializer): `serializeHost(hostFromURLRecord)`
@@ -80,6 +81,8 @@ const result = parseURLWithValidationErrors("https://example.org/%s");
 console.log(result.url === null); // false
 console.log(result.validationErrors); // [ "invalid-URL-unit" ]
 ```
+
+The `isValidURLString` function implements the grammar-based validity checker from the URL Standard's URL writing section. This is separate from parser validation errors, so it can disagree with `parseURLWithValidationErrors()` in some cases. Pass a `baseURL` URL record to check relative-URL strings.
 
 ### `whatwg-url/webidl2js-wrapper` module
 
