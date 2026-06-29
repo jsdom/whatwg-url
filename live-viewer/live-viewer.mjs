@@ -37,10 +37,12 @@ update();
 function update() {
   const browserResult = getBrowserResult();
   const jsdomResult = getJsdomResult();
+  const jsdomValidationResult = getJsdomValidationResult();
   const mismatchedComponents = getMismatchedComponents(browserResult, jsdomResult);
 
   setResult("browser", browserResult, mismatchedComponents);
   setResult("jsdom", jsdomResult, mismatchedComponents);
+  setValidationErrors(jsdomValidationResult, jsdomResult instanceof Error);
   updateFragmentForSharing();
 }
 
@@ -83,6 +85,37 @@ function setComponentElMismatch(componentEl, isMismatched) {
   componentEl.classList.toggle("fail", isMismatched);
 }
 
+function setValidationErrors(result, hasParseError) {
+  const validationErrorsEl = document.querySelector("#jsdom-validation-errors");
+  const headingEl = validationErrorsEl.querySelector("h3");
+  const listEl = validationErrorsEl.querySelector("ol");
+  const { validationErrors } = result;
+
+  validationErrorsEl.parentElement.classList.toggle("has-parse-error", hasParseError);
+  validationErrorsEl.classList.toggle("has-parse-error", hasParseError);
+  validationErrorsEl.classList.toggle("unavailable", result.isUnavailable);
+  validationErrorsEl.classList.toggle("valid", validationErrors.length === 0 && !result.isUnavailable && !hasParseError);
+
+  if (result.isUnavailable) {
+    headingEl.textContent = "Validation unavailable";
+    listEl.replaceChildren();
+    listEl.hidden = true;
+    return;
+  }
+
+  headingEl.textContent = `${validationErrors.length} validation ${validationErrors.length === 1 ? "error" : "errors"}`;
+  listEl.replaceChildren();
+  listEl.hidden = validationErrors.length === 0;
+
+  for (const error of validationErrors) {
+    const item = document.createElement("li");
+    const errorName = document.createElement("code");
+    errorName.textContent = error;
+    item.append(errorName);
+    listEl.append(item);
+  }
+}
+
 function getMismatchedComponents(result1, result2) {
   const mismatched = new Set();
   for (const component of components) {
@@ -107,6 +140,19 @@ function getJsdomResult() {
   } catch (e) {
     return e;
   }
+}
+
+function getJsdomValidationResult() {
+  const baseURL = whatwgURL.parseURL(baseEl.value);
+
+  if (baseURL === null) {
+    return { validationErrors: [], isUnavailable: true };
+  }
+
+  return {
+    validationErrors: whatwgURL.parseURLWithValidationErrors(inputEl.value, { baseURL }).validationErrors,
+    isUnavailable: false
+  };
 }
 
 // We use "url=" in the fragment for backward-compatibility, even though "input=" would be a bit more correct.

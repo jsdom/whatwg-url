@@ -1,16 +1,25 @@
+:root {
+  --monospace-font: 'Bitstream Vera Sans Mono', 'Andale Mono', 'Lucida Console', monospace, fixed;
+  --output-width: 95%;
+  --error-color: rgb(220 20 60);
+  --pass-color: rgb(0 128 0);
+  --fail-color: rgb(255 0 0);
+  --unavailable-color: rgb(128 128 128);
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: Georgia;
+  font-family: Georgia, serif;
   max-width: 70em;
   margin: 12px;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-style: italic;
-  color: DarkBlue;
+  color: rgb(0 0 139);
   margin-bottom: 0.2em;
 }
 
@@ -38,55 +47,121 @@ footer {
   right: 1em;
 }
 
-form label {
-  display: block;
-  margin-bottom: 6px;
-}
+form {
+  label {
+    display: block;
+    margin-bottom: 6px;
+  }
 
-form input {
-  width: 90%;
-  margin-bottom: 20px;
-  padding: 3px;
+  input {
+    width: 90%;
+    margin-bottom: 20px;
+    padding: 3px;
+  }
 }
 
 .output {
-  background-color: whitesmoke;
-  border: 1px dashed crimson;
-  width: 95%;
+  background-color: rgb(245 245 245);
+  border: 1px dashed var(--error-color);
+  width: var(--output-width);
   padding: 1em;
   margin: 0;
-}
 
-.output.error {
-  color: Crimson;
-}
+  &.error {
+    color: var(--error-color);
+  }
 
-.output th {
-  width: 100px;
-  text-align: right;
-  padding-right: 20px;
-}
+  th {
+    width: 100px;
+    text-align: right;
+    padding-right: 20px;
+  }
 
-.output td {
-  font-family: 'Bitstream Vera Sans Mono', 'Andale Mono', 'Lucida Console', monospace, fixed;
+  td {
+    font-family: var(--monospace-font);
+
+    &.empty-string {
+      font-family: inherit;
+      font-size: smaller;
+      font-style: italic;
+
+      &:not(.fail) {
+        color: rgb(204 204 204);
+      }
+    }
+  }
 }
 
 .pass {
-  color: green;
+  color: var(--pass-color);
 }
 
 .fail {
-  color: red;
+  color: var(--fail-color);
 }
 
-.output td.empty-string {
-  font-family: inherit;
-  font-size: smaller;
-  font-style: italic;
+.jsdom-results {
+  display: grid;
+  gap: 1em;
+  width: var(--output-width);
+
+  > .output {
+    width: 100%;
+  }
+
+  @media (min-width: 58em) {
+    grid-template-columns: minmax(0, 2fr) minmax(16em, 1fr);
+    align-items: stretch;
+  }
 }
 
-.output td.empty-string:not(.fail) {
-  color: #CCC;
+.validation-errors {
+  align-self: start;
+  min-height: 100%;
+
+  h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+  }
+
+  .parse-error {
+    color: var(--error-color);
+  }
+
+  li code {
+    font-family: var(--monospace-font);
+    overflow-wrap: anywhere;
+  }
+
+  &.valid {
+    border-color: var(--pass-color);
+
+    h3 {
+      color: var(--pass-color);
+      font-family: inherit;
+      font-weight: bold;
+    }
+  }
+
+  &.unavailable {
+    border-color: var(--unavailable-color);
+
+    h3 {
+      color: var(--unavailable-color);
+    }
+  }
+
+  &.has-parse-error {
+    border-color: var(--error-color);
+  }
+}
+
+@media (min-width: 58em) {
+  .jsdom-results {
+    &.has-parse-error .validation-errors {
+      grid-column: 1 / -1;
+    }
+  }
 }
 
 summary {
@@ -98,8 +173,9 @@ samp {
 }
 
 aside {
-  border-left: .25rem solid gray;
-}
-aside p {
-  margin-left: .5rem;
+  border-left: .25rem solid var(--unavailable-color);
+
+  p {
+    margin-left: .5rem;
+  }
 }

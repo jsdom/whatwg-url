@@ -57,25 +57,31 @@ serves as a good comparison versus the standard itself.
 
 <h2>jsdom/whatwg-url's components</h2>
 
-<table class="output" id="jsdom-output">
-  <tr class="href"><th>href</th><td></td></tr>
-  <tr class="protocol"><th>protocol</th><td></td></tr>
-  <tr class="username"><th>username</th><td></td></tr>
-  <tr class="password"><th>password</th><td></td></tr>
-  <tr class="port"><th>port</th><td></td></tr>
-  <tr class="hostname"><th>hostname</th><td></td></tr>
-  <tr class="pathname"><th>pathname</th><td></td></tr>
-  <tr class="search"><th>search</th><td></td></tr>
-  <tr class="hash"><th>hash</th><td></td></tr>
-  <tr class="origin"><th>origin</th><td></td></tr>
-</table>
+<div class="jsdom-results">
+  <table class="output" id="jsdom-output">
+    <tr class="href"><th>href</th><td></td></tr>
+    <tr class="protocol"><th>protocol</th><td></td></tr>
+    <tr class="username"><th>username</th><td></td></tr>
+    <tr class="password"><th>password</th><td></td></tr>
+    <tr class="port"><th>port</th><td></td></tr>
+    <tr class="hostname"><th>hostname</th><td></td></tr>
+    <tr class="pathname"><th>pathname</th><td></td></tr>
+    <tr class="search"><th>search</th><td></td></tr>
+    <tr class="hash"><th>hash</th><td></td></tr>
+    <tr class="origin"><th>origin</th><td></td></tr>
+  </table>
 
-<p class="output error" id="jsdom-error"></p>
+  <section class="output validation-errors" id="jsdom-validation-errors" aria-live="polite">
+    <p class="parse-error" id="jsdom-error" hidden></p>
+    <h3></h3>
+    <ol></ol>
+  </section>
+</div>
 
 <aside>
   <p>Note: <code>window.whatwgURL</code> is exposed in the browser console if you would like to play around with it there.</p>
 </aside>
 
 <footer>
-  <a href="https://github.com/jsdom/whatwg-url/tree/master/live-viewer">Fork me on GitHub!</a>
+  <a href="https://github.com/jsdom/whatwg-url/tree/main/live-viewer">Fork me on GitHub!</a>
 </footer>

@@ -19,6 +19,7 @@ The main API is provided by the [`URL`](https://url.spec.whatwg.org/#url-class) 
 The following methods are exported for use by places like jsdom that need to implement things like [`HTMLHyperlinkElementUtils`](https://html.spec.whatwg.org/#htmlhyperlinkelementutils). They mostly operate on or return an "internal URL" or ["URL record"](https://url.spec.whatwg.org/#concept-url) type.
 
 - [URL parser](https://url.spec.whatwg.org/#concept-url-parser): `parseURL(input, { baseURL, encoding = "UTF-8" })`
+- URL parser with [validation errors](https://url.spec.whatwg.org/#validation-error): `parseURLWithValidationErrors(input, { baseURL, encoding = "UTF-8" })`
 - [Basic URL parser](https://url.spec.whatwg.org/#concept-basic-url-parser): `basicURLParse(input, { baseURL, url, stateOverride, encoding = "UTF-8" })`
 - [URL serializer](https://url.spec.whatwg.org/#concept-url-serializer): `serializeURL(urlRecord, excludeFragment)`
 - [Host serializer](https://url.spec.whatwg.org/#concept-host-serializer): `serializeHost(hostFromURLRecord)`
@@ -70,6 +71,15 @@ The URL record type has the following API:
 These properties should be treated with care, as in general changing them will cause the URL record to be in an inconsistent state until the appropriate invocation of `basicURLParse` is used to fix it up. You can see examples of this in the URL Standard, where there are many step sequences like "4. Set context object’s url’s fragment to the empty string. 5. Basic URL parse _input_ with context object’s url as _url_ and fragment state as _state override_." In between those two steps, a URL record is in an unusable state.
 
 The return value of "failure" in the spec is represented by `null`. That is, functions like `parseURL` and `basicURLParse` can return _either_ a URL record _or_ `null`.
+
+The `parseURLWithValidationErrors` function returns an object with a `url` property and a `validationErrors` property. The `url` property is a URL record or `null`, and the `validationErrors` property is an array of validation error names reported while parsing.
+
+```js
+const result = parseURLWithValidationErrors("https://example.org/%s");
+
+console.log(result.url === null); // false
+console.log(result.validationErrors); // [ "invalid-URL-unit" ]
+```
 
 ### `whatwg-url/webidl2js-wrapper` module
 
