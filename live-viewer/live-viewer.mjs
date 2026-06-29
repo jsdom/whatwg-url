@@ -15,6 +15,7 @@ const components = [
   "protocol",
   "username",
   "password",
+  "host",
   "port",
   "hostname",
   "pathname",
