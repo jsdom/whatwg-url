@@ -12,6 +12,7 @@ exports.URL = sharedGlobalObject.URL;
 exports.URLSearchParams = sharedGlobalObject.URLSearchParams;
 
 exports.parseURL = urlStateMachine.parseURL;
+exports.parseURLWithValidationErrors = urlStateMachine.parseURLWithValidationErrors;
 exports.basicURLParse = urlStateMachine.basicURLParse;
 exports.serializeURL = urlStateMachine.serializeURL;
 exports.serializePath = urlStateMachine.serializePath;
