@@ -3,6 +3,7 @@
 const { URL, URLSearchParams } = require("./webidl2js-wrapper");
 const urlStateMachine = require("./lib/url-state-machine");
 const percentEncoding = require("./lib/percent-encoding");
+const urlStringValidator = require("./lib/url-string-validator");
 
 const sharedGlobalObject = { Array, Object, Promise, String, TypeError };
 URL.install(sharedGlobalObject, ["Window"]);
@@ -13,6 +14,7 @@ exports.URLSearchParams = sharedGlobalObject.URLSearchParams;
 
 exports.parseURL = urlStateMachine.parseURL;
 exports.parseURLWithValidationErrors = urlStateMachine.parseURLWithValidationErrors;
+exports.isValidURLString = urlStringValidator.isValidURLString;
 exports.basicURLParse = urlStateMachine.basicURLParse;
 exports.serializeURL = urlStateMachine.serializeURL;
 exports.serializePath = urlStateMachine.serializePath;
