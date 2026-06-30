@@ -6,7 +6,7 @@ const { parseURL, parseURLWithValidationErrors } = require("..");
 
 const validationErrorNames = [
   "domain-to-ASCII",
-  "domain-invalid-code-point",
+  "domain-percent-encoded",
   "host-invalid-code-point",
   "IPv4-empty-part",
   "IPv4-too-many-parts",
@@ -46,8 +46,17 @@ const validationErrorTestCases = [
     failure: true
   },
   {
+    // A domain whose strict Unicode ToASCII fails (U+005F) but whose relaxed processing succeeds.
+    input: "https://_dmarc.example.com/",
+    validationErrors: ["domain-to-ASCII"]
+  },
+  {
+    input: "https://exam%70le.org/",
+    validationErrors: ["domain-percent-encoded"]
+  },
+  {
     input: "https://exa%23mple.org",
-    validationErrors: ["domain-invalid-code-point"],
+    validationErrors: ["domain-percent-encoded", "domain-to-ASCII"],
     failure: true
   },
   {
@@ -57,7 +66,7 @@ const validationErrorTestCases = [
   },
   {
     input: "https://127.0.0.1./",
-    validationErrors: ["IPv4-empty-part"]
+    validationErrors: ["domain-to-ASCII", "IPv4-empty-part"]
   },
   {
     input: "https://1.2.3.4.5/",
@@ -134,6 +143,10 @@ const validationErrorTestCases = [
   },
   {
     input: "https://example.org/%s",
+    validationErrors: ["invalid-URL-unit"]
+  },
+  {
+    input: "foo:bar baz", // U+0020 SPACE in an opaque path
     validationErrors: ["invalid-URL-unit"]
   },
   {
