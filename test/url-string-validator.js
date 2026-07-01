@@ -19,7 +19,6 @@ describe("isValidURLString", () => {
     "https://example.com///this///is///fine.",
     "https://EXAMPLE.com/../x",
     "https://☕.example/",
-    "https://example.255/",
     "https://example/%25?%25#%25",
     "https://[::1]/",
     "https://127.0.0.1/",
@@ -56,6 +55,7 @@ describe("isValidURLString", () => {
     "https://example.com/[]?[]#[]",
     "https://example/%?%#%",
     "https://%30/",
+    "https://example.255/",
     "https://xn--8i7caa/",
     "foo://exa[mple.org"
   ];
@@ -134,22 +134,37 @@ describe("isValidURLString", () => {
     assert.equal(isValidURLString("?q#frag%", { baseURL: base }), false);
   });
 
-  test("URL-writing validity is separate from parser validation errors", () => {
-    // A "valid domain string" only runs the domain parser, so a host that looks like an IPv4
-    // address is grammar-valid even though host parsing later rejects it as a bad IPv4 address.
-    const grammarValidParserInvalid = [
-      ["https://example.255/", ["IPv4-non-numeric-part"]],
+  test("host strings ending in a number must be valid IPv4 addresses", () => {
+    // A host that ends in a number is only valid if it is a valid IPv4 address string.
+    const hostEndingInNumberInvalid = [
+      ["https://example.255/", ["IPv4-too-few-parts", "IPv4-non-numeric-part"]],
       ["https://1.2.3.4.5/", ["IPv4-too-many-parts"]],
       ["https://256.1.1.1/", ["IPv4-out-of-range-part"]]
     ];
 
-    for (const [input, expectedErrors] of grammarValidParserInvalid) {
+    for (const [input, expectedErrors] of hostEndingInNumberInvalid) {
       const { url, validationErrors } = parseURLWithValidationErrors(input);
 
       assert.equal(url, null, input);
       assert.deepStrictEqual(validationErrors, expectedErrors, input);
-      assert.equal(isValidURLString(input), true, input);
+      assert.equal(isValidURLString(input), false, input);
     }
+  });
+
+  test("domain strings must not end in a number", () => {
+    const invalid = [
+      "https://example.1/",
+      "https://example.255/",
+      "https://1.2.3/",
+      "https://1.2.3.4.5/",
+      "https://0x1/"
+    ];
+
+    for (const input of invalid) {
+      assert.equal(isValidURLString(input), false, input);
+    }
+
+    assert.equal(isValidURLString("https://127.0.0.1/"), true);
   });
 
   test("relative-URL-with-fragment strings with an opaque-path base can only add a fragment", () => {
