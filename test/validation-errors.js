@@ -9,6 +9,7 @@ const validationErrorNames = [
   "domain-percent-encoded",
   "host-invalid-code-point",
   "IPv4-empty-part",
+  "IPv4-too-few-parts",
   "IPv4-too-many-parts",
   "IPv4-non-numeric-part",
   "IPv4-non-decimal-part",
@@ -69,13 +70,17 @@ const validationErrorTestCases = [
     validationErrors: ["domain-to-ASCII", "IPv4-empty-part"]
   },
   {
+    input: "https://1.2.3/",
+    validationErrors: ["IPv4-too-few-parts"]
+  },
+  {
     input: "https://1.2.3.4.5/",
     validationErrors: ["IPv4-too-many-parts"],
     failure: true
   },
   {
     input: "https://test.42",
-    validationErrors: ["IPv4-non-numeric-part"],
+    validationErrors: ["IPv4-too-few-parts", "IPv4-non-numeric-part"],
     failure: true
   },
   {
