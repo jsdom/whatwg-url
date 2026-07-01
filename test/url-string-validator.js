@@ -25,7 +25,9 @@ describe("isValidURLString", () => {
     "hello:world",
     "foo://",
     "foo:///path",
-    "foo://example:65535/path?query#fragment"
+    "foo://example:65535/path?query#fragment",
+    "foo:a:b",
+    "urn:isbn:0451450523"
   ];
 
   for (const input of validAbsoluteURLStrings) {
@@ -127,10 +129,12 @@ describe("isValidURLString", () => {
   });
 
   test("URL-writing validity is separate from parser validation errors", () => {
+    // These parse cleanly (no validation errors) yet are not valid URL strings: a path-absolute-URL
+    // string cannot start with "//", but the parser happily produces an empty leading path segment.
     const grammarInvalidParserValid = [
-      "file://loc%61lhost/",
-      "https://%30/",
-      "https://example.org//"
+      "https://example.org//",
+      "https://example.org//p",
+      "foo://example.org//"
     ];
 
     for (const input of grammarInvalidParserValid) {
@@ -158,28 +162,52 @@ describe("isValidURLString", () => {
     }
   });
 
-  test("documents current behavior for whatwg/url#905 examples", () => {
-    // https://github.com/whatwg/url/pull/905 discusses changing these results. Until that PR
-    // lands, assert the current behavior so any later update is intentional.
-    const cases = [
-      "https://exam%70le.org",
-      "https://_dmarc.example.com",
-      "foo:bar baz",
-      "foo:a:b"
+  test("relative-URL strings can be valid yet unresolvable against a cannot-be-a-base base", () => {
+    // The relative-URL string grammar switches only on the base URL's scheme, so these are valid
+    // URL strings. But the parser cannot resolve a non-fragment relative reference against a base
+    // with an opaque path (a cannot-be-a-base URL), so it fails with missing-scheme-non-relative-URL.
+    const base = baseURL("foo:opaque");
+
+    for (const input of ["a/b", "/p", "_dmarc.x"]) {
+      assert.equal(isValidURLString(input, { baseURL: base }), true, input);
+
+      const { url, validationErrors } = parseURLWithValidationErrors(input, { baseURL: base });
+      assert.equal(url, null, input);
+      assert.deepStrictEqual(validationErrors, ["missing-scheme-non-relative-URL"], input);
+    }
+
+    // A fragment-only reference does resolve against a cannot-be-a-base URL, so there is no gap there.
+    assert.equal(isValidURLString("#frag", { baseURL: base }), true);
+    assert.notEqual(parseURLWithValidationErrors("#frag", { baseURL: base }).url, null);
+  });
+
+  test("whatwg/url#905 aligns parser validation errors with URL-writing validity", () => {
+    // Each input parses successfully but is not a valid URL string, and the parser now reports a
+    // validation error that matches that invalidity. https://github.com/whatwg/url/pull/905
+    const reportsError = [
+      ["https://exam%70le.org", ["domain-percent-encoded"]], // percent-encoding in a domain
+      ["https://_dmarc.example.com", ["domain-to-ASCII"]], // strict Unicode ToASCII fails
+      ["foo:bar baz", ["invalid-URL-unit"]] // U+0020 SPACE in an opaque path
     ];
 
-    for (const input of cases) {
+    for (const [input, expectedErrors] of reportsError) {
       const { url, validationErrors } = parseURLWithValidationErrors(input);
 
       assert.notEqual(url, null, input);
-      assert.deepStrictEqual(validationErrors, [], input);
+      assert.deepStrictEqual(validationErrors, expectedErrors, input);
       assert.equal(isValidURLString(input), false, input);
     }
+
+    // A non-special scheme followed by an opaque path is now a valid URL string (previously the
+    // leading scheme-like "a:" wrongly made "foo:a:b" invalid).
+    const { url, validationErrors } = parseURLWithValidationErrors("foo:a:b");
+    assert.notEqual(url, null);
+    assert.deepStrictEqual(validationErrors, []);
+    assert.equal(isValidURLString("foo:a:b"), true);
   });
 
-  // "Valid domain" runs the domain parser with beStrict = true, which is stricter than the
-  // non-strict domain parsing the URL parser itself uses. These hosts therefore parse fine but
-  // are not valid URL strings.
+  // Hosts are still parsed with non-strict domain parsing for web compatibility, but strict
+  // domain-to-ASCII failures are validation errors and also make these invalid URL strings.
   test("host strings are validated with strict domain-to-ASCII", () => {
     const invalid = [
       "https://example.com./", // trailing empty label rejected by VerifyDnsLength
@@ -188,7 +216,10 @@ describe("isValidURLString", () => {
     ];
 
     for (const input of invalid) {
-      assert.notEqual(parseURL(input), null, `${input} should still parse`);
+      const { url, validationErrors } = parseURLWithValidationErrors(input);
+
+      assert.notEqual(url, null, `${input} should still parse`);
+      assert.deepStrictEqual(validationErrors, ["domain-to-ASCII"], input);
       assert.equal(isValidURLString(input), false, input);
     }
   });
@@ -279,7 +310,7 @@ describe("isValidURLString", () => {
     assert.equal(isValidURLString("foo://[::1]:80"), true); // opaque hosts may be IPv6
     assert.equal(isValidURLString("foo://h/x"), true);
     assert.equal(isValidURLString("foo://h@x"), false); // "@" is a forbidden host code point
-    assert.equal(isValidURLString("hello:foo:bar"), false); // body begins with a scheme, so not scheme-less
+    assert.equal(isValidURLString("foo://h:8x"), false); // the authority form still requires a valid port
   });
 
   test("fragment and query code points must be URL units", () => {
