@@ -93,7 +93,7 @@ function setValidationErrors(result, hasParseError) {
   const headingEl = validationErrorsEl.querySelector("h3");
   const listEl = validationErrorsEl.querySelector("ol");
   const { validationErrors } = result;
-  const showURLStringValidityNote = result.isValidURLString === false && validationErrors.length === 0;
+  const showURLStringValidityNote = !result.isUnavailable && result.isValidURLString !== result.isParserValid;
 
   validationErrorsEl.parentElement.classList.toggle("has-parse-error", hasParseError);
   validationErrorsEl.classList.toggle("has-parse-error", hasParseError);
@@ -159,12 +159,15 @@ function getJsdomValidationResult() {
   const baseURL = whatwgURL.parseURL(baseEl.value);
 
   if (baseURL === null) {
-    return { validationErrors: [], isValidURLString: null, isUnavailable: true };
+    return { validationErrors: [], isValidURLString: null, isParserValid: null, isUnavailable: true };
   }
 
+  const result = whatwgURL.parseURLWithValidationErrors(inputEl.value, { baseURL });
+
   return {
-    validationErrors: whatwgURL.parseURLWithValidationErrors(inputEl.value, { baseURL }).validationErrors,
+    validationErrors: result.validationErrors,
     isValidURLString: whatwgURL.isValidURLString(inputEl.value, { baseURL }),
+    isParserValid: result.url !== null && result.validationErrors.length === 0,
     isUnavailable: false
   };
 }
