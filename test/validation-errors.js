@@ -20,6 +20,7 @@ const validationErrorNames = [
   "IPv6-multiple-compression",
   "IPv6-invalid-code-point",
   "IPv6-too-few-pieces",
+  "IPv6-piece-leading-zero",
   "IPv4-in-IPv6-too-many-pieces",
   "IPv4-in-IPv6-invalid-code-point",
   "IPv4-in-IPv6-out-of-range-part",
@@ -118,9 +119,18 @@ const validationErrorTestCases = [
     failure: true
   },
   {
+    input: "http://[v7.a]/",
+    validationErrors: ["IPv6-invalid-code-point"],
+    failure: true
+  },
+  {
     input: "https://[1:2:3]",
     validationErrors: ["IPv6-too-few-pieces"],
     failure: true
+  },
+  {
+    input: "https://[::01]",
+    validationErrors: ["IPv6-piece-leading-zero"]
   },
   {
     input: "https://[1:1:1:1:1:1:1:127.0.0.1]",
