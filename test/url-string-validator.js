@@ -152,22 +152,22 @@ describe("isValidURLString", () => {
     }
   });
 
-  test("relative-URL strings can be valid yet unresolvable against a cannot-be-a-base base", () => {
-    // The relative-URL string grammar switches only on the base URL's scheme, so these are valid
-    // URL strings. But the parser cannot resolve a non-fragment relative reference against a base
-    // with an opaque path (a cannot-be-a-base URL), so it fails with missing-scheme-non-relative-URL.
+  test("relative-URL-with-fragment strings with an opaque-path base can only add a fragment", () => {
     const base = baseURL("foo:opaque");
 
-    for (const input of ["a/b", "/p", "_dmarc.x"]) {
-      assert.equal(isValidURLString(input, { baseURL: base }), true, input);
+    assert.equal(isValidURLString("", { baseURL: base }), true);
+    assert.equal(isValidURLString("#frag", { baseURL: base }), true);
+    assert.equal(isValidURLString("#frag%25", { baseURL: base }), true);
+    assert.equal(isValidURLString("#frag%", { baseURL: base }), false);
+
+    for (const input of ["?query", "a/b", "/p", "_dmarc.x", "//example/path"]) {
+      assert.equal(isValidURLString(input, { baseURL: base }), false, input);
 
       const { url, validationErrors } = parseURLWithValidationErrors(input, { baseURL: base });
       assert.equal(url, null, input);
       assert.deepStrictEqual(validationErrors, ["missing-scheme-non-relative-URL"], input);
     }
 
-    // A fragment-only reference does resolve against a cannot-be-a-base URL, so there is no gap there.
-    assert.equal(isValidURLString("#frag", { baseURL: base }), true);
     assert.notEqual(parseURLWithValidationErrors("#frag", { baseURL: base }).url, null);
   });
 
