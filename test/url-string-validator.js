@@ -52,6 +52,7 @@ describe("isValidURLString", () => {
     "https://example.com:demo",
     "https://example.com:65536",
     "http://[www.example.com]/",
+    "http://[v7.a]/",
     "https://[1:2:3]/",
     "https://example.com/[]?[]#[]",
     "https://example/%?%#%",
@@ -88,7 +89,7 @@ describe("isValidURLString", () => {
     assert.equal(isValidURLString("../path", { baseURL: baseURL("file://server/tmp/") }), true);
   });
 
-  test("IPv6 address strings follow the RFC 4291 text representation forms", () => {
+  test("IPv6 address strings follow the URL Standard text representation forms", () => {
     const valid = [
       "https://[ABCD:EF01:2345:6789:ABCD:EF01:2345:6789]/",
       "https://[2001:DB8:0:0:8:800:200C:417A]/",
@@ -112,6 +113,8 @@ describe("isValidURLString", () => {
       "https://[1::2::3]/",
       "https://[1:2:3:4:5:6:7::8]/",
       "https://[12345::]/",
+      "https://[0DB8::1]/",
+      "https://[::01]/",
       "https://[:1]/",
       "https://[1:]/",
       "https://[::ffff:192.168.000.1]/",
@@ -214,10 +217,9 @@ describe("isValidURLString", () => {
     }
   });
 
-  // Per RFC 4291 §2.2, referenced by the "valid IPv6-address string" definition.
-  test("IPv6 address strings accept the RFC 4291 §2.2 example forms", () => {
+  test("IPv6 address strings accept expanded, compressed, and mixed IPv4 forms", () => {
     const valid = [
-      // Preferred form, expanded forms, and their compressed equivalents.
+      // Expanded and compressed forms.
       "https://[ABCD:EF01:2345:6789:ABCD:EF01:2345:6789]/",
       "https://[FF01:0:0:0:0:0:0:101]/",
       "https://[0:0:0:0:0:0:0:1]/",
@@ -226,16 +228,15 @@ describe("isValidURLString", () => {
       "https://[FF01::101]/",
       "https://[::1]/",
       "https://[::]/",
-      // Mixed IPv4 form, expanded and compressed.
+      // Mixed IPv4 forms.
       "https://[0:0:0:0:0:0:13.1.68.3]/",
       "https://[0:0:0:0:0:FFFF:129.144.52.38]/",
       "https://[::13.1.68.3]/",
       "https://[::FFFF:129.144.52.38]/",
       "https://[1:2:3:4:5:6:1.2.3.4]/",
-      // Leading zeros within a field and mixed-case hex are permitted.
-      "https://[0DB8:0:0:0:0:0:0:1]/",
+      // Mixed-case hex is permitted.
       "https://[abcd:ef01:2345:6789:ABCD:EF01:2345:6789]/",
-      // "::" may compress a single zero group ("one or more groups").
+      // "::" may compress a single zero piece.
       "https://[1:2:3:4:5:6:7::]/",
       "https://[::2:3:4:5:6:7:8]/"
     ];
@@ -246,6 +247,7 @@ describe("isValidURLString", () => {
 
     const invalid = [
       "https://[12345::]/", // field longer than four hex digits
+      "https://[0DB8:0:0:0:0:0:0:1]/", // leading zero in a field
       "https://[1:2:3:4:5:6:7:1.2.3.4]/", // seven hex pieces plus an embedded IPv4 address
       "https://[1:2:3:4:5:6:7:8::]/", // eight pieces leave no group for "::" to compress
       "https://[::13.1.068.3]/", // leading zero in an embedded IPv4 octet
