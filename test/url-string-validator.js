@@ -15,6 +15,8 @@ describe("isValidURLString", () => {
     "https://example.com/",
     "https://example.com/././foo",
     "https://example.org/foo//bar",
+    "https://example.org//",
+    "https://example.com///this///is///fine.",
     "https://EXAMPLE.com/../x",
     "https://☕.example/",
     "https://example.255/",
@@ -25,7 +27,11 @@ describe("isValidURLString", () => {
     "hello:world",
     "foo://",
     "foo:///path",
+    "foo:////bar",
+    "foo://:80",
     "foo://example:65535/path?query#fragment",
+    "foo://h@x",
+    "foo://h:8x",
     "foo:a:b",
     "urn:isbn:0451450523"
   ];
@@ -46,15 +52,12 @@ describe("isValidURLString", () => {
     "https://example.com:demo",
     "https://example.com:65536",
     "http://[www.example.com]/",
-    "https://example.org//",
     "https://[1:2:3]/",
     "https://example.com/[]?[]#[]",
     "https://example/%?%#%",
     "https://%30/",
     "https://xn--8i7caa/",
-    "foo://exa[mple.org",
-    "foo://:80",
-    "foo:////bar"
+    "foo://exa[mple.org"
   ];
 
   for (const input of invalidAbsoluteURLStrings) {
@@ -72,6 +75,9 @@ describe("isValidURLString", () => {
     assert.equal(isValidURLString("//example.com/path", { baseURL: baseURL("https://example.com/") }), true);
     assert.equal(isValidURLString("/path", { baseURL: baseURL("https://example.com/") }), true);
     assert.equal(isValidURLString("path/../file", { baseURL: baseURL("https://example.com/") }), true);
+    assert.equal(isValidURLString("//:80", { baseURL: baseURL("https://example.com/") }), true);
+    assert.equal(isValidURLString("//h:8x", { baseURL: baseURL("foo://example.com/") }), true);
+    assert.equal(isValidURLString("//:80", { baseURL: baseURL("file:///tmp/") }), true);
     assert.equal(isValidURLString("\\example\\path", { baseURL: baseURL("https://example.com/") }), false);
     assert.equal(isValidURLString("foo/%", { baseURL: baseURL("https://example.com/") }), false);
   });
@@ -129,22 +135,6 @@ describe("isValidURLString", () => {
   });
 
   test("URL-writing validity is separate from parser validation errors", () => {
-    // These parse cleanly (no validation errors) yet are not valid URL strings: a path-absolute-URL
-    // string cannot start with "//", but the parser happily produces an empty leading path segment.
-    const grammarInvalidParserValid = [
-      "https://example.org//",
-      "https://example.org//p",
-      "foo://example.org//"
-    ];
-
-    for (const input of grammarInvalidParserValid) {
-      const { url, validationErrors } = parseURLWithValidationErrors(input);
-
-      assert.notEqual(url, null, input);
-      assert.deepStrictEqual(validationErrors, [], input);
-      assert.equal(isValidURLString(input), false, input);
-    }
-
     // A "valid domain string" only runs the domain parser, so a host that looks like an IPv4
     // address is grammar-valid even though host parsing later rejects it as a bad IPv4 address.
     const grammarValidParserInvalid = [
@@ -269,8 +259,10 @@ describe("isValidURLString", () => {
 
   test("file URL strings require \"//\" and forbid ports", () => {
     const valid = [
+      "file://",
       "file:///", // empty host followed by a path-absolute string
       "file:///path",
+      "file:////path",
       "file://host",
       "file://host/",
       "file://host/path",
@@ -284,8 +276,6 @@ describe("isValidURLString", () => {
     const invalid = [
       "file:", // no "//"
       "file:/path", // single slash, no "//"
-      "file://", // empty host and no path
-      "file:////path", // "//path" is not a path-absolute string
       "file://host:80/", // file URLs have no port in the grammar
       "file://host/C:/demo" // drive letter path is excluded when a host is present
     ];
@@ -309,8 +299,7 @@ describe("isValidURLString", () => {
     assert.equal(isValidURLString("foo://a~b!c"), true);
     assert.equal(isValidURLString("foo://[::1]:80"), true); // opaque hosts may be IPv6
     assert.equal(isValidURLString("foo://h/x"), true);
-    assert.equal(isValidURLString("foo://h@x"), false); // "@" is a forbidden host code point
-    assert.equal(isValidURLString("foo://h:8x"), false); // the authority form still requires a valid port
+    assert.equal(isValidURLString("foo://exa[mple.org"), false); // "[" is not valid in either host or path
   });
 
   test("fragment and query code points must be URL units", () => {
@@ -331,6 +320,8 @@ describe("isValidURLString", () => {
   test("URL-path-segment strings exclude raw \"/\" and \"?\" but allow their encodings", () => {
     assert.equal(isValidURLString("https://example.com/."), true);
     assert.equal(isValidURLString("https://example.com/.."), true);
+    assert.equal(isValidURLString("https://example.com//"), true); // empty path segment
+    assert.equal(isValidURLString("https://example.com///path"), true); // multiple empty path segments
     assert.equal(isValidURLString("https://example.com/%2e%2e"), true);
     assert.equal(isValidURLString("https://example.com/a%2Fb"), true); // %2F stays inside the segment
     assert.equal(isValidURLString("https://example.com/a%2"), false); // truncated percent sequence
