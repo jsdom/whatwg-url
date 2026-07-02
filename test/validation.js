@@ -77,19 +77,19 @@ const validationTestCases = [
   { input: "foo:////bar", validURLString: true },
   {
     input: "foo://:80",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["host-missing"],
     parserFailure: true
   },
   { input: "foo://example:65535/path?query#fragment", validURLString: true },
   {
     input: "foo://h@x",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["invalid-credentials"]
   },
   {
     input: "foo://h:8x",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["port-invalid"],
     parserFailure: true
   },
@@ -203,21 +203,21 @@ const validationTestCases = [
   {
     input: "//:80",
     base: "https://example.com/",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["host-missing"],
     parserFailure: true
   },
   {
     input: "//h:8x",
     base: "foo://example.com/",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["port-invalid"],
     parserFailure: true
   },
   {
     input: "//:80",
     base: "file:///tmp/",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["domain-to-ASCII"],
     parserFailure: true
   },
@@ -251,14 +251,14 @@ const validationTestCases = [
     parserValidationErrors: ["domain-to-ASCII"],
     parserFailure: true
   },
-  { input: "file://host/C:/demo", validURLString: false },
+  { input: "file://host/C:/demo", validURLString: true },
   {
     input: "file://c:",
     validURLString: false,
     parserValidationErrors: ["file-invalid-Windows-drive-letter-host"]
   },
   { input: "/C:/path", base: "file:///tmp/", validURLString: true },
-  { input: "/C:/path", base: "file://server/tmp/", validURLString: false },
+  { input: "/C:/path", base: "file://server/tmp/", validURLString: true },
   {
     input: "c|/path/to/file",
     base: "file:///c:/",
@@ -271,7 +271,7 @@ const validationTestCases = [
   {
     input: "",
     base: "foo:opaque",
-    validURLString: true,
+    validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
     parserFailure: true
   },
