@@ -35,6 +35,7 @@ const validationErrorNames = [
   "IPv4-non-numeric-part",
   "IPv4-non-decimal-part",
   "IPv4-out-of-range-part",
+  "IPv4-non-ASCII-input",
   "IPv6-unclosed",
   "IPv6-invalid-compression",
   "IPv6-too-many-pieces",
@@ -386,6 +387,31 @@ const validationTestCases = [
     validURLString: false,
     parserValidationErrors: ["IPv4-out-of-range-part"],
     parserFailure: true
+  },
+  {
+    input: "https://\u2460.\u2461.\u2462.\u2463",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-non-ASCII-input"]
+  },
+  {
+    input: "https://1\u30022\u30023\u30024",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-non-ASCII-input"]
+  },
+  {
+    input: "https://\u00B2.2.3.4",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-non-ASCII-input"]
+  },
+  {
+    input: "https://\uFF11\uFF12\uFF17.\uFF10.\uFF10.\uFF11",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-non-ASCII-input"]
+  },
+  {
+    input: "https://%E2%91%A0.%E2%91%A1.%E2%91%A2.%E2%91%A3",
+    validURLString: false,
+    parserValidationErrors: ["domain-percent-encoded", "IPv4-non-ASCII-input"]
   },
   { input: "https://exam%70le.org", validURLString: false, parserValidationErrors: ["domain-percent-encoded"] },
   { input: "https://exam%70le.org/", validURLString: false, parserValidationErrors: ["domain-percent-encoded"] },
