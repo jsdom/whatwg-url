@@ -25,6 +25,13 @@ bench.add("long input not starting or ending with control characters (GH-286)", 
   }
 });
 
+bench.add("1000 searchParams.append() calls on a URL", () => {
+  const url = new URL("https://example.com/");
+  for (let i = 0; i < 1000; i++) {
+    url.searchParams.append(`key${i}`, `value${i}`);
+  }
+});
+
 bench.run().then(() => {
   console.table(bench.table());
 });
