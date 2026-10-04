@@ -15,7 +15,7 @@
     "url": "git+https://github.com/jsdom/whatwg-url.git"
   },
   "dependencies": {
-    "@exodus/bytes": "^1.15.1",
+    "@exodus/bytes": "^1.16.0",
     "tr46": "^7.0.0",
     "webidl-conversions": "^8.0.1"
   },
@@ -24,9 +24,9 @@
     "tinybench": "^6.2.0",
     "c8": "^12.0.0",
     "esbuild": "^0.28.2",
-    "eslint": "^10.10.0",
-    "globals": "^17.12.0",
-    "webidl2js": "^21.0.0"
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "webidl2js": "^21.0.2"
   },
   "engines": {
     "node": "^22.14.0 || >=24.0.0"
