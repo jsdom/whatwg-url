@@ -4,7 +4,7 @@ whatwg-url is a full implementation of the WHATWG [URL Standard](https://url.spe
 
 ## Specification conformance
 
-whatwg-url is currently up to date with the URL spec up to commit [9dc3827](https://github.com/whatwg/url/commit/9dc3827fc722ac4af3f11061aa3e9adb44a17c8b).
+whatwg-url is currently up to date with the URL spec up to commit [fde3f74](https://github.com/whatwg/url/commit/fde3f74f063341a28d437216f75735b8b40128f5).
 
 For `file:` URLs, whose [origin is left unspecified](https://url.spec.whatwg.org/#concept-url-origin), whatwg-url chooses to use a new opaque origin (which serializes to `"null"`).
 
