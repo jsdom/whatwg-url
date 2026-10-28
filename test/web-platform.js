@@ -3,11 +3,8 @@ const { describe, before, test } = require("node:test");
 const path = require("node:path");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const assert = require("node:assert");
-const {
-  directlyRunnableTests,
-  resourceDependentTests,
-} = require("../scripts/get-latest-platform-tests.js");
+const assert = require("node:assert/strict");
+const { directlyRunnableTests, resourceDependentTests } = require("./web-platform-test-files.mjs");
 const testharness = require("./testharness.js");
 
 const { basicURLParse } = require("..");
@@ -29,7 +26,7 @@ describe("Directly-runnable web platform tests", () => {
 
 describe("Data file-based web platform tests", () => {
   before(() => {
-    assert.deepStrictEqual(
+    assert.deepEqual(
       resourceDependentTests,
       [
         "IdnaTestV2.any.js",

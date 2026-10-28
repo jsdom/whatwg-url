@@ -1,6 +1,6 @@
 "use strict";
 const test = require("node:test");
-const assert = require("node:assert");
+const assert = require("node:assert/strict");
 const { URL } = require("..");
 
 // Regression test for https://github.com/jsdom/whatwg-url/issues/315.

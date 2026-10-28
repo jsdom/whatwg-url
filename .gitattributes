@@ -1,2 +1,1 @@
-# lint requires lf line endings
-*.js text eol=lf
+* text=auto eol=lf

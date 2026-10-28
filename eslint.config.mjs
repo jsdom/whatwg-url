@@ -1,20 +1,23 @@
 import domenicConfig from "@domenic/eslint-config";
 import domenicStylisticConfig from "@domenic/eslint-config/stylistic";
 import globals from "globals";
+
 export default [
   {
     ignores: [
-      "coverage/",
       "_site/",
-      "test/web-platform-tests/",
-      "live-viewer/whatwg-url.mjs",
-      "lib/VoidFunction.js",
+      "coverage/",
       "lib/Function.js",
       "lib/URL.js",
       "lib/URLSearchParams.js",
+      "lib/VoidFunction.js",
       "lib/utils.js",
+      "live-viewer/whatwg-url.mjs",
+      "test/web-platform-tests/",
     ],
   },
+  ...domenicConfig,
+  ...domenicStylisticConfig,
   {
     files: ["**/*.js"],
     languageOptions: {
@@ -23,16 +26,20 @@ export default [
     },
   },
   {
+    files: ["**/*.mjs"],
+    ignores: ["live-viewer/**"],
+    languageOptions: {
+      globals: globals.nodeBuiltin,
+    },
+  },
+  {
     files: ["live-viewer/**.mjs"],
     languageOptions: {
-      sourceType: "module",
       globals: globals.browser,
     },
   },
-  ...domenicConfig,
-  ...domenicStylisticConfig,
   {
-    files: ["scripts/**.js"],
+    files: ["scripts/**/*.mjs"],
     rules: {
       "no-console": "off",
     },

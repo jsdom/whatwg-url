@@ -791,7 +791,7 @@ describe("URL validation", () => {
       }
     }
 
-    assert.deepStrictEqual([...coveredErrors].sort(), validationErrorNames.toSorted());
+    assert.deepEqual([...coveredErrors].sort(), validationErrorNames.toSorted());
   });
 
   for (const testCase of validationTestCases) {
@@ -803,7 +803,7 @@ describe("URL validation", () => {
       const { url, validationErrors } = parseURLWithValidationErrors(testCase.input, options);
 
       assert.equal(url === null, testCase.parserFailure === true, "parser failure result");
-      assert.deepStrictEqual(validationErrors, testCase.parserValidationErrors ?? []);
+      assert.deepEqual(validationErrors, testCase.parserValidationErrors ?? []);
     });
   }
 
@@ -811,7 +811,7 @@ describe("URL validation", () => {
     const { url, validationErrors } = parseURLWithValidationErrors(" https://user@example.org/%s ");
 
     assert.notEqual(url, null);
-    assert.deepStrictEqual(validationErrors, [
+    assert.deepEqual(validationErrors, [
       "invalid-URL-unit",
       "invalid-credentials",
       "invalid-URL-unit",

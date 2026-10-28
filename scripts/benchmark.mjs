@@ -1,11 +1,11 @@
-"use strict";
-const { Bench } = require("tinybench");
-const { URL } = require("../");
+import { Bench } from "tinybench";
 
-const testData = require("../test/web-platform-tests/resources/urltestdata.json");
+import { URL } from "../index.js";
+import testData from "../test/web-platform-tests/resources/urltestdata.json" with { type: "json" };
+
 const testInputs = testData.filter((c) => typeof c === "object").map((c) => c.input);
 
-const bench = new Bench();
+const bench = new Bench({ throws: true });
 
 bench.add("URL constructor with WPT data", () => {
   for (const input of testInputs) {
@@ -25,6 +25,5 @@ bench.add("long input not starting or ending with control characters (GH-286)", 
   }
 });
 
-bench.run().then(() => {
-  console.table(bench.table());
-});
+await bench.run();
+console.table(bench.table());
