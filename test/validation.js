@@ -56,7 +56,7 @@ const validationErrorNames = [
   "port-out-of-range",
   "port-invalid",
   "file-invalid-Windows-drive-letter",
-  "file-invalid-Windows-drive-letter-host"
+  "file-invalid-Windows-drive-letter-host",
 ];
 
 const validationTestCases = [
@@ -80,24 +80,28 @@ const validationTestCases = [
     input: "foo://:80",
     validURLString: false,
     parserValidationErrors: ["host-missing"],
-    parserFailure: true
+    parserFailure: true,
   },
   { input: "foo://example:65535/path?query#fragment", validURLString: true },
   {
     input: "foo://h@x",
     validURLString: false,
-    parserValidationErrors: ["invalid-credentials"]
+    parserValidationErrors: ["invalid-credentials"],
   },
   {
     input: "foo://h:8x",
     validURLString: false,
     parserValidationErrors: ["port-invalid"],
-    parserFailure: true
+    parserFailure: true,
   },
   { input: "foo:a:b", validURLString: true },
   { input: "urn:isbn:0451450523", validURLString: true },
 
-  { input: "https:example.org", validURLString: false, parserValidationErrors: ["special-scheme-missing-following-solidus"] },
+  {
+    input: "https:example.org",
+    validURLString: false,
+    parserValidationErrors: ["special-scheme-missing-following-solidus"],
+  },
   {
     input: "https://////example.com///",
     validURLString: false,
@@ -105,48 +109,60 @@ const validationTestCases = [
       "special-scheme-missing-following-solidus",
       "special-scheme-missing-following-solidus",
       "special-scheme-missing-following-solidus",
-      "special-scheme-missing-following-solidus"
-    ]
+      "special-scheme-missing-following-solidus",
+    ],
   },
   { input: "file:///C|/demo", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://user:password@example.org/", validURLString: false, parserValidationErrors: ["invalid-credentials"] },
-  { input: "https://user@example.org", validURLString: false, parserValidationErrors: ["invalid-credentials"] },
-  { input: "https://example.org/foo bar", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
+  {
+    input: "https://user:password@example.org/",
+    validURLString: false,
+    parserValidationErrors: ["invalid-credentials"],
+  },
+  {
+    input: "https://user@example.org",
+    validURLString: false,
+    parserValidationErrors: ["invalid-credentials"],
+  },
+  {
+    input: "https://example.org/foo bar",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
   {
     input: "https://ex ample.org/",
     validURLString: false,
     parserValidationErrors: ["domain-to-ASCII"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.com:demo",
     validURLString: false,
     parserValidationErrors: ["port-invalid"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.com:65536",
     validURLString: false,
     parserValidationErrors: ["port-out-of-range"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "http://[www.example.com]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "http://[v7.a]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-few-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.com/[]?[]#[]",
@@ -157,37 +173,41 @@ const validationTestCases = [
       "invalid-URL-unit",
       "invalid-URL-unit",
       "invalid-URL-unit",
-      "invalid-URL-unit"
-    ]
+      "invalid-URL-unit",
+    ],
   },
   {
     input: "https://example/%?%#%",
     validURLString: false,
-    parserValidationErrors: ["invalid-URL-unit", "invalid-URL-unit", "invalid-URL-unit"]
+    parserValidationErrors: ["invalid-URL-unit", "invalid-URL-unit", "invalid-URL-unit"],
   },
   {
     input: "https://%30/",
     validURLString: false,
-    parserValidationErrors: ["domain-percent-encoded", "IPv4-too-few-parts"]
+    parserValidationErrors: ["domain-percent-encoded", "IPv4-too-few-parts"],
   },
   {
     input: "https://#fragment",
     validURLString: false,
     parserValidationErrors: ["host-missing"],
-    parserFailure: true
+    parserFailure: true,
   },
-  { input: "https://xn--8i7caa/", validURLString: false, parserValidationErrors: ["domain-to-ASCII"] },
+  {
+    input: "https://xn--8i7caa/",
+    validURLString: false,
+    parserValidationErrors: ["domain-to-ASCII"],
+  },
   {
     input: "https://\u200D.example/",
     validURLString: false,
     parserValidationErrors: ["domain-to-ASCII"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "foo://exa[mple.org",
     validURLString: false,
     parserValidationErrors: ["host-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
 
   // Relative URL strings.
@@ -195,7 +215,7 @@ const validationTestCases = [
     input: "example",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
   { input: "example", base: "https://example.com/demo", validURLString: true },
   { input: "//example.com/path", base: "https://example.com/", validURLString: true },
@@ -206,33 +226,33 @@ const validationTestCases = [
     base: "https://example.com/",
     validURLString: false,
     parserValidationErrors: ["host-missing"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "//h:8x",
     base: "foo://example.com/",
     validURLString: false,
     parserValidationErrors: ["port-invalid"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "//:80",
     base: "file:///tmp/",
     validURLString: false,
     parserValidationErrors: ["domain-to-ASCII"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "\\example\\path",
     base: "https://example.com/",
     validURLString: false,
-    parserValidationErrors: ["invalid-reverse-solidus", "invalid-reverse-solidus"]
+    parserValidationErrors: ["invalid-reverse-solidus", "invalid-reverse-solidus"],
   },
   {
     input: "foo/%",
     base: "https://example.com/",
     validURLString: false,
-    parserValidationErrors: ["invalid-URL-unit"]
+    parserValidationErrors: ["invalid-URL-unit"],
   },
 
   // File URL strings.
@@ -244,19 +264,27 @@ const validationTestCases = [
   { input: "file://host/", validURLString: true },
   { input: "file://host/path", validURLString: true },
   { input: "file://host/C:", validURLString: true },
-  { input: "file:", validURLString: false, parserValidationErrors: ["special-scheme-missing-following-solidus"] },
-  { input: "file:/path", validURLString: false, parserValidationErrors: ["special-scheme-missing-following-solidus"] },
+  {
+    input: "file:",
+    validURLString: false,
+    parserValidationErrors: ["special-scheme-missing-following-solidus"],
+  },
+  {
+    input: "file:/path",
+    validURLString: false,
+    parserValidationErrors: ["special-scheme-missing-following-solidus"],
+  },
   {
     input: "file://host:80/",
     validURLString: false,
     parserValidationErrors: ["domain-to-ASCII"],
-    parserFailure: true
+    parserFailure: true,
   },
   { input: "file://host/C:/demo", validURLString: true },
   {
     input: "file://c:",
     validURLString: false,
-    parserValidationErrors: ["file-invalid-Windows-drive-letter-host"]
+    parserValidationErrors: ["file-invalid-Windows-drive-letter-host"],
   },
   { input: "/C:/path", base: "file:///tmp/", validURLString: true },
   { input: "/C:/path", base: "file://server/tmp/", validURLString: true },
@@ -264,7 +292,7 @@ const validationTestCases = [
     input: "c|/path/to/file",
     base: "file:///c:/",
     validURLString: false,
-    parserValidationErrors: ["file-invalid-Windows-drive-letter", "invalid-URL-unit"]
+    parserValidationErrors: ["file-invalid-Windows-drive-letter", "invalid-URL-unit"],
   },
   { input: "../path", base: "file://server/tmp/", validURLString: true },
 
@@ -274,7 +302,7 @@ const validationTestCases = [
     base: "foo:opaque",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
   { input: "#frag", base: "foo:opaque", validURLString: true },
   { input: "#frag%25", base: "foo:opaque", validURLString: true },
@@ -282,42 +310,42 @@ const validationTestCases = [
     input: "#frag%",
     base: "foo:opaque",
     validURLString: false,
-    parserValidationErrors: ["invalid-URL-unit"]
+    parserValidationErrors: ["invalid-URL-unit"],
   },
   {
     input: "?query",
     base: "foo:opaque",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "a/b",
     base: "foo:opaque",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "/p",
     base: "foo:opaque",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "_dmarc.x",
     base: "foo:opaque",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "//example/path",
     base: "foo:opaque",
     validURLString: false,
     parserValidationErrors: ["missing-scheme-non-relative-URL"],
-    parserFailure: true
+    parserFailure: true,
   },
 
   // Query and fragment strings.
@@ -326,104 +354,162 @@ const validationTestCases = [
     input: "?q=%#fragment",
     base: "https://example.com/",
     validURLString: false,
-    parserValidationErrors: ["invalid-URL-unit"]
+    parserValidationErrors: ["invalid-URL-unit"],
   },
   { input: "?q#frag%25", base: "https://example.com/", validURLString: true },
   {
     input: "?q#frag%",
     base: "https://example.com/",
     validURLString: false,
-    parserValidationErrors: ["invalid-URL-unit"]
+    parserValidationErrors: ["invalid-URL-unit"],
   },
   { input: "https://example.com/#\u00A0", validURLString: true },
   { input: "https://example.com/#\u{1F600}", validURLString: true },
   { input: "https://example.com/#\u{10FFFD}", validURLString: true },
-  { input: "https://example.com/#\u009F", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/#\u007F", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/#\uFDD0", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/#\uFFFF", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/#\u{10FFFF}", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/#\uD800", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
+  {
+    input: "https://example.com/#\u009F",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/#\u007F",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/#\uFDD0",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/#\uFFFF",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/#\u{10FFFF}",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/#\uD800",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
 
   // Host strings.
   {
     input: "https://example.255/",
     validURLString: false,
     parserValidationErrors: ["IPv4-too-few-parts", "IPv4-non-numeric-part"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.1/",
     validURLString: false,
     parserValidationErrors: ["IPv4-too-few-parts", "IPv4-non-numeric-part"],
-    parserFailure: true
+    parserFailure: true,
   },
-  { input: "https://1.2.3/", validURLString: false, parserValidationErrors: ["IPv4-too-few-parts"] },
-  { input: "https://1.2.3.4.5/", validURLString: false, parserValidationErrors: ["IPv4-too-many-parts"], parserFailure: true },
-  { input: "https://256.1.1.1/", validURLString: false, parserValidationErrors: ["IPv4-out-of-range-part"], parserFailure: true },
+  {
+    input: "https://1.2.3/",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-too-few-parts"],
+  },
+  {
+    input: "https://1.2.3.4.5/",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-too-many-parts"],
+    parserFailure: true,
+  },
+  {
+    input: "https://256.1.1.1/",
+    validURLString: false,
+    parserValidationErrors: ["IPv4-out-of-range-part"],
+    parserFailure: true,
+  },
   {
     input: "https://0x1/",
     validURLString: false,
-    parserValidationErrors: ["IPv4-too-few-parts", "IPv4-non-decimal-part"]
+    parserValidationErrors: ["IPv4-too-few-parts", "IPv4-non-decimal-part"],
   },
   {
     input: "https://127.0.0.1./",
     validURLString: false,
-    parserValidationErrors: ["domain-to-ASCII", "IPv4-empty-part"]
+    parserValidationErrors: ["domain-to-ASCII", "IPv4-empty-part"],
   },
   {
     input: "https://test.42",
     validURLString: false,
     parserValidationErrors: ["IPv4-too-few-parts", "IPv4-non-numeric-part"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://127.0.0x0.1",
     validURLString: false,
-    parserValidationErrors: ["IPv4-non-decimal-part"]
+    parserValidationErrors: ["IPv4-non-decimal-part"],
   },
   {
     input: "https://255.255.4000.1",
     validURLString: false,
     parserValidationErrors: ["IPv4-out-of-range-part"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://\u2460.\u2461.\u2462.\u2463",
     validURLString: false,
-    parserValidationErrors: ["IPv4-non-ASCII-input"]
+    parserValidationErrors: ["IPv4-non-ASCII-input"],
   },
   {
     input: "https://1\u30022\u30023\u30024",
     validURLString: false,
-    parserValidationErrors: ["IPv4-non-ASCII-input"]
+    parserValidationErrors: ["IPv4-non-ASCII-input"],
   },
   {
     input: "https://\u00B2.2.3.4",
     validURLString: false,
-    parserValidationErrors: ["IPv4-non-ASCII-input"]
+    parserValidationErrors: ["IPv4-non-ASCII-input"],
   },
   {
     input: "https://\uFF11\uFF12\uFF17.\uFF10.\uFF10.\uFF11",
     validURLString: false,
-    parserValidationErrors: ["IPv4-non-ASCII-input"]
+    parserValidationErrors: ["IPv4-non-ASCII-input"],
   },
   {
     input: "https://%E2%91%A0.%E2%91%A1.%E2%91%A2.%E2%91%A3",
     validURLString: false,
-    parserValidationErrors: ["domain-percent-encoded", "IPv4-non-ASCII-input"]
+    parserValidationErrors: ["domain-percent-encoded", "IPv4-non-ASCII-input"],
   },
-  { input: "https://exam%70le.org", validURLString: false, parserValidationErrors: ["domain-percent-encoded"] },
-  { input: "https://exam%70le.org/", validURLString: false, parserValidationErrors: ["domain-percent-encoded"] },
+  {
+    input: "https://exam%70le.org",
+    validURLString: false,
+    parserValidationErrors: ["domain-percent-encoded"],
+  },
+  {
+    input: "https://exam%70le.org/",
+    validURLString: false,
+    parserValidationErrors: ["domain-percent-encoded"],
+  },
   {
     input: "https://exa%23mple.org",
     validURLString: false,
     parserValidationErrors: ["domain-percent-encoded", "domain-to-ASCII"],
-    parserFailure: true
+    parserFailure: true,
   },
-  { input: "https://_dmarc.example.com", validURLString: false, parserValidationErrors: ["domain-to-ASCII"] },
-  { input: "https://_dmarc.example.com/", validURLString: false, parserValidationErrors: ["domain-to-ASCII"] },
-  { input: "https://example.com./", validURLString: false, parserValidationErrors: ["domain-to-ASCII"] },
+  {
+    input: "https://_dmarc.example.com",
+    validURLString: false,
+    parserValidationErrors: ["domain-to-ASCII"],
+  },
+  {
+    input: "https://_dmarc.example.com/",
+    validURLString: false,
+    parserValidationErrors: ["domain-to-ASCII"],
+  },
+  {
+    input: "https://example.com./",
+    validURLString: false,
+    parserValidationErrors: ["domain-to-ASCII"],
+  },
   { input: "https://a_b.com/", validURLString: false, parserValidationErrors: ["domain-to-ASCII"] },
   { input: "https://a-.com/", validURLString: false, parserValidationErrors: ["domain-to-ASCII"] },
 
@@ -451,159 +537,171 @@ const validationTestCases = [
     input: "https://[::1",
     validURLString: false,
     parserValidationErrors: ["IPv6-unclosed"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3:4:5:6:7]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-few-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3:4:5:6:7:8:9]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-many-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3:4:5:6:7:8:9]",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-many-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1::2::3]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-multiple-compression"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1::1::1]",
     validURLString: false,
     parserValidationErrors: ["IPv6-multiple-compression"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3:4:5:6:7::8]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-many-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[12345::]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3!:4]",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
-  { input: "https://[0DB8::1]/", validURLString: false, parserValidationErrors: ["IPv6-piece-leading-zero"] },
+  {
+    input: "https://[0DB8::1]/",
+    validURLString: false,
+    parserValidationErrors: ["IPv6-piece-leading-zero"],
+  },
   {
     input: "https://[0DB8:0:0:0:0:0:0:1]/",
     validURLString: false,
-    parserValidationErrors: ["IPv6-piece-leading-zero"]
+    parserValidationErrors: ["IPv6-piece-leading-zero"],
   },
-  { input: "https://[::01]/", validURLString: false, parserValidationErrors: ["IPv6-piece-leading-zero"] },
-  { input: "https://[::01]", validURLString: false, parserValidationErrors: ["IPv6-piece-leading-zero"] },
+  {
+    input: "https://[::01]/",
+    validURLString: false,
+    parserValidationErrors: ["IPv6-piece-leading-zero"],
+  },
+  {
+    input: "https://[::01]",
+    validURLString: false,
+    parserValidationErrors: ["IPv6-piece-leading-zero"],
+  },
   {
     input: "https://[:1]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-compression"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[:1]",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-compression"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3]",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-few-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[::ffff:192.168.000.1]/",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[ffff::127.00.0.1]",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[::ffff:192.168.0.256]/",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-out-of-range-part"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[ffff::127.0.0.4000]",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-out-of-range-part"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[::ffff:192.168.0]/",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-too-few-parts"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[ffff::127.0.0]",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-too-few-parts"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[192.168.0.1]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-few-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3:4:5:6:7:1.2.3.4]/",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-too-many-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:1:1:1:1:1:1:127.0.0.1]",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-too-many-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[1:2:3:4:5:6:7:8::]/",
     validURLString: false,
     parserValidationErrors: ["IPv6-too-many-pieces"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[::13.1.068.3]/",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://[::1.2.3.4.5]/",
     validURLString: false,
     parserValidationErrors: ["IPv4-in-IPv6-invalid-code-point"],
-    parserFailure: true
+    parserFailure: true,
   },
 
   // Port strings.
@@ -615,25 +713,25 @@ const validationTestCases = [
     input: "https://example.com:65536/",
     validURLString: false,
     parserValidationErrors: ["port-out-of-range"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.org:70000",
     validURLString: false,
     parserValidationErrors: ["port-out-of-range"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.com:8x/",
     validURLString: false,
     parserValidationErrors: ["port-invalid"],
-    parserFailure: true
+    parserFailure: true,
   },
   {
     input: "https://example.org:7z",
     validURLString: false,
     parserValidationErrors: ["port-invalid"],
-    parserFailure: true
+    parserFailure: true,
   },
 
   // Opaque host strings.
@@ -649,15 +747,39 @@ const validationTestCases = [
   { input: "https://example.com///path", validURLString: true },
   { input: "https://example.com/%2e%2e", validURLString: true },
   { input: "https://example.com/a%2Fb", validURLString: true },
-  { input: "https://example.com/a%2", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/a%2g", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.org/>", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.org/%s", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
-  { input: "https://example.com/a\\b", validURLString: false, parserValidationErrors: ["invalid-reverse-solidus"] },
-  { input: "https://example.org\\", validURLString: false, parserValidationErrors: ["invalid-reverse-solidus"] },
+  {
+    input: "https://example.com/a%2",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/a%2g",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.org/>",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.org/%s",
+    validURLString: false,
+    parserValidationErrors: ["invalid-URL-unit"],
+  },
+  {
+    input: "https://example.com/a\\b",
+    validURLString: false,
+    parserValidationErrors: ["invalid-reverse-solidus"],
+  },
+  {
+    input: "https://example.org\\",
+    validURLString: false,
+    parserValidationErrors: ["invalid-reverse-solidus"],
+  },
 
   // Opaque path strings.
-  { input: "foo:bar baz", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] }
+  { input: "foo:bar baz", validURLString: false, parserValidationErrors: ["invalid-URL-unit"] },
 ];
 
 describe("URL validation", () => {
@@ -692,7 +814,7 @@ describe("URL validation", () => {
     assert.deepStrictEqual(validationErrors, [
       "invalid-URL-unit",
       "invalid-credentials",
-      "invalid-URL-unit"
+      "invalid-URL-unit",
     ]);
   });
 });

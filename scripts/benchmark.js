@@ -3,7 +3,7 @@ const { Bench } = require("tinybench");
 const { URL } = require("../");
 
 const testData = require("../test/web-platform-tests/resources/urltestdata.json");
-const testInputs = testData.filter(c => typeof c === "object").map(c => c.input);
+const testInputs = testData.filter((c) => typeof c === "object").map((c) => c.input);
 
 const bench = new Bench();
 

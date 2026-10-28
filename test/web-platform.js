@@ -4,7 +4,10 @@ const path = require("node:path");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const assert = require("node:assert");
-const { directlyRunnableTests, resourceDependentTests } = require("../scripts/get-latest-platform-tests.js");
+const {
+  directlyRunnableTests,
+  resourceDependentTests,
+} = require("../scripts/get-latest-platform-tests.js");
 const testharness = require("./testharness.js");
 
 const { basicURLParse } = require("..");
@@ -33,31 +36,31 @@ describe("Data file-based web platform tests", () => {
         "IdnaTestV2-removed.any.js",
         "url-constructor.any.js",
         "url-origin.any.js",
-        "url-setters.any.js"
+        "url-setters.any.js",
       ],
-      "The list of resource-dependent tests should be updated if new tests are added"
+      "The list of resource-dependent tests should be updated if new tests are added",
     );
   });
 
-  runWPT("IdnaTestV2.any.js", sandbox => {
+  runWPT("IdnaTestV2.any.js", (sandbox) => {
     sandbox.runTests(idnaTestV2Data);
   });
 
-  runWPT("IdnaTestV2-removed.any.js", sandbox => {
+  runWPT("IdnaTestV2-removed.any.js", (sandbox) => {
     sandbox.runTests(idnaTestV2RemovedData);
   });
 
-  runWPT("url-constructor.any.js", sandbox => {
+  runWPT("url-constructor.any.js", (sandbox) => {
     sandbox.runURLTests(urlTestData);
     sandbox.runURLTests(urlTestDataJavaScriptOnly);
   });
 
-  runWPT("url-origin.any.js", sandbox => {
+  runWPT("url-origin.any.js", (sandbox) => {
     sandbox.runURLTests(urlTestData);
     sandbox.runURLTests(urlTestDataJavaScriptOnly);
   });
 
-  runWPT("url-setters.any.js", sandbox => {
+  runWPT("url-setters.any.js", (sandbox) => {
     sandbox.runURLSettersTests(settersData);
   });
 });
@@ -105,7 +108,7 @@ describe("Manually recreated web platform tests", () => {
           // a URL with that document's encoding. We use basicURLParse with the encoding option.
           const url = basicURLParse(
             `https://doesnotmatter.invalid/?${testUnit.input}#${testUnit.input}`,
-            { encoding }
+            { encoding },
           );
 
           // Test that the fragment is always UTF-8 encoded
@@ -171,12 +174,12 @@ function runWPT(testFile, extraAction = () => {}) {
       URLSearchParams,
       DOMException,
       fetch: fakeFetch,
-      ...testharness
+      ...testharness,
     });
 
     vm.runInContext(code, sandbox, {
       filename: testFile,
-      displayErrors: true
+      displayErrors: true,
     });
 
     extraAction(sandbox);
@@ -188,6 +191,6 @@ function fakeFetch(url) {
   return Promise.resolve({
     json() {
       return fs.promises.readFile(filePath, { encoding: "utf-8" }).then(JSON.parse);
-    }
+    },
   });
 }

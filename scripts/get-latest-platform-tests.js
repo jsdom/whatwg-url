@@ -26,7 +26,7 @@ const resources = [
   "resources/urltestdata.json",
   "resources/urltestdata-javascript-only.json",
   "resources/IdnaTestV2.json",
-  "resources/IdnaTestV2-removed.json"
+  "resources/IdnaTestV2-removed.json",
 ];
 
 // These tests we can download and run directly in /test/web-platform.js.
@@ -47,7 +47,7 @@ exports.directlyRunnableTests = [
   "urlsearchparams-set.any.js",
   "urlsearchparams-size.any.js",
   "urlsearchparams-sort.any.js",
-  "urlsearchparams-stringifier.any.js"
+  "urlsearchparams-stringifier.any.js",
 ];
 
 // These tests need some special handling in /test/web-platform.js, since they need to be hooked up to their resource
@@ -58,7 +58,7 @@ exports.resourceDependentTests = [
   "IdnaTestV2-removed.any.js",
   "url-constructor.any.js",
   "url-origin.any.js",
-  "url-setters.any.js"
+  "url-setters.any.js",
 ];
 
 // These tests need their logic duplicated in /test/web-platform.js, because we can't easly shim them. They are not
@@ -68,7 +68,7 @@ exports.resourceDependentTests = [
 // - toascii.window.js
 
 if (require.main === module) {
-  main().catch(e => {
+  main().catch((e) => {
     console.error(e);
     process.exit(1);
   });
@@ -79,14 +79,11 @@ async function main() {
   await fs.mkdir(path.resolve(targetDir, "resources"), { recursive: true });
 
   await Promise.all(
-    [
-      ...resources,
-      ...exports.directlyRunnableTests,
-      ...exports.resourceDependentTests
-    ]
-      .map(async file => {
+    [...resources, ...exports.directlyRunnableTests, ...exports.resourceDependentTests].map(
+      async (file) => {
         const res = await fetch(`${urlPrefix}${file}`);
         await fs.writeFile(path.resolve(targetDir, file), res.body);
-      })
+      },
+    ),
   );
 }

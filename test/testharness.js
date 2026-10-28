@@ -49,5 +49,5 @@ module.exports = {
   subsetTestByKey(key, testRunnerFunc, func, name) {
     // Don't do any keying stuff.
     testRunnerFunc(func, name);
-  }
+  },
 };

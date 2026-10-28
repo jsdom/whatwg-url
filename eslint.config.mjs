@@ -1,4 +1,5 @@
 import domenicConfig from "@domenic/eslint-config";
+import domenicStylisticConfig from "@domenic/eslint-config/stylistic";
 import globals from "globals";
 export default [
   {
@@ -11,28 +12,29 @@ export default [
       "lib/Function.js",
       "lib/URL.js",
       "lib/URLSearchParams.js",
-      "lib/utils.js"
-    ]
+      "lib/utils.js",
+    ],
   },
   {
     files: ["**/*.js"],
     languageOptions: {
       sourceType: "commonjs",
-      globals: globals.node
-    }
+      globals: globals.node,
+    },
   },
   {
     files: ["live-viewer/**.mjs"],
     languageOptions: {
       sourceType: "module",
-      globals: globals.browser
-    }
+      globals: globals.browser,
+    },
   },
   ...domenicConfig,
+  ...domenicStylisticConfig,
   {
     files: ["scripts/**.js"],
     rules: {
-      "no-console": "off"
-    }
-  }
+      "no-console": "off",
+    },
+  },
 ];

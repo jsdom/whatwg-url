@@ -21,7 +21,7 @@ const components = [
   "pathname",
   "search",
   "hash",
-  "origin"
+  "origin",
 ];
 
 inputEl.addEventListener("input", updateEscaped);
@@ -93,14 +93,15 @@ function setValidationErrors(result, hasParseError) {
   const headingEl = validationErrorsEl.querySelector("h3");
   const listEl = validationErrorsEl.querySelector("ol");
   const { validationErrors } = result;
-  const showURLStringValidityNote = !result.isUnavailable && result.isValidURLString !== result.isParserValid;
+  const showURLStringValidityNote =
+    !result.isUnavailable && result.isValidURLString !== result.isParserValid;
 
   validationErrorsEl.parentElement.classList.toggle("has-parse-error", hasParseError);
   validationErrorsEl.classList.toggle("has-parse-error", hasParseError);
   validationErrorsEl.classList.toggle("unavailable", result.isUnavailable);
   validationErrorsEl.classList.toggle(
     "valid",
-    validationErrors.length === 0 && result.isValidURLString === true && !hasParseError
+    validationErrors.length === 0 && result.isValidURLString === true && !hasParseError,
   );
   urlStringValidityEl.classList.toggle("pass", result.isValidURLString === true);
   urlStringValidityEl.classList.toggle("fail", result.isValidURLString === false);
@@ -159,7 +160,12 @@ function getJsdomValidationResult() {
   const baseURL = whatwgURL.parseURL(baseEl.value);
 
   if (baseURL === null) {
-    return { validationErrors: [], isValidURLString: null, isParserValid: null, isUnavailable: true };
+    return {
+      validationErrors: [],
+      isValidURLString: null,
+      isParserValid: null,
+      isUnavailable: true,
+    };
   }
 
   const result = whatwgURL.parseURLWithValidationErrors(inputEl.value, { baseURL });
@@ -168,7 +174,7 @@ function getJsdomValidationResult() {
     validationErrors: result.validationErrors,
     isValidURLString: whatwgURL.isValidURLString(inputEl.value, { baseURL }),
     isParserValid: result.url !== null && result.validationErrors.length === 0,
-    isUnavailable: false
+    isUnavailable: false,
   };
 }
 
@@ -177,7 +183,7 @@ function updateFragmentForSharing() {
   history.replaceState(
     undefined,
     "",
-    `#url=${encodeToBase64(inputEl.value)}&base=${encodeToBase64(baseEl.value)}`
+    `#url=${encodeToBase64(inputEl.value)}&base=${encodeToBase64(baseEl.value)}`,
   );
 }
 
@@ -210,38 +216,31 @@ function setFromFragment() {
 // the live viewer which used btoa / atob directly.
 function encodeToBase64(originalString) {
   const bytes = te.encode(originalString);
-  const byteString = Array.from(bytes, byte => String.fromCharCode(byte)).join("");
+  const byteString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
   const encoded = btoa(byteString);
   return encoded;
 }
 
 function decodeFromBase64(encoded) {
   const byteString = atob(encoded);
-  const bytes = Uint8Array.from(byteString, char => char.charCodeAt(0));
+  const bytes = Uint8Array.from(byteString, (char) => char.charCodeAt(0));
   const originalString = td.decode(bytes);
   return originalString;
 }
 
 function escape(rawString) {
   return rawString
+    .replaceAll("\\u", "\\\\u")
     .replaceAll(
-      "\\u",
-      "\\\\u"
-    )
-    .replaceAll(
-      /[^\u{0021}-\u{007E}]/ug,
-      c => `\\u{${c.codePointAt(0).toString(16).padStart(4, "0")}}`
+      /[^\u{0021}-\u{007E}]/gu,
+      (c) => `\\u{${c.codePointAt(0).toString(16).padStart(4, "0")}}`,
     );
 }
 
 function unescape(escapedString) {
   return escapedString
-    .replaceAll(
-      /(?<!\\)\\u\{([0-9a-fA-F]+)\}/ug,
-      (_, c) => String.fromCodePoint(Number.parseInt(c, 16))
+    .replaceAll(/(?<!\\)\\u\{([0-9a-fA-F]+)\}/gu, (_, c) =>
+      String.fromCodePoint(Number.parseInt(c, 16)),
     )
-    .replaceAll(
-      "\\\\u",
-      "\\u"
-    );
+    .replaceAll("\\\\u", "\\u");
 }
