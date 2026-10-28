@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   id-token: write
@@ -19,6 +19,6 @@ jobs:
           node-version: lts/*
           registry-url: https://registry.npmjs.org
       - run: npm ci
-      - run: npm run lint
+      - run: npm run check
       - run: npm test
       - run: npm publish

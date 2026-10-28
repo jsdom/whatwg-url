@@ -1,5 +1,5 @@
 :root {
-  --monospace-font: 'Bitstream Vera Sans Mono', 'Andale Mono', 'Lucida Console', monospace, fixed;
+  --monospace-font: "Bitstream Vera Sans Mono", "Andale Mono", "Lucida Console", monospace, fixed;
   --output-width: 95%;
   --error-color: rgb(220 20 60);
   --pass-color: rgb(0 128 0);
@@ -17,7 +17,12 @@ body {
   margin: 12px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-style: italic;
   color: rgb(0 0 139);
   margin-bottom: 0.2em;
@@ -27,7 +32,11 @@ h1 {
   margin-top: 0;
 }
 
-h2, h3, h4, h5, h6 {
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-top: 1em;
 }
 
@@ -186,9 +195,9 @@ samp {
 }
 
 aside {
-  border-left: .25rem solid var(--unavailable-color);
+  border-left: 0.25rem solid var(--unavailable-color);
 
   p {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

@@ -1,57 +1,112 @@
 <!doctype html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Live URL Viewer</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css" />
 <script>
-"use strict";
-// Stub out SharedArrayBuffer so that the whatwg-url module can load in browsers despite lack of cross-origin isolation.
-globalThis.SharedArrayBuffer = class {
-  get byteLength() { return 0; }
-  get growable() { return false; }
-};
+  "use strict";
+  // Stub out SharedArrayBuffer so that the whatwg-url module can load in browsers despite lack of cross-origin isolation.
+  globalThis.SharedArrayBuffer = class {
+    get byteLength() {
+      return 0;
+    }
+    get growable() {
+      return false;
+    }
+  };
 </script>
 <script type="module" src="live-viewer.mjs"></script>
 
 <h1>Live URL Viewer</h1>
 
-<p>The output below will display a URL's parsed components from the browser versus those given by <a href="https://github.com/jsdom/whatwg-url">jsdom/whatwg-url</a>.
+<p>
+  The output below will display a URL's parsed components from the browser versus those given by
+  <a href="https://github.com/jsdom/whatwg-url">jsdom/whatwg-url</a>.
+</p>
 
-<p>jsdom/whatwg-url closely follows the <a href="http://url.spec.whatwg.org/">URL Standard</a> and the associated <a href="https://github.com/w3c/web-platform-tests/tree/master/url">web-platform-tests</a>, so this
-serves as a good comparison versus the standard itself.
+<p>
+  jsdom/whatwg-url closely follows the <a href="http://url.spec.whatwg.org/">URL Standard</a> and
+  the associated
+  <a href="https://github.com/w3c/web-platform-tests/tree/master/url">web-platform-tests</a>, so
+  this serves as a good comparison versus the standard itself.
+</p>
 
-<p>The output will be colored <span class="pass">dark green</span> unless a difference occurs between the two parsers in which case the affected URL component will be colored <span class="fail">red</span>.
+<p>
+  The output will be colored <span class="pass">dark green</span> unless a difference occurs between
+  the two parsers in which case the affected URL component will be colored
+  <span class="fail">red</span>.
+</p>
 
 <form>
   <label for="input">Input:</label>
-  <input id="input" value="https://example.com/" autofocus>
+  <input id="input" value="https://example.com/" autofocus />
 
   <label for="input-escaped">Input with escapes:</label>
-  <input id="input-escaped" value="https://example.com/">
+  <input id="input-escaped" value="https://example.com/" />
 
   <label for="base">Base URL:</label>
-  <input id="base" value="about:blank">
+  <input id="base" value="about:blank" />
 </form>
 
 <details>
   <summary>How do I use "Input with escapes?"</summary>
 
-  <p>Most of the time, you don't need to worry about this. But if you want to test characters outside of the U+0021 (!) through U+007E (~) range, which can be harder to input or to visually distinguish, you can use this field. Any strings of the form <samp>\u{<var>number</var>}</samp> will be decoded to their corresponding Unicode code point. So for example, you could test how null characters are processed by the URL parser by using the input <samp>test:\u{0000}</samp>.
+  <p>
+    Most of the time, you don't need to worry about this. But if you want to test characters outside
+    of the U+0021 (!) through U+007E (~) range, which can be harder to input or to visually
+    distinguish, you can use this field. Any strings of the form
+    <samp>\u{<var>number</var>}</samp> will be decoded to their corresponding Unicode code point. So
+    for example, you could test how null characters are processed by the URL parser by using the
+    input <samp>test:\u{0000}</samp>.
+  </p>
 </details>
 
 <h2>Browser's URL components</h2>
 
 <table class="output" id="browser-output">
-  <tr class="href"><th>href</th><td></td></tr>
-  <tr class="protocol"><th>protocol</th><td></td></tr>
-  <tr class="username"><th>username</th><td></td></tr>
-  <tr class="password"><th>password</th><td></td></tr>
-  <tr class="host"><th>host</th><td></td></tr>
-  <tr class="port"><th>port</th><td></td></tr>
-  <tr class="hostname"><th>hostname</th><td></td></tr>
-  <tr class="pathname"><th>pathname</th><td></td></tr>
-  <tr class="search"><th>search</th><td></td></tr>
-  <tr class="hash"><th>hash</th><td></td></tr>
-  <tr class="origin"><th>origin</th><td></td></tr>
+  <tr class="href">
+    <th>href</th>
+    <td></td>
+  </tr>
+  <tr class="protocol">
+    <th>protocol</th>
+    <td></td>
+  </tr>
+  <tr class="username">
+    <th>username</th>
+    <td></td>
+  </tr>
+  <tr class="password">
+    <th>password</th>
+    <td></td>
+  </tr>
+  <tr class="host">
+    <th>host</th>
+    <td></td>
+  </tr>
+  <tr class="port">
+    <th>port</th>
+    <td></td>
+  </tr>
+  <tr class="hostname">
+    <th>hostname</th>
+    <td></td>
+  </tr>
+  <tr class="pathname">
+    <th>pathname</th>
+    <td></td>
+  </tr>
+  <tr class="search">
+    <th>search</th>
+    <td></td>
+  </tr>
+  <tr class="hash">
+    <th>hash</th>
+    <td></td>
+  </tr>
+  <tr class="origin">
+    <th>origin</th>
+    <td></td>
+  </tr>
 </table>
 
 <p class="output error" id="browser-error"></p>
@@ -60,24 +115,58 @@ serves as a good comparison versus the standard itself.
 
 <div class="jsdom-results">
   <table class="output" id="jsdom-output">
-    <tr class="href"><th>href</th><td></td></tr>
-    <tr class="protocol"><th>protocol</th><td></td></tr>
-    <tr class="username"><th>username</th><td></td></tr>
-    <tr class="password"><th>password</th><td></td></tr>
-    <tr class="host"><th>host</th><td></td></tr>
-    <tr class="port"><th>port</th><td></td></tr>
-    <tr class="hostname"><th>hostname</th><td></td></tr>
-    <tr class="pathname"><th>pathname</th><td></td></tr>
-    <tr class="search"><th>search</th><td></td></tr>
-    <tr class="hash"><th>hash</th><td></td></tr>
-    <tr class="origin"><th>origin</th><td></td></tr>
+    <tr class="href">
+      <th>href</th>
+      <td></td>
+    </tr>
+    <tr class="protocol">
+      <th>protocol</th>
+      <td></td>
+    </tr>
+    <tr class="username">
+      <th>username</th>
+      <td></td>
+    </tr>
+    <tr class="password">
+      <th>password</th>
+      <td></td>
+    </tr>
+    <tr class="host">
+      <th>host</th>
+      <td></td>
+    </tr>
+    <tr class="port">
+      <th>port</th>
+      <td></td>
+    </tr>
+    <tr class="hostname">
+      <th>hostname</th>
+      <td></td>
+    </tr>
+    <tr class="pathname">
+      <th>pathname</th>
+      <td></td>
+    </tr>
+    <tr class="search">
+      <th>search</th>
+      <td></td>
+    </tr>
+    <tr class="hash">
+      <th>hash</th>
+      <td></td>
+    </tr>
+    <tr class="origin">
+      <th>origin</th>
+      <td></td>
+    </tr>
   </table>
 
   <section class="output validation-errors" id="jsdom-validation-errors" aria-live="polite">
     <p class="parse-error" id="jsdom-error" hidden></p>
     <p class="url-string-validity"></p>
     <p class="url-string-validity-note" hidden>
-      URL string validity and parser validation disagree. See <a href="https://github.com/whatwg/url/issues/704">whatwg/url#704</a>.
+      URL string validity and parser validation disagree. See
+      <a href="https://github.com/whatwg/url/issues/704">whatwg/url#704</a>.
     </p>
     <h3></h3>
     <ol></ol>
@@ -85,7 +174,10 @@ serves as a good comparison versus the standard itself.
 </div>
 
 <aside>
-  <p>Note: <code>window.whatwgURL</code> is exposed in the browser console if you would like to play around with it there.</p>
+  <p>
+    Note: <code>window.whatwgURL</code> is exposed in the browser console if you would like to play
+    around with it there.
+  </p>
 </aside>
 
 <footer>
