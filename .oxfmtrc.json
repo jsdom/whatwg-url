@@ -1,3 +1,4 @@
 {
-  "sortImports": true
+  "sortImports": true,
+  "ignorePatterns": ["**/*.html"]
 }
