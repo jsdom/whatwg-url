@@ -1,6 +1,6 @@
 "use strict";
 const test = require("node:test");
-const assert = require("node:assert");
+const assert = require("node:assert/strict");
 
 /* eslint-disable camelcase */
 module.exports = {
@@ -18,28 +18,28 @@ module.exports = {
   },
 
   assert_true(actual) {
-    assert.strictEqual(actual, true);
+    assert.equal(actual, true);
   },
 
   assert_false(actual) {
-    assert.strictEqual(actual, false);
+    assert.equal(actual, false);
   },
 
   assert_equals(actual, expected) {
-    assert.strictEqual(actual, expected);
+    assert.equal(actual, expected);
   },
 
   assert_not_equals(actual, expected) {
-    assert.notStrictEqual(actual, expected);
+    assert.notEqual(actual, expected);
   },
 
   assert_array_equals(actual, expected) {
-    assert.deepStrictEqual([...actual], [...expected]);
+    assert.deepEqual([...actual], [...expected]);
   },
 
   assert_throws_js(errorConstructor, func) {
     // Don't pass errorConstructor itself since that brings in tricky realm issues.
-    assert.throws(func, errorConstructor.name);
+    assert.throws(func, { name: errorConstructor.name });
   },
 
   assert_unreached() {

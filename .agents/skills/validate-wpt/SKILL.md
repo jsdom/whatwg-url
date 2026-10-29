@@ -10,13 +10,13 @@ metadata:
 
 ## Overview
 
-Validate a `web-platform-tests/wpt` pull request against this repo by pinning `scripts/get-latest-platform-tests.js` to the PR head commit, running `npm test`, and restoring the script before finishing.
+Validate a `web-platform-tests/wpt` pull request against this repo by pinning `scripts/get-latest-platform-tests.mjs` to the PR head commit, running `npm test`, and restoring the script before finishing.
 
 ## Workflow
 
 1. Parse the PR number from the user-provided WPT PR URL. Strip any URL fragment such as `#event-...` or `#issuecomment-...`; accept trailing slashes.
 
-2. Confirm `scripts/get-latest-platform-tests.js` has no existing local edits before changing it. If it is already modified, do not overwrite or restore it without explicit user approval.
+2. Confirm `scripts/get-latest-platform-tests.mjs` has no existing local edits before changing it. If it is already modified, do not overwrite or restore it without explicit user approval.
 
 3. Get the PR head information with `gh`:
 
@@ -30,7 +30,7 @@ Validate a `web-platform-tests/wpt` pull request against this repo by pinning `s
    - `headRepositoryOwner.login` as the GitHub owner
    - `headRepository.name` as the GitHub repo
 
-4. Edit `scripts/get-latest-platform-tests.js`:
+4. Edit `scripts/get-latest-platform-tests.mjs`:
 
    - Replace the `commitHash` string with the PR head SHA.
    - Replace the owner and repo in `urlPrefix` so it points to the PR head repository.
@@ -56,10 +56,10 @@ Validate a `web-platform-tests/wpt` pull request against this repo by pinning `s
    - Summarize any failing tests.
    - Wrap test names, URLs, expected values, actual values, backslashes, and angle-bracketed strings in backticks so Markdown does not interpret them.
 
-7. Restore `scripts/get-latest-platform-tests.js` to its original state before finishing. If the file was clean before step 4, use:
+7. Restore `scripts/get-latest-platform-tests.mjs` to its original state before finishing. If the file was clean before step 4, use:
 
    ```sh
-   git checkout -- scripts/get-latest-platform-tests.js
+   git checkout -- scripts/get-latest-platform-tests.mjs
    ```
 
-   Confirm the restore succeeded with `git diff -- scripts/get-latest-platform-tests.js`.
+   Confirm the restore succeeded with `git diff -- scripts/get-latest-platform-tests.mjs`.
